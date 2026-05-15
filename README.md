@@ -1,42 +1,96 @@
-# AI Skills
+# Почти автономный набор skills
 
-Open beta package of portable Codex skills for SQL/data work.
+Этот репозиторий помогает агенту работать с задачами по аналитике и инженерии: понимать контекст, писать и проверять SQL, аккуратно работать с доступом к БД и честно отделять read-only доказательства от sandbox/prod действий.
 
-## Included skills
+Текущий фокус для передачи команде в open beta: `SQL + поведение агента`.
 
-- `agent-workflow-core` - task mode, planning, context, stop-points, validation wording, self-review.
-- `sql-quality-core` - engine-agnostic SQL quality rules: grain, joins, windows, category-safe metrics, proof mindset.
-- `sql-style-core` - shared SQL readability and formatting rules.
-- `clickhouse-sql` - ClickHouse-specific SQL guidance.
-- `greenplum-sql` - Greenplum-specific SQL guidance.
-- `db-access` - rules for using already configured database MCP tools safely.
+В основной beta-пакет входят:
 
-Not included in this release: internal autotest/evaluation tools, authoring standards, private task context, run logs, and local environment files.
+- `agent-workflow-core` — поведение агента, режимы, контекст, stop-points, proof-level и согласования.
+- `sql-quality-core` — общая SQL-семантика: grain, joins, окна, категории, validation mindset.
+- `sql-style-core` — общий стиль и читаемость SQL.
+- `clickhouse-sql` — ClickHouse-специфика поверх общих SQL-слоёв.
+- `greenplum-sql` — Greenplum-специфика поверх общих SQL-слоёв.
+- `db-access` — безопасная работа с уже настроенными MCP-доступами к БД.
 
-## Install
+Человеку почти ничего не нужно настраивать руками. Главное требование: в agent runtime уже должен быть настроен MCP доступ к нужным базам.
 
-For Codex-style runtimes, copy the skill folders from this repo into:
+## Что обычно вызывать
+
+- `clickhouse-sql` — если надо написать, проверить или улучшить SQL-запрос к ClickHouse.
+- `greenplum-sql` — если надо написать, проверить или улучшить SQL-запрос к Greenplum.
+
+## Что агент подтягивает сам
+
+- `agent-workflow-core` — ведёт задачу: режим, план, контекст, проверки, self-review.
+- `sql-quality-core` — общий слой качества SQL.
+- `sql-style-core` — общий слой стиля и читаемости SQL.
+- `db-access` — подключается, когда задаче нужен доступ к БД через MCP.
+
+## Что нужно заранее
+
+- Установить эти skills в agent runtime.
+- Настроить MCP database tools.
+
+Если не знаешь, как установить skills, дай агенту ссылку или папку с этим репозиторием и попроси установить skills из него.
+
+Всё остальное skills должны помочь подготовить сами.
+
+## Первый запуск
+
+Durable context включается, когда ты даёшь `task id`, явно просишь вести контекст/agent log или продолжаешь уже заведённую context-backed задачу.
+
+В такой задаче агент должен:
+
+1. Найти или предложить создать локальную папку/рабочую область `my-coding-context`.
+2. Завести в ней минимум:
+   - `context.md`
+   - `environment.md`
+   - `tasks/`
+3. Предложить заполнить `environment.md` вручную или разрешить read-only discovery, чтобы агент сам подготовил draft.
+
+Без `task id` или явного запроса на durable context агент должен работать автономно и не создавать task context сам.
+
+`environment.md` нужен, чтобы в context-backed задачах агент не искал окружение с нуля в каждом новом чате: где лежат repo, локальный контекст и рабочие контуры.
+
+Если название `my-coding-context` не подходит, можно выбрать другое. Это recommended default, а не жёсткое имя.
+
+## Быстрый старт
+
+Можно подготовить локальный контекст заранее. Открой новый чат из папки, где хочешь хранить рабочий контекст, и напиши:
 
 ```text
-$CODEX_HOME/skills/
+Используй skill: agent-workflow-core.
+
+Подготовь локальную папку контекста для рабочих задач.
 ```
 
-Or give an agent this repository URL/folder and ask:
+Агент должен создать обычную папку с основой контекста. Если он найдёт значения для `environment.md`, он должен пометить их как draft/unconfirmed и попросить подтвердить или поправить.
+
+## Быстрый старт задачи
+
+Открой новый чат из папки проекта или рабочей области и напиши задачу обычным языком. Если есть номер задачи, лучше указать его сразу:
 
 ```text
-Install skills from this repository.
+Используй skill: clickhouse-sql.
+
+Task id: DP-1234.
+
+Найди нужный SQL-контекст и предложи план проверки задачи.
 ```
 
-See `PORTABLE_SETUP.md` for a Russian quick start and expected runtime assumptions.
+Агент должен сам восстановить локальный контекст, прочитать `environment.md`, подтянуть связанные workflow/quality skills и остановиться на согласование, если задаче нужен доступ к БД, изменение общего кода или другое важное решение.
 
-## Runtime assumptions
+## Логирование
 
-- The agent runtime already has the database MCP tools configured when database access is needed.
-- The skills do not contain credentials, local task snapshots, or private paths.
-- Local task context should live outside this repository.
+Обычно агент ведёт краткий task context. Если нужен отдельный подробный ход работы, добавь в запрос:
 
-## Feedback
+```text
+Включи agent log.
+```
 
-Pull requests are welcome as feedback carriers: notes, agent logs, failed prompts, diffs, and reproducible examples.
+Тогда агент будет вести отдельный лог задачи в локальной папке контекста.
 
-The `main` branch is a locked release channel. Opening PRs is expected; merging to `main` is intentionally blocked until the release gate is changed by the maintainer.
+## Главное правило
+
+Skills не хранят личные пути, credentials и task snapshots внутри себя. Они являются переносимым ядром, а локальные детали живут в `my-coding-context`.
