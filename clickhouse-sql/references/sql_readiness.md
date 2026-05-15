@@ -127,8 +127,8 @@ Before returning a non-trivial production `SELECT`:
 - Pointer/reference validation is not a substitute for bounded smoke coverage. If a query reports both pricing/fact coverage and pointer existence from the same heavy table, check that the coverage branch is bounded and the pointer branch is explicitly named all-history when it scans history.
 - For outer-join match metrics, project an explicit right-side flag such as `toUInt8(1) AS has_client_match` from the reduced right side and count that flag after the join. Do not infer unmatched rows from `right_col IS NULL` unless `join_use_nulls = 1` is deliberately set and validated.
 - If a selective key filter creates repeated CTE reads, do not drop the key filter as the first fix. Compare unfiltered vs key-filtered row counts, then try a one-flow rewrite, a minimal key-only subquery, or an explicitly accepted tradeoff.
-- If the user requested an eval/reasoning artifact, record the material validation signals in that artifact: final smoke result counts, `EXPLAIN` parts/granules/primary-key conditions, repeated `ReadFromMergeTree`, heavy-table scan shape, and accept/rewrite decisions. Do not create such an artifact unless the user asked for it.
-- Do not write that `EXPLAIN` was "not saved" or "not run" as an acceptable validation state in an eval/reasoning artifact. If `EXPLAIN` is absent, record the concrete blocker or error; if the final smoke query executed, `EXPLAIN indexes = 1` should normally execute too.
+- If the user requested a reasoning/evidence artifact, record the material validation signals in that artifact: final smoke result counts, `EXPLAIN` parts/granules/primary-key conditions, repeated `ReadFromMergeTree`, heavy-table scan shape, and accept/rewrite decisions. Do not create such an artifact unless the user asked for it.
+- Do not write that `EXPLAIN` was "not saved" or "not run" as an acceptable validation state in a reasoning/evidence artifact. If `EXPLAIN` is absent, record the concrete blocker or error; if the final smoke query executed, `EXPLAIN indexes = 1` should normally execute too.
 - If validation cannot be run because `db-access` is unavailable, the query is text-only, or execution would be too risky, say so briefly.
 
 For optimization tasks, also use `system.query_log` metrics when available; see `optimization.md`.
@@ -172,6 +172,6 @@ Pause and re-check metadata, native shape, or validation if the query has:
 - removing a selective key filter from a heavy history/enrichment table only to avoid CTE inlining, without row-count comparison or another rewrite attempt;
 - `EXPLAIN` summaries that mention only parts and ignore granules, primary-key conditions, or all-granule reads within selected partitions;
 - `EXPLAIN` summaries for queries with reused CTEs/subqueries that do not mention repeated `ReadFromMergeTree` checks;
-- eval/reasoning artifacts that omit `EXPLAIN` without a concrete blocker;
+- reasoning/evidence artifacts that omit `EXPLAIN` without a concrete blocker;
 - `ASOF JOIN` without a right-side duplicate check or deterministic tie-break;
 - assumptions about one row per ClickHouse key that were not verified from metadata, repo contracts, or business logic.

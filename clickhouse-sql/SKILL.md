@@ -33,7 +33,7 @@ Use this skill for ClickHouse SQL work in repositories that follow our database 
 4. Load the mandatory references from the hard gates, then any task-specific reference listed below.
 5. Inspect metadata/DDL and draft SQL only after grain, business semantics, and refresh scope are clear.
 6. Run ClickHouse native-shape, load-readiness, validation, and style-overlay self-review before returning SQL or findings.
-7. If the user requested an eval/reasoning artifact, save the material validation summary there: smoke counts, parts/granules or primary-key conditions, repeated `ReadFromMergeTree`, heavy scan shape, and accept/rewrite decisions.
+7. If the user requested a reasoning/evidence artifact, save the material validation summary there: smoke counts, parts/granules or primary-key conditions, repeated `ReadFromMergeTree`, heavy scan shape, and accept/rewrite decisions.
 
 ## Reference Triggers
 

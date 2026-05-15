@@ -4,7 +4,7 @@ Choose the lightest mode that protects quality. For non-tiny work, make the chos
 
 The mode set is closed: `quick`, `focused`, `project`, `investigation`, and `review`.
 Use the mode as an exact literal token. Do not append or prepend qualifiers, checklist names, phases, or task labels.
-Do not invent synonyms or phase names such as `quick-check`, `edit`, `implementation`, `development`, `analysis`, `audit`, `research`, or `review/scoring`. If a task is implementation work, its mode is still `quick`, `focused`, or `project` depending on risk. If a task is a check, proof, or scoring pass, its mode is still one of the five allowed values.
+Do not invent synonyms or phase names such as `quick-check`, `edit`, `implementation`, `development`, `analysis`, `audit`, `research`, or `review-pass`. If a task is implementation work, its mode is still `quick`, `focused`, or `project` depending on risk. If a task is a check, proof, or assessment pass, its mode is still one of the five allowed values.
 
 When announcing a non-tiny task, the first user-facing sentence must be shaped like `Режим: ` followed by exactly one allowed mode value in backticks. Put the task subtype in the next sentence, not in the mode token.
 

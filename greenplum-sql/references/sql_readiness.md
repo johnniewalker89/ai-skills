@@ -30,7 +30,7 @@ Before drafting or finalizing non-trivial SQL against real Greenplum objects:
 
 Metadata inspection is required because Greenplum SQL choices depend on MPP shape, not only on column names.
 
-When the task requests a reasoning/eval artifact, record repo-backed evidence next to the selected sources:
+When the task requests a reasoning/evidence artifact, record repo-backed evidence next to the selected sources:
 
 - use exact local Greenplum DDL/model/contract paths for the selected live objects;
 - do not use ClickHouse DDL mirrors or lower-layer lineage as proof for the selected Greenplum object;
@@ -120,7 +120,7 @@ Rules:
 - If querying the ClickHouse mirror requires non-trivial SQL, use `clickhouse-sql` for that query shape and interpretation.
 - Verify current privileges before relying on the source.
 - If SELECT is blocked, record the exact table/grant blocker.
-- Never invent workload metrics from old proof notes, registry entries, or intuition; use a real bounded query-history window from the task request or the owning workflow/evaluation layer.
+- Never invent workload metrics from old proof notes, registry entries, or intuition; use a real bounded query-history window from the task request or the owning workflow/evidence layer.
 
 ## CTE and materialization awareness
 

@@ -21,7 +21,7 @@ Use this file when the task is about speeding up or diagnosing ClickHouse SQL.
   - `read_rows`
   - `read_bytes`
   - `memory_usage`
-- For optimization review of an existing ClickHouse mart/build/query, run `EXPLAIN` through `db-access` for the current query or for the key expensive subquery/branch when database access is available and execution is safe. If `EXPLAIN` is skipped, record the concrete blocker in the final answer or eval artifact; do not silently replace plan review with metadata/query_log only.
+- For optimization review of an existing ClickHouse mart/build/query, run `EXPLAIN` through `db-access` for the current query or for the key expensive subquery/branch when database access is available and execution is safe. If `EXPLAIN` is skipped, record the concrete blocker in the final answer or requested evidence artifact; do not silently replace plan review with metadata/query_log only.
 - Before returning substantial new or changed SQL, run `EXPLAIN` through `db-access` when database access is needed, `db-access` validation is available, and execution is safe.
 - Read the `EXPLAIN` output, not only its exit status. Repeated heavy `ReadFromMergeTree` nodes, repeated `FINAL` scans, missing partition pruning, `PrimaryKey Condition: true` on large tables, or all-granule reads inside selected partitions are findings to address or explicitly accept.
 - For plan and index-reading diagnostics, prefer:

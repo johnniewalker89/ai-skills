@@ -138,7 +138,7 @@ When a query first builds a narrow set of business keys and then enriches it fro
 
 - build a key-only CTE such as `relevant_orders` or `active_clients`;
 - apply `LEFT SEMI JOIN relevant_orders USING (order_id)` to the heavy history table before `GROUP BY`, `argMax`, `ASOF JOIN`, or wide lookup enrichment;
-- compare the filtered row count against the unfiltered date-window row count for smoke/eval tasks when `db-access` validation is available;
+- compare the filtered row count against the unfiltered date-window row count for smoke/test tasks when `db-access` validation is available;
 - if the table's `ORDER BY` starts with the key, check through `db-access` whether `EXPLAIN` improves primary-key/granule pruning.
 - If the key filter causes repeated CTE reads, do not remove it as the default fix. Prefer a one-flow rewrite, a minimal key-only subquery, or a documented row-count tradeoff.
 

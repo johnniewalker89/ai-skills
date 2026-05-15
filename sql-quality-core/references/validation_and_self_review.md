@@ -20,7 +20,7 @@ Before returning or approving non-trivial SQL:
 - treat a successful plan as "can be planned", not "ready";
 - interpret the plan with the engine-specific skill: largest scans, largest estimates, repeated work, materialization/reuse, partition/key pruning, and surprising data movement where applicable;
 - decide whether surprising plan items are accepted, reduced, or rewritten;
-- after changing the final query window, sources, joins, filters, or category logic, rerun affected sanity counts and keep notes/eval artifacts aligned with the final SQL, not an earlier draft;
+- after changing the final query window, sources, joins, filters, or category logic, rerun affected sanity counts and keep notes/evidence artifacts aligned with the final SQL, not an earlier draft;
 - if validation cannot run, state why and identify the remaining risk.
 
 ## Default SQL Return Gate

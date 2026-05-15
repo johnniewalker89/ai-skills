@@ -22,7 +22,7 @@ Use this skill for Greenplum SQL/DDL work in repositories that follow our databa
 5. **Load-readiness gate.** Before handing a Greenplum DDL/load/rebuild artifact back to the workflow layer, run the load-readiness checks from `references/sql_readiness.md`: syntax, storage/distribution/partition shape, staging compatibility, insert/delete/truncate/swap mechanics, stats/`ANALYZE`, repeated heavy scans, and approved event/window semantics. Report pass/fail/blockers; this skill does not decide final proof status or sandbox need.
 6. **Telemetry gate.** For Greenplum workload history in our environment, use only the confirmed telemetry sources in `references/sql_readiness.md`. Fresh Greenplum signals in `profi` are limited to confirmed live views; missing grants/sources are blockers. Use telemetry only as Greenplum workload evidence, not as ClickHouse business data, Greenplum metadata, repo evidence, or a shortcut around missing direct Greenplum logs.
 7. **Lineage gate.** Repo-backed cross-engine source flow is not telemetry. If repo evidence proves a Greenplum object is loaded from ClickHouse, analyze that source layer through `clickhouse-sql`; keep Greenplum target metadata, DDL, and plan evidence in this skill.
-8. **Eval-evidence gate.** If the user requested an eval/reasoning artifact, include exact Greenplum repo-backed paths or a clear `DB-only fallback`, plus concrete plan/validation signals. Do not use another engine's DDL as proof for a live Greenplum object.
+8. **Evidence-artifact gate.** If the user requested a reasoning/evidence artifact, include exact Greenplum repo-backed paths or a clear `DB-only fallback`, plus concrete plan/validation signals. Do not use another engine's DDL as proof for a live Greenplum object.
 
 ## Workflow
 
