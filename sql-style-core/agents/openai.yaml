@@ -1,0 +1,4 @@
+interface:
+  display_name: "SQL Style Core"
+  short_description: "Companion layer for SQL style and readability"
+  default_prompt: "Use $sql-style-core directly only for engine-agnostic SQL style review; ClickHouse, Greenplum, dbt, and Python SQL workflows normally pull it in automatically."

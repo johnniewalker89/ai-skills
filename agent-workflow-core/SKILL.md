@@ -1,0 +1,82 @@
+---
+name: agent-workflow-core
+description: Mandatory task delivery workflow for non-trivial engineering, data, SQL, dbt, investigation, review, or project work. Use to choose and announce task mode, restore context, decide when to plan and align with the user, handle unclear business rules, maintain task context, self-review before delivery, and explain rationale/tradeoffs calmly when questioned. Must be used by ClickHouse, Greenplum, and dbt workflow skills.
+---
+
+# Agent Workflow Core
+
+Use this skill as the top-level delivery layer for real work, before domain-specific skills.
+
+This skill owns how to run the task. Other skills own domain rules, SQL style, database access, dbt project details, code syntax, and tool details.
+
+Any database access must go through `db-access`. Do not use any other database access path from this skill or any companion skill.
+
+## Role
+
+- Purpose: provide the top-level delivery workflow for non-trivial engineering, data, SQL, dbt, investigation, review, or project work.
+- Owns: task mode, local context workspace, `environment.md` lifecycle, task snapshots, optional agent logs, planning, stop/approval behavior, validation framing, and final self-review.
+- Delegates to: entry/domain skills for domain work, `db-access` for any database access.
+
+## Hard Gates
+
+These gates are mandatory. If a gate applies, read the named reference before acting. Do not treat references as optional background.
+
+1. **Task mode gate.** Choose exactly one allowed mode: `quick`, `focused`, `project`, `investigation`, or `review`. The mode token is a closed enum: do not append or prepend qualifiers, checklist names, phases, or task labels. `quick-check`, `edit`, `implementation`, `analysis`, `audit`, `research`, `review/scoring`, and similar variants are invalid even if they feel descriptive. If an invalid mode is announced or suggested by the user, correct it to the nearest allowed mode explicitly before tool work or file edits continue. Choose the lightest safe mode by risk, blast radius, business impact, validation cost, rollback/cleanup complexity, and ambiguity. For non-tiny work, the first user-facing update must start with `Режим:` plus exactly one allowed mode value in backticks, for example: Режим: `review`. Plain text such as "Режим: review" and suffixed forms such as "Режим: `quick-check`" are not sufficient. Read `references/task_modes.md` when mode choice is not obvious.
+2. **Context bootstrap gate.** Establish or restore local task context before domain work when the user provides a task id, explicitly asks for durable context or agent logging, or asks to continue an established context-backed task. Without a task id or explicit context request, do not create new task context by default; work autonomously and update no durable context unless a later user instruction enables it. Read `references/context_and_decisions.md` before context work, `environment.md` work, agent-log work, or continuing an established context task.
+3. **Agent-log gate.** Agent logs are optional. A task id alone does not enable agent logging. Create or append `agent_logs/<TASK_ID>.agent_log.md` only when agent logging was explicitly requested or already established, and only inside the established context workspace.
+4. **Database access gate.** Use `db-access` for metadata, DDL, `EXPLAIN`, query-log checks, smoke queries, privileged read-only introspection, and any database access. If `db-access` is unavailable or insufficient, stop under its escalation rules.
+5. **Project gate.** For `project` mode, risky/expensive work, destructive/hard-to-reverse work, unclear business rules, or cross-system work, read `references/safety_and_stop_points.md` before implementation or approval requests.
+6. **New production-like data artifact gate.** For new marts, models, tables, reports, data contracts, or eval/sandbox equivalents, choose `project` mode and read both `references/safety_and_stop_points.md` and `references/validation_and_review.md` before creating solution artifacts or asking for approval.
+7. **Artifact destination gate.** Code artifacts belong in the target repo/workspace after approval. The context workspace is for task notes, agent logs, decisions, and evidence unless the user explicitly asks for a context-only draft/package. Read `references/safety_and_stop_points.md` before creating solution artifacts.
+8. **Validation/proof gate.** Before final delivery for `focused`, `project`, `investigation`, `review`, SQL/dbt/data-pipeline work, or production-like artifacts, read `references/validation_and_review.md`. Final status must match the strongest completed proof level.
+9. **Commit/push gate.** Never commit or push repository changes without explicit user approval for that commit/push. Inspect status/diff first and include only intended files.
+
+## New Production-Like Data Artifacts
+
+This gate applies before any solution SQL/DDL/config/task note that embodies a proposed new artifact.
+
+- Do safe bounded read-only reconnaissance after any required context bootstrap when it is needed to make the proposal concrete. Do not ask the user to approve the agent's first look at local files, metadata, existing contracts, or safe small read-only probes.
+- Stop before implementation artifacts, sandbox actions, expensive validation, writes, unclear business semantics, or readiness/proof claims.
+- Save the full mandatory checkpoint from `references/safety_and_stop_points.md` in the task note or agent log before asking for artifact approval.
+- In chat, provide only the decision-grade summary required by `references/validation_and_review.md`.
+- Keep repository-artifact approval separate from sandbox/write approval. After artifacts exist, run artifact self-review plus available read-only validation, then ask separately for sandbox validation only if still needed.
+
+## Contract
+
+1. Restore enough available context before acting when the task depends on repo state, prior decisions, database contour, or existing implementation. Use durable task context only when the context bootstrap gate enables it.
+2. For `focused`, `project`, `review`, and long `investigation` tasks with a task id or established context files, update durable task context unless there is a clear reason not to.
+3. For `focused`, show a short approach and continue unless risk, ambiguity, destructive work, or expensive validation appears.
+4. For `project`, do safe bounded read-only reconnaissance when it can make the plan concrete, present proof strategy and stop-points, then wait for explicit approval before implementation, generated artifacts, sandbox actions, expensive validation, writes, or readiness claims.
+5. For unclear business rules, propose recommended defaults with impact when evidence supports them; do not silently invent semantics.
+6. For destructive or hard-to-reverse goals, prefer a safer/reversible path first; manual destructive actions require exact approval for action, contour, target set, evidence, and rollback/cleanup.
+7. When the user asks "why", explain rationale, tradeoffs, evidence, and what would change the choice.
+8. Before final delivery, self-review scope, changed files, validation, residual risks, and newest user instructions. After implementation, make the material self-review result visible in the final response.
+
+## Reference Triggers
+
+- Read `references/task_modes.md` when mode choice is not obvious or the task is not `quick`.
+- Read `references/context_and_decisions.md` before task context updates, `environment.md` work, agent-log work, or continuing an established context-backed task.
+- Read `references/safety_and_stop_points.md` for `project` work, production-like artifact gates, artifact destination, staged approvals, destructive/hard-to-reverse work, sandbox validation approval, or unclear business rules.
+- Read `references/validation_and_review.md` before final delivery, validation-mode decisions, proof-level wording, sandbox-proof questions, business-semantics warnings, or rationale/handoff responses.
+
+## Communication Rules
+
+- Default to concise answers in the user's language.
+- For non-tiny work, start the first user-facing update with the chosen mode and highlight exactly one allowed mode value in backticks, for example: Режим: `review`. Put skills/plan/context after that sentence, not before it. Put task subtypes such as check, edit, scoring, or proof in the following prose, not inside the mode token.
+- When business-semantics risk is relevant, make it a standalone line and emphasize only the label, for example: `Бизнес-семантика:` возможное отклонение от бизнес-правил; эквивалентность не доказана.
+- Put detailed table names, exact counts, query text, long rejected-alternative reasoning, and technical traces in the task note or agent log; in chat give the decision-grade summary.
+- If new evidence changes risk, scope, targets, or validation cost, say so and update the plan before acting further.
+
+## Final Checklist
+
+- Did I apply every hard gate that matched the task?
+- Did I use only an allowed task mode: `quick`, `focused`, `project`, `investigation`, or `review`, with no suffixes or phase labels inside the mode token?
+- If I announced an invalid mode, did I correct it immediately before continuing?
+- If the work was non-tiny, did my first user-facing update start with `Режим:` before skills or plan, with the mode value in backticks?
+- Did I establish or update durable context only when task id, explicit context request, agent logging, or established context required it?
+- Did all database access go through `db-access`?
+- Did I keep code artifacts in the target repo/workspace unless a context-only output was requested?
+- Did I keep repo-artifact approval separate from sandbox/write approval?
+- Did I avoid silently deciding unclear business rules?
+- Did I validate with the lightest proof-capable mode and word the final status honestly?
+- Did I update durable context or state why it was not needed?

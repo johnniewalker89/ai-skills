@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agent Workflow Core"
+  short_description: "Companion workflow layer for task delivery"
+  default_prompt: "Use $agent-workflow-core directly only to prepare local task context or review delivery workflow; domain skills normally pull it in automatically."

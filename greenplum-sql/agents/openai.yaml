@@ -1,0 +1,4 @@
+interface:
+  display_name: "Greenplum SQL"
+  short_description: "Write and review Greenplum SQL with MPP-aware shape"
+  default_prompt: "Use $greenplum-sql when you need to write, check, or improve a SQL query for Greenplum."

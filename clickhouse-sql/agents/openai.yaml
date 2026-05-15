@@ -1,0 +1,4 @@
+interface:
+  display_name: "ClickHouse SQL"
+  short_description: "Write and review ClickHouse SQL with native query shape"
+  default_prompt: "Use $clickhouse-sql when you need to write, check, or improve a SQL query for ClickHouse."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "SQL Quality Core"
+  short_description: "Companion layer for engine-agnostic SQL quality"
+  default_prompt: "Use $sql-quality-core directly only for engine-agnostic SQL review; ClickHouse, Greenplum, and dbt skills normally pull it in automatically."
