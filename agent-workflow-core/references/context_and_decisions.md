@@ -4,7 +4,7 @@ Use this reference for work that depends on previous state, local repos, task fi
 
 ## Local Context Workspace
 
-Use the user's configured local context workspace/folder as the task memory area when the user refers to local context, task context, personal context, environment notes, or local skill development notes.
+Use the user's configured local context workspace/folder as the task memory area when the user refers to local context, task context, personal context, environment notes, or long-running local notes.
 
 Do not assume a hardcoded folder name, owner, or filesystem path in this shared skill. Discover the local context workspace from:
 
@@ -19,7 +19,7 @@ Automatic durable context is task-id driven. For non-trivial engineering, analyt
 
 If there is no task id, no explicit context/log request, and no established context-backed task to continue, do not create a new context workspace, task snapshot, `environment.md`, or agent log by default. Work autonomously under the normal task mode, validation, database-access, approval, and safety gates. If durable memory would materially help, ask the user whether to enable it instead of creating it silently.
 
-Do not treat the current working directory, task directory, project root, workspace root, or eval/sandbox root as the local context workspace merely because it is writable. The context workspace must be explicitly configured, previously established, user-provided, or an actual nearby `my-coding-context` directory.
+Do not treat the current working directory, task directory, project root, workspace root, or test/sandbox root as the local context workspace merely because it is writable. The context workspace must be explicitly configured, previously established, user-provided, or an actual nearby `my-coding-context` directory.
 
 Phrases such as "work only inside this folder/workspace/sandbox", "do not use the real context workspace", or "enable agent log" define the allowed boundary for the task. They are not permission to use that root directory as a context workspace or to scatter `context.md`, `environment.md`, `tasks/`, or `agent_logs/` directly in it.
 
@@ -113,7 +113,7 @@ Use this minimal `context.md` template when initializing a new local context wor
 
 Add optional `context.md` sections only when needed:
 
-- `Мета-задачи`: long-lived areas without a normal task id, such as skills development or Airflow analyses.
+- `Мета-задачи`: long-lived areas without a normal task id, such as Airflow analyses or project notes.
 - `Логи агента`: only when agent logging is explicitly enabled.
 
 Meta-task files use a lighter structure than task snapshots. Keep the current focus near the top, keep history below, and use this shape when creating or reworking a meta-task file:
@@ -237,7 +237,7 @@ When agent logging is enabled and a task id becomes known, create or append `age
 
 If skill routing changes during the task, update the log instead of leaving only the initial skill list. Either update `Active skills` or add `Skill routing updates` with the skill name, reason, and role, for example `greenplum-sql: cross-engine lineage interpretation`.
 
-Meta-tasks do not require separate agent logs by default. Keep meta-task reasoning in the meta-task file itself, such as `meta/<topic>.md` or `airflow_logs/airflow_logs.md`. Create an agent log for a meta-task only when the task is specifically an eval, regression analysis, or separate reasoning/behavior review.
+Meta-tasks do not require separate agent logs by default. Keep meta-task reasoning in the meta-task file itself, such as `meta/<topic>.md` or `airflow_logs/airflow_logs.md`. Create an agent log for a meta-task only when the user explicitly asks for a separate reasoning, regression-analysis, or behavior-review trail.
 
 Do not archive agent logs. Keep `agent_logs/<TASK_ID>.agent_log.md` as an append-only audit trail; use search and the current task snapshot to avoid rereading old detail.
 

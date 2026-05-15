@@ -89,7 +89,7 @@ The local context workspace is for task notes, agent logs, decisions, and eviden
 
 Code artifacts such as SQL, DDL, YAML, Python, dbt models, tests, or configs belong in the target repository or target workspace that the task asks to change, following existing conventions and paths, after any required approval.
 
-Use the context workspace for solution code only when the user explicitly asks for a design draft, eval artifact package, MR package, or context-only output, or when no target repository/workspace is part of the task.
+Use the context workspace for solution code only when the user explicitly asks for a design draft, review/evidence package, MR package, or context-only output, or when no target repository/workspace is part of the task.
 
 Separate production database writes from repository edits: "no production writes" blocks database DDL/DML or other live-environment mutations, but does not automatically forbid code edits in the repo unless the user says not to touch the repo.
 

@@ -54,7 +54,7 @@ Use when the task is multi-step, expensive, destructive, high-stakes, cross-syst
 Also use `project` when the change is small but the risk is high:
 
 - production or production-like model, SQL, config, or data-contract logic;
-- new production-like mart/model design, even in an eval or sandbox, when business grain, refresh window, attribution window, target materialization, or validation assumptions are not already fixed by the user;
+- new production-like mart/model design, even in test/sandbox work, when business grain, refresh window, attribution window, target materialization, or validation assumptions are not already fixed by the user;
 - attribution, allocation, revenue, billing, audit, compliance, or permission-policy semantics;
 - grain, join keys, mappings, fallback/default behavior, lifecycle windows, or validation assumptions;
 - external system state changes, database writes, object creation, rebuilds, recalculations, or actions requiring cleanup/rollback;
@@ -96,7 +96,7 @@ Behavior:
 
 ## review
 
-Use when the user asks for review, findings, or evaluation.
+Use when the user asks for review, findings, or assessment.
 
 Behavior:
 
