@@ -105,6 +105,8 @@ Extended sandbox validation always requires explicit user approval before any sa
 
 Before running it, define the sandbox contour, exact target set, short validation window, comparison baseline, expected artifacts, `db-access` escalation path, and cleanup/rollback plan. Then stop for explicit approval.
 
+Approval for repository edits, read-only validation, or the abstract idea of "sandbox proof" is not approval to use privileged database tools. If the proof requires `privileged_access_mcp_*`, ask for that exact contour, action type, target set, and cleanup/rollback expectation before the first privileged call. If ordinary MCP access is down or times out, stop and ask whether to switch to the privileged contour; do not infer that switch from the outage.
+
 ## Business Rules
 
 When business rules are unclear:
@@ -147,6 +149,8 @@ Examples of manual destructive actions:
 - removing entries from equivalent operational state.
 
 If the user asks for a destructive outcome but a config-driven or MR-driven workflow exists, propose that safer path first. Escalate to manual destructive action only when the user explicitly approves it or when the safer path is unavailable and the user accepts the risk.
+
+Cleanup after a proof is a separate state-changing action unless it was explicitly included in the approved target set and timing. If the user asked to leave proof objects for review, wait for a new cleanup approval.
 
 ## Approval Hygiene
 

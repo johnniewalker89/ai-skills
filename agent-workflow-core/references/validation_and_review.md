@@ -123,6 +123,8 @@ Extended sandbox validation is `project`-gated. Before any action, propose:
 
 Then stop and wait for explicit approval.
 
+If the validation will use `privileged_access_mcp_*`, the approval request must name the privileged contour and the state-changing action class, such as CTAS/materialization, DML, rebuild, diff artifact creation, or cleanup. A prior approval for repo changes, read-only checks, or a non-privileged sandbox plan does not authorize privileged database actions.
+
 After approved sandbox actions run, compare the result with the success criteria. A successful run, build, create, or rebuild is not validation by itself.
 
 Do not create database validation artifacts by default. First use read-only validation; if it is insufficient, propose the sandbox validation plan in the user's language and stop. For Russian chat, end with a compact question like: `Следующий шаг проверки: расширенная валидация в песочнице — <sandbox target>, <bounded load>, <comparison checks>, <cleanup>. Запускать?`

@@ -18,7 +18,7 @@ Use this skill as the single shared database access contract.
 1. Use `agent-workflow-core` first for task mode and stop-points.
 2. Use already configured MCP database tools/servers only; do not use any other database access path.
 3. Use `profi-mcp` first for ordinary metadata, DDL reading, `SELECT`, `EXPLAIN`, and smoke checks.
-4. Use `privileged_access_mcp_*` only after explicit approval for the exact contour, action, target set, and rollback/cleanup expectation when relevant.
+4. Use `privileged_access_mcp_*` only after explicit approval for the exact contour, action type, target set, and rollback/cleanup expectation when relevant. Approval must be current to the task step; do not infer it from a general "continue", repo-edit approval, read-only proof request, old sandbox approval, or default MCP outage.
 5. If the needed default or privileged MCP is unavailable, stop and ask the user what to do next. Do not install, repair, or change MCP/database configuration from this skill.
 6. Never print, copy, or store credentials, passwords, tokens, writable-schema secrets, or admin paths.
 7. For potentially long privileged actions, prefer configured async privileged tools when available: start the query, poll status, and keep the returned query/job id for cleanup/cancel evidence. Do not rely on a single long blocking tool call as the control mechanism.
@@ -48,12 +48,15 @@ Required approval shape:
 - target set: database/schema/table/query scope;
 - rollback/cleanup expectation when the action creates, changes, or removes state.
 
+If ordinary `profi-mcp` access fails or is too limited, report the blocker and ask whether to use the privileged contour. The outage itself does not approve privileged access.
+
 After approval:
 
 1. Use only the matching `privileged_access_mcp_*` tool.
 2. Keep actions inside the approved target set.
 3. If any generated SQL, target, cleanup, or dependency resolves outside approval, stop.
-4. Report the proof and cleanup result honestly.
+4. Record the approved contour/action/target set in the task note, agent log, or final handoff before or with the first privileged action.
+5. Report the proof and cleanup result honestly.
 
 For long-running sandbox writes or expensive proof checks, use async privileged MCP tools when they are configured:
 
@@ -67,6 +70,7 @@ The returned id is the cancellable handle for that privileged flow's own query. 
 - Did I use only `profi-mcp` or approved `privileged_access_mcp_*` tools?
 - Did I use `profi-mcp` first unless privileged access was explicitly approved?
 - If privileged access was used, did approval name the contour, action, and target set?
+- Did I avoid treating a default MCP outage, old approval, repo-edit approval, or abstract sandbox request as privileged-action approval?
 - Did I use the matching `privileged_access_mcp_*` tool and stay inside the approved target set?
 - For long privileged actions, did I use async start/status/cancel when available instead of a single blocking call?
 - Did I avoid claiming I can kill another MCP user's query unless the current contour actually has `KILL QUERY` permission for it?
