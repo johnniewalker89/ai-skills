@@ -40,7 +40,7 @@ SELECT
     , sum(source.revenue)     AS revenue
     , count(source.order_id)  AS n_order
 FROM some_table source
-WHERE 1 = 1
+WHERE 1=1
   AND source.dt >= DATE '2026-01-01'
   AND source.dt <  DATE '2026-02-01'
 GROUP BY source.dt
@@ -92,8 +92,8 @@ GROUP BY orders.client_id
 - Align continuation `AND` conditions under the join condition, not by moving `ON` to a separate line.
 - In multiline `WHERE`, each next condition starts on a new line with `AND`.
 - In multiline `HAVING`, each next condition starts on a new line with `AND`.
-- `WHERE 1 = 1` and `HAVING` are acceptable when the filter block is multiline or likely to grow.
-- For a short one-condition filter, direct `WHERE` without `1 = 1` is acceptable.
+- `WHERE 1=1` and `HAVING` are acceptable when the filter block is multiline or likely to grow.
+- For a short one-condition filter, direct `WHERE` without `1=1` is acceptable.
 - For date and datetime windows, prefer half-open ranges: lower bound with `>=`, upper bound with `<`.
 - In window filters, right-hand side values should be visually aligned when that stays readable.
 - `GROUP BY` should explicitly repeat grouped columns instead of using positions.
