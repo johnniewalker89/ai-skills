@@ -29,8 +29,9 @@ These gates are mandatory. If a gate applies, read the named reference before ac
 6. **Project gate.** For `project` mode, risky/expensive work, destructive/hard-to-reverse work, unclear business rules, or cross-system work, read `references/safety_and_stop_points.md` before implementation or approval requests.
 7. **New production-like data artifact gate.** For new marts, models, tables, reports, data contracts, or test/sandbox equivalents of production-like artifacts, choose `project` mode and read both `references/safety_and_stop_points.md` and `references/validation_and_review.md` before creating solution artifacts or asking for approval.
 8. **Artifact destination gate.** Code artifacts belong in the target repo/workspace after approval. The context workspace is for task notes, agent logs, decisions, and evidence unless the user explicitly asks for a context-only draft/package. Read `references/safety_and_stop_points.md` before creating solution artifacts.
-9. **Validation/proof gate.** Before final delivery for `focused`, `project`, `investigation`, `review`, SQL/dbt/data-pipeline work, or production-like artifacts, read `references/validation_and_review.md`. Final status must match the strongest completed proof level.
-10. **Commit/push gate.** Never commit or push repository changes without explicit user approval for that commit/push. Inspect status/diff first and include only intended files.
+9. **Cleanup/deletion usage-proof gate.** For repo cleanup, deletion, deprecation, DAG/report/job removal, live cleanup/drop lists, or hard-to-reverse cleanup recommendations, read `references/safety_and_stop_points.md` before editing or recommending removal. Prove ownership and usage with read-only evidence first; keep repo cleanup separate from live state changes.
+10. **Validation/proof gate.** Before final delivery for `focused`, `project`, `investigation`, `review`, SQL/dbt/data-pipeline work, or production-like artifacts, read `references/validation_and_review.md`. Final status must match the strongest completed proof level.
+11. **Commit/push gate.** Never commit or push repository changes without explicit user approval for that commit/push. Inspect status/diff first and include only intended files.
 
 ## New Production-Like Data Artifacts
 
@@ -50,14 +51,15 @@ This gate applies before any solution SQL/DDL/config/task note that embodies a p
 4. For `project`, do safe bounded read-only reconnaissance when it can make the plan concrete, present proof strategy and stop-points, then wait for explicit approval before implementation, generated artifacts, sandbox actions, expensive validation, writes, or readiness claims.
 5. For unclear business rules, propose recommended defaults with impact when evidence supports them; do not silently invent semantics.
 6. For destructive or hard-to-reverse goals, prefer a safer/reversible path first; manual destructive actions require exact approval for action, contour, target set, evidence, and rollback/cleanup.
-7. When the user asks "why", explain rationale, tradeoffs, evidence, and what would change the choice.
-8. Before final delivery, self-review scope, changed files, validation, residual risks, and newest user instructions. After implementation, make the material self-review result visible in the final response.
+7. For cleanup or deletion, do not remove artifacts based only on task description or stale metadata. Check repo callers, runtime/live usage, manual/API trigger paths, owner exceptions, rollback path, and telemetry limits first.
+8. When the user asks "why", explain rationale, tradeoffs, evidence, and what would change the choice.
+9. Before final delivery, self-review scope, changed files, validation, residual risks, and newest user instructions. After implementation, make the material self-review result visible in the final response.
 
 ## Reference Triggers
 
 - Read `references/task_modes.md` when mode choice is not obvious or the task is not `quick`.
 - Read `references/context_and_decisions.md` before task context updates, `environment.md` work, agent-log work, or continuing an established context-backed task.
-- Read `references/safety_and_stop_points.md` for `project` work, production-like artifact gates, artifact destination, staged approvals, destructive/hard-to-reverse work, sandbox validation approval, or unclear business rules.
+- Read `references/safety_and_stop_points.md` for `project` work, production-like artifact gates, artifact destination, staged approvals, destructive/hard-to-reverse work, cleanup/deletion usage proof, sandbox validation approval, or unclear business rules.
 - Read `references/validation_and_review.md` before final delivery, validation-mode decisions, proof-level wording, sandbox-proof questions, business-semantics warnings, or rationale/handoff responses.
 
 ## Communication Rules
@@ -79,6 +81,7 @@ This gate applies before any solution SQL/DDL/config/task note that embodies a p
 - Before any sandbox write, cleanup, rebuild, or privileged database action, did I have exact current approval for contour, action, target set, and cleanup/rollback expectation?
 - Did I keep code artifacts in the target repo/workspace unless a context-only output was requested?
 - Did I keep repo-artifact approval separate from sandbox/write approval?
+- For cleanup/deletion, did I prove ownership and usage limits before removing or recommending removal, and keep live state changes as a separate approved step?
 - Did I avoid silently deciding unclear business rules?
 - Did I validate with the lightest proof-capable mode and word the final status honestly?
 - Did I update durable context or state why it was not needed?

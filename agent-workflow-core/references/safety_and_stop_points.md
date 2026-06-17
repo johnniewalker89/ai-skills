@@ -152,6 +152,26 @@ If the user asks for a destructive outcome but a config-driven or MR-driven work
 
 Cleanup after a proof is a separate state-changing action unless it was explicitly included in the approved target set and timing. If the user asked to leave proof objects for review, wait for a new cleanup approval.
 
+## Cleanup And Deletion Usage Proof
+
+Use this section before repository cleanup, deletion, deprecation, report removal, DAG/job removal, generated-config cleanup, or live drop/cleanup recommendations.
+
+Do not delete or recommend deletion based only on a task description, naming pattern, stale UI metadata, or a single zero-run signal.
+
+Before repo cleanup, prove the candidate set and keep set with read-only evidence:
+
+- repo callers and generated references;
+- runtime metadata, run history, scheduler/import state, or equivalent operational evidence;
+- manual triggers, API triggers, REST handlers, callbacks, external schedulers, wrappers, export tails, BI/report consumers, and owner exceptions when relevant;
+- known telemetry limits such as stale metadata, retention windows, renamed objects, missed manual/API usage, or dev/prod config drift;
+- rollback path, backup path, or reversible alternative such as disable/quarantine before deletion.
+
+For Airflow DAG cleanup, check DAG files, generated config ownership, current metadata, stale state, run history, manual/API trigger paths, external repo callers, and downstream generated tasks before removing DAGs or excludes.
+
+For data/report cleanup, keep repository cleanup separate from live DB drops, report deletion, role/user changes, or operational state changes. A repo diff or merge plan is not approval for live cleanup.
+
+Live cleanup/drop lists must name exact targets, contour, evidence boundary, safer alternatives considered, and rollback/cleanup plan. Avoid `CASCADE` unless the dependency impact is explicitly inspected and approved.
+
 ## Approval Hygiene
 
 Approval must be specific enough to bind the next action. If approval is vague and the action is expensive, destructive, or cross-system, restate the exact next step before acting.

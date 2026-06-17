@@ -66,3 +66,12 @@ For independent fact aggregates combined into one output, such as demand and sup
 - do not join facts on a coarser key and then sum measures from both sides unless a reconciliation proves the coarser join is one-to-one for the selected window;
 - validate the final output grain, not only each source-side aggregate. A smoke that proves both sources return rows does not prove the combined result is safe;
 - if the final join can repeat a measure across another fact's segments, SQL-quality-check fails for production-like artifacts and the object must be held/reworked below sandbox handoff until the grain, allocation, or non-additive semantics are explicit and validated.
+
+For build-from-scratch marts, detecting a repeated-measure risk is not the end of the design attempt. Before holding the object, try a bounded recovery design that preserves business intent:
+
+- aggregate both fact families to their common additive grain;
+- introduce an explicit allocation rule with source-side control totals;
+- remove or rename the dimension that would make a measure non-additive;
+- keep measures in separate additive-safe blocks with names that prevent cross-segment summing.
+
+Any recovery that allocates or narrows semantics must be validated against source-side controls. At minimum, prove that final totals reconcile to the accepted source totals for the checked window and name which dimensions are additive, allocated, or non-additive. If this proof is missing, the object stays below sandbox handoff.

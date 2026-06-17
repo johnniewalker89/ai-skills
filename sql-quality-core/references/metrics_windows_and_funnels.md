@@ -35,6 +35,12 @@ If validation or performance uses a proxy timestamp different from the business 
 - otherwise downgrade the proof claim to the proxy/guarded surface and block full business-window readiness;
 - do not let engine-specific partition pruning evidence replace business-window coverage evidence.
 
+For production-like marts, an unresolved proxy timestamp is a handoff blocker, not only a residual risk. A mart may advance only when one of these is true:
+
+- full business-window coverage is proven for the proposed rebuild window;
+- the artifact explicitly uses proxy/cohort semantics and its names, notes, and validation surface match that narrowed meaning;
+- the object stays below sandbox handoff with rejected proof designs or coverage blockers saved.
+
 For concrete filters and literals:
 
 - check actual values for enum-like filters and metric literals;

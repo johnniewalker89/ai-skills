@@ -53,6 +53,13 @@ For ClickHouse mart-build candidates where the business timestamp differs from t
 
 Do not mark such a candidate `read_only_validated` for a response-date or event-date mart when only a proxy/cohort surface was proven. Either make the output semantics explicitly cohort/proxy-scoped, prove coverage for the business window, or hold the object.
 
+Operational handoff gate for ClickHouse mart-build:
+
+- if the final artifact is business-date scoped, proxy pruning evidence alone cannot put the object in `proof_targets.md`;
+- coverage counts must compare rows in the business window with rows retained by the proxy guard for the same proposed rebuild window;
+- if the proxy guard intentionally defines the cohort, the target name/columns/notes must use cohort or proxy wording rather than claiming the original business-date window;
+- if neither proof is safe, save the rejected business-timestamp and proxy-coverage proof designs and keep the object below sandbox handoff.
+
 ## What metadata should change
 
 Use ClickHouse metadata to choose:
