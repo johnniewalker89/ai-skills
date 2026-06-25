@@ -88,6 +88,7 @@ Correctness comes before avoiding expensive engine readers.
 
 - Do not remove `FINAL` from `ReplacingMergeTree`, `CollapsingMergeTree`, or `VersionedCollapsingMergeTree` just because `FINAL` is expensive.
 - Prefer the existing local reader pattern from repo models for the same table unless there is a measured reason to change it.
+- For aliased `FINAL` readers, review syntax before execution. Do not use `FROM table FINAL AS alias`. Use a locally proven alias form such as `FROM table alias FINAL`, or wrap `SELECT ... FROM table FINAL` in a subquery/CTE and alias that subquery.
 - Manual replacement for `FINAL` is allowed only when the selected output grain and selected columns are explicitly preserved.
 - For `VersionedCollapsingMergeTree`, a plain `GROUP BY ... HAVING sum(sign) > 0` is not a general reader. It is acceptable only for existence/key filtering or when every selected field is correctly aggregated for the target business grain.
 - If manual collapsing is used instead of `FINAL`, validate equivalence on a constrained window or state the semantic assumption.
@@ -160,6 +161,7 @@ Pause and re-check metadata, native shape, or validation if the query has:
 - `SELECT *`;
 - casts in `JOIN` or `WHERE`;
 - `FINAL`;
+- `FROM table FINAL AS alias` or another unproven `FINAL` alias placement;
 - window functions where `argMax`, `argMin`, arrays, or pre-aggregation may fit better;
 - ordinary `LEFT JOIN` to a lookup-shaped table;
 - ordinary `LEFT JOIN` to a right side already reduced to one row per key, where `LEFT ANY JOIN` expresses the intended lookup and protects against accidental multiplication;

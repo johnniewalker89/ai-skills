@@ -15,6 +15,7 @@ For engine-agnostic SQL quality anti-patterns, use `sql-quality-core` first.
 - Do not copy Greenplum or Postgres idioms into ClickHouse without confirming that the pattern is valid and local.
 - Do not use `current_setting(...)` in ClickHouse marts when the local pattern is `getSetting(...)`.
 - Do not use a closed interval or `BETWEEN` for standard date-window filters when the project pattern is half-open `>= dt_from` and `< dt_to`.
+- Do not use `FROM table FINAL AS alias`; review `FINAL` alias placement before live execution.
 
 ## Query anti-patterns
 
@@ -35,6 +36,7 @@ For engine-agnostic SQL quality anti-patterns, use `sql-quality-core` first.
 - `IN (SELECT ...)`, `NOT IN (SELECT ...)`, or left join plus `IS NULL` when `LEFT SEMI JOIN` or `LEFT ANTI JOIN` expresses the same intent more directly.
 - Claiming that ClickHouse `LEFT SEMI JOIN` cannot expose right-side columns. It can; the real question is whether projecting those columns has deterministic enrichment semantics for the checked right-side grain.
 - Using `LEFT SEMI JOIN` as a shortcut enrichment join for right-side attributes when the right side can have multiple matching rows and no deterministic row-choice rule is defined.
+- Putting a heavy `FINAL` reader or large fact on the filled right side of `LEFT SEMI JOIN` without plan/query-log evidence that the shape is safe.
 - Window functions before rejecting `argMax` / `argMin`, aggregate-based, or array-based solutions.
 - `SELECT DISTINCT` before checking whether the real grain should be expressed through `GROUP BY`, `argMax` / `argMin`, or engine-aware reader logic.
 - `quantileExact` on large grouped production data unless exact percentile semantics are explicitly required.

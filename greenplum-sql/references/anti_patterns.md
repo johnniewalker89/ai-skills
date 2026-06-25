@@ -46,3 +46,5 @@ For engine-agnostic SQL quality anti-patterns, use `sql-quality-core` first.
 - Changing `DISTRIBUTED BY` without understanding downstream joins, skew, and execution behavior.
 - Working with heavily changed large tables without checking `ANALYZE` / `VACUUM`.
 - Refactoring a script that already contains an explicit `COMMIT` and silently removing the transaction boundary.
+- Keeping `UNLOGGED` on a table whose owner SQL only refreshes part of history, appends, or updates without a proven recovery contract.
+- Recreating a table without restoring the full owner/comment/grant surface from migrator output or `pg_class.relacl`.

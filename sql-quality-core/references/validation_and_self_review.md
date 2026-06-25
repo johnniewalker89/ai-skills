@@ -23,6 +23,18 @@ Before returning or approving non-trivial SQL:
 - after changing the final query window, sources, joins, filters, or category logic, rerun affected sanity counts and keep notes/evidence artifacts aligned with the final SQL, not an earlier draft;
 - if validation cannot run, state why and identify the remaining risk.
 
+## Cleanup And Repair Validation
+
+For cleanup, deduplication, repair, backfill, or negative-row recovery plans, validate the declared repair grain, not only the removal predicate.
+
+Before calling the repair sufficient:
+
+- prove the bad-row/drop predicate is gone from the repaired source and target surfaces;
+- prove same-grain duplicate keys are absent after repair, even when cross-entity overlap is already fixed;
+- reconcile the accepted source/repair surface to the affected target or aggregate totals for the declared windows/partitions;
+- separate raw/source repair checks from finalized/aggregate target checks when the target is built from the raw surface;
+- if the repair intentionally removes rows outside pairwise overlap, name that business decision and validate the resulting totals.
+
 ## Default SQL Return Gate
 
 Before returning any non-trivial SQL to the user, run a final SQL-quality self-review. For small one-off snippets this can be a lightweight mental pass; for production-like queries, marts, loads, DDL, or validation suites it is a real gate.

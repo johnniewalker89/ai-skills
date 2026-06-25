@@ -247,6 +247,8 @@ ClickHouse allows selecting columns from the right side of `LEFT SEMI JOIN`. Do 
 - if the right side can have duplicates, use `LEFT ANY JOIN` after deterministic reduction, `argMax`/pre-aggregation, or another row-choice pattern that matches the business meaning;
 - if the right side is used only for membership, project only left-side columns to make the intent obvious.
 
+For production-sized `LEFT SEMI JOIN`, also check the physical side. ClickHouse may spend memory filling/building the right side. If the right side is a heavy `FINAL` reader, large fact, or expensive CTE, use `EXPLAIN`/query-log evidence when available, or flip/rewrite the join so the heavy branch is not the filled right side while preserving the intended left-row output.
+
 Challenge:
 
 ```sql

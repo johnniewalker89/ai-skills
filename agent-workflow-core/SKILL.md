@@ -31,7 +31,7 @@ These gates are mandatory. If a gate applies, read the named reference before ac
 8. **Artifact destination gate.** Code artifacts belong in the target repo/workspace after approval. The context workspace is for task notes, agent logs, decisions, and evidence unless the user explicitly asks for a context-only draft/package. Read `references/safety_and_stop_points.md` before creating solution artifacts.
 9. **Cleanup/deletion usage-proof gate.** For repo cleanup, deletion, deprecation, DAG/report/job removal, live cleanup/drop lists, or hard-to-reverse cleanup recommendations, read `references/safety_and_stop_points.md` before editing or recommending removal. Prove ownership and usage with read-only evidence first; keep repo cleanup separate from live state changes.
 10. **Validation/proof gate.** Before final delivery for `focused`, `project`, `investigation`, `review`, SQL/dbt/data-pipeline work, or production-like artifacts, read `references/validation_and_review.md`. Final status must match the strongest completed proof level.
-11. **Commit/push gate.** Never commit or push repository changes without explicit user approval for that commit/push. Inspect status/diff first and include only intended files.
+11. **Commit/push gate.** Never commit or push repository changes without explicit user approval for that exact commit/push. Inspect status/diff first and include only intended files. Before any push, verify current branch, upstream, and exact remote target; if a feature branch tracks the default branch such as `origin/master` or `origin/main`, stop and fix/ask before pushing.
 
 ## New Production-Like Data Artifacts
 
@@ -79,6 +79,7 @@ This gate applies before any solution SQL/DDL/config/task note that embodies a p
 - Did I establish or update durable context only when task id, explicit context request, agent logging, or established context required it?
 - Did all database access go through `db-access`?
 - Before any sandbox write, cleanup, rebuild, or privileged database action, did I have exact current approval for contour, action, target set, and cleanup/rollback expectation?
+- Before any commit/push, did I verify branch, upstream, exact remote target, and repo-specific user workflow?
 - Did I keep code artifacts in the target repo/workspace unless a context-only output was requested?
 - Did I keep repo-artifact approval separate from sandbox/write approval?
 - For cleanup/deletion, did I prove ownership and usage limits before removing or recommending removal, and keep live state changes as a separate approved step?

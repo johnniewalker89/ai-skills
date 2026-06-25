@@ -62,6 +62,7 @@ Use this file when the task is about speeding up or diagnosing ClickHouse SQL.
 - Consider pre-aggregation before `JOIN`.
 - Consider replacing a lookup `JOIN` with `dictGet(...)`.
 - Consider whether `ANY`, `SEMI`, or `ANTI` semantics better match the business logic and avoid extra work.
+- For `LEFT SEMI JOIN`, verify which side is physically filled/built when one side is heavy, especially around `FINAL` readers. A semantically equivalent side swap can be the difference between a normal run and a memory-limit failure.
 
 ## Storage-level options
 
