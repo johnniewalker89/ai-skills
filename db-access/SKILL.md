@@ -1,6 +1,6 @@
 ---
 name: db-access
-description: Use for ClickHouse, Greenplum, BI OpenMetadata/catalog, or other database access through already configured MCP database tools/servers. Apply when a task needs database metadata, schema/table/column inspection, DDL reading, read-only query checks, privileged introspection, sandbox writes, catalog search, lineage, or any database access. Use `profi-mcp` for ordinary ClickHouse/Greenplum read-only access and the configured `bi_metadata`/OpenMetadata MCP for BI catalog/OpenMetadata access. Use `privileged_access_mcp_*` only after explicit approval for the exact privileged contour/action/target. If the needed configured MCP is unavailable, stop and ask the user what to do next.
+description: Use for ClickHouse, Greenplum, BI OpenMetadata/catalog, or other database access through already configured MCP database tools/servers. Apply when a task needs database metadata, schema/table/column inspection, DDL reading, read-only query checks, privileged introspection, sandbox writes, catalog search, table discovery, owner/tag/domain lookup, lineage, root-cause investigation, or any database access. Use `profi-mcp` for ordinary ClickHouse/Greenplum read-only access and the configured `bi_metadata`/OpenMetadata MCP for BI catalog/OpenMetadata access. Use `privileged_access_mcp_*` only after explicit approval for the exact privileged contour/action/target. If the needed configured MCP is unavailable, stop and ask the user what to do next.
 ---
 
 # DB Access
@@ -52,6 +52,19 @@ without exact approval for the action and target entity.
 
 If the needed default MCP database access is not available in the current host agent, state that configured MCP access is unavailable and ask the user what to do next. Do not switch to direct access or change tool configuration from this skill.
 
+## OpenMetadata Investigation Workflow
+
+Use `bi_metadata` as the first catalog step when a task asks to find, understand, compare, explain, or debug tables, marts, dashboards, owners, tags, domains, columns, upstream/downstream dependencies, or data-quality impact.
+
+- Start with `search_metadata` for exact names, FQNs, services, owners, tags, tiers, domains, known column names, or structured filters.
+- Use `semantic_search` for vague business-language requests, unknown table names, or exploratory source discovery.
+- Pass the returned `fullyQualifiedName` and `entityType` unchanged into `get_entity_details` or `get_entity_lineage`; do not construct or normalize FQNs manually.
+- Use `get_entity_details` to inspect descriptions, columns, owners, tags, service/database/schema, domains, data products, and available table metadata before choosing or documenting a source.
+- Use `get_entity_lineage` for normal upstream/downstream explanation and impact checks; use `root_cause_analysis` only when investigating data-quality failures or suspected upstream breakage.
+- Keep catalog evidence separate from live DB proof: OpenMetadata can identify candidates, ownership, meaning, and lineage, but DDL, row counts, query behavior, freshness, and runtime proof still require the appropriate read-only database tools when needed.
+- Page search results deliberately. Prefer a narrow query or small candidate set over dumping broad catalog results into chat.
+- If OpenMetadata and live DB/repo evidence disagree, report the mismatch and do not silently treat catalog metadata as runtime truth.
+
 ## Privileged MCP Access
 
 Use `privileged_access_mcp_*` only for approved privileged introspection or state-changing actions.
@@ -85,6 +98,7 @@ The returned id is the cancellable handle for that privileged flow's own query. 
 - Did I use only `profi-mcp`, `bi_metadata`, or approved `privileged_access_mcp_*` tools?
 - Did I use `profi-mcp` first for ClickHouse/Greenplum read-only access unless privileged access was explicitly approved?
 - Did I use `bi_metadata` first for BI OpenMetadata/catalog access?
+- For table investigation, did I use catalog search/details/lineage when it could clarify meaning, ownership, candidates, or impact?
 - Did I keep OpenMetadata write/admin tools behind exact approval?
 - If privileged access was used, did approval name the contour, action, and target set?
 - Did I avoid treating a default MCP outage, old approval, repo-edit approval, or abstract sandbox request as privileged-action approval?

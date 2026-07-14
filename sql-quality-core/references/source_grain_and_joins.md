@@ -7,6 +7,7 @@ Use this reference for source choice, lineage explanation, driving grain, joins,
 Before choosing source tables:
 
 - search candidates by exact object names and by business keywords from the task;
+- when catalog access is available, use `db-access`/`bi_metadata` to search OpenMetadata for candidate tables, owners, tags/domains, column names, descriptions, and lineage before settling on a non-obvious source;
 - identify the canonical source from repo contracts, model SQL/YAML, checked-in DDL, source definitions, lineage, or existing project patterns;
 - identify live DB candidates when `db-access` metadata is available;
 - prefer candidates present in both repo and live DB when they fit the requested grain and join keys;
@@ -21,6 +22,7 @@ When source choice is non-obvious, keep a compact candidate matrix in notes: can
 When explaining a table, mart, chain, lineage, source flow, or business logic:
 
 - identify the target object, checked-in DDL/contract, build SQL/model, schedule/orchestration config, and downstream export/consumer configs when they exist;
+- use OpenMetadata details/lineage through `db-access` when the table is present in the catalog, and label catalog-only facts separately from repo-backed and live-DB facts;
 - list direct SQL sources and classify each as raw/source, dictionary/lookup, mart/model, mirror/export, or unknown;
 - do not stop at the first `FROM` when a direct source is itself a mart/model/mirror and the user asked for a chain;
 - treat material mart/model sources as possible cross-engine mirrors when repo patterns suggest transfers or load scripts between contours;
