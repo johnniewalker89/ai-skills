@@ -18,7 +18,7 @@ Use this skill as the single shared database access contract.
 1. Use `agent-workflow-core` first for task mode and stop-points.
 2. Use already configured MCP database tools/servers only; do not use any other database access path.
 3. Use `profi-mcp` first for ordinary ClickHouse/Greenplum metadata, DDL reading, `SELECT`, `EXPLAIN`, and smoke checks.
-4. Use the configured `bi_metadata`/OpenMetadata MCP first for BI catalog/OpenMetadata search, table FQN/columns/owners/tags/domains, database services/schemas, and lineage. Prefer read-only tools such as `search_metadata`, `semantic_search`, `get_entity_details`, `get_entity_lineage`, `root_cause_analysis`, and `get_test_definitions` when the remote OpenMetadata MCP is configured. If the local fallback `mcp-bi-metadata` is configured instead, use its `bi_metadata_*` read-only tools. Do not use `profi-mcp` or legacy `OpenMetaData__*` tools for OpenMetadata catalog work while a dedicated BI metadata MCP is configured.
+4. Use the configured `bi_metadata`/OpenMetadata MCP first for BI catalog/OpenMetadata search, table FQN/columns/owners/tags/domains, database services/schemas, and lineage. Use read-only tools such as `search_metadata`, `semantic_search`, `get_entity_details`, `get_entity_lineage`, `root_cause_analysis`, and `get_test_definitions`. Do not use `profi-mcp` or legacy `OpenMetaData__*` tools for OpenMetadata catalog work while the dedicated BI metadata MCP is configured.
 5. Use `privileged_access_mcp_*` only after explicit approval for the exact contour, action type, target set, and rollback/cleanup expectation when relevant. Approval must be current to the task step; do not infer it from a general "continue", repo-edit approval, read-only proof request, old sandbox approval, or default MCP outage.
 6. If the needed default or privileged MCP is unavailable, stop and ask the user what to do next. Do not install, repair, or change MCP/database configuration from this skill.
 7. Never print, copy, or store credentials, passwords, tokens, writable-schema secrets, or admin paths.
@@ -37,25 +37,12 @@ Use the host agent's already configured `profi-mcp` tools for ordinary read-only
 
 Use the configured `bi_metadata`/OpenMetadata MCP tools for BI OpenMetadata catalog access.
 
-Preferred remote OpenMetadata MCP read-only tools:
-
 - `search_metadata`
 - `semantic_search`
 - `get_entity_details`
 - `get_entity_lineage`
 - `root_cause_analysis`
 - `get_test_definitions`
-
-Fallback local `mcp-bi-metadata` read-only tools:
-
-- `bi_metadata_search`
-- `bi_metadata_list_tables`
-- `bi_metadata_get_table_by_fqn`
-- `bi_metadata_get_table_by_id`
-- `bi_metadata_table_lineage_by_fqn`
-- `bi_metadata_list_database_services`
-- `bi_metadata_list_databases`
-- `bi_metadata_list_database_schemas`
 
 Do not use `OpenMetaData__*`; those legacy tools are not the supported catalog path.
 
