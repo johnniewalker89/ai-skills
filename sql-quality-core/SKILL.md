@@ -7,18 +7,18 @@ description: Mandatory engine-agnostic SQL quality framework. MUST be used for e
 
 Use this skill for every SQL writing, editing, review, optimization, validation, DDL, or data-artifact task.
 
-This skill owns engine-agnostic SQL business semantics and quality gates. `sql-style-core` owns shared SQL style. `db-access` owns database access. Engine/dbt skills own syntax, native idioms, physical execution details, engine-specific style overlays, and plan interpretation.
+This skill owns engine-agnostic SQL business semantics and quality gates. `sql-style-core` owns shared SQL style. `db-access` owns direct database/OpenMetadata MCP access; a separately installed access skill may own a typed runtime database-read transport. Engine/dbt skills own target-specific SQL.
 
 ## Role
 
 - Purpose: provide engine-agnostic SQL quality checks before any engine-specific SQL layer.
 - Owns: source choice, driving grain, join sanity, independent fact aggregate combination, multi-row fact semantics, category-safe metrics, metric/window semantics, proxy timestamp coverage, duration/time-to-stage semantics, sequential funnel logic, mutable-source risk, smoke scale, validation mindset, and SQL-quality blockers.
-- Delegates to: `agent-workflow-core` for delivery workflow/proof status, `sql-style-core` for shared SQL style, `db-access` for database access, and engine/dbt skills for engine-specific rules.
+- Delegates to: `agent-workflow-core` for delivery workflow/proof status, `sql-style-core` for shared SQL style, `db-access` for direct database/OpenMetadata MCP access, a separately installed typed runtime-read access owner when selected, and engine/dbt skills for target-specific rules.
 
 ## Hard Gates
 
-1. **Skill chain gate.** Use `agent-workflow-core` first, this skill before any engine-specific SQL skill, `sql-style-core` for shared style, and the matching engine/dbt skill for target-specific SQL.
-2. **Database access gate.** Any database access for SQL work must go through `db-access`. If unavailable, use repo contracts/models/DDL and state the limitation.
+1. **Skill chain gate.** Use `agent-workflow-core` first, this skill before any engine-specific SQL skill, `sql-style-core` for shared style, and every available matching engine/dbt skill for target-specific SQL. If no engine-specific skill exists for the resolved engine, keep the SQL core pair and state that boundary instead of inventing an owner.
+2. **Database access gate.** Direct database/OpenMetadata MCP access must use `db-access`. A separate typed runtime-read route may be used only through its installed dedicated access owner, complete SQL dependency chain, and exact current approval contract. If no valid route is available, use repo evidence and state the limitation.
 3. **Source/grain gate.** Do not draft, approve, or return non-trivial SQL until source choice, driving grain, central joins, and metric semantics have been considered.
 4. **Independent facts gate.** When two or more fact aggregates are combined, name each fact grain and validate the final join/output grain. Do not approve a shape that can duplicate one fact's measures across another fact's dimensions.
 5. **Date/window gate.** Do not claim full business-window coverage when filtering or validating through a proxy timestamp unless coverage is proven or the claim is downgraded to the proxy/guarded surface.
@@ -32,7 +32,7 @@ This skill owns engine-agnostic SQL business semantics and quality gates. `sql-s
 ## Workflow
 
 1. Identify whether the task is writing, editing, review, optimization, DDL, validation, lineage, or explanation.
-2. Identify the target engine and activate the matching engine/dbt skill.
+2. Identify the target engine and activate every available matching engine/dbt skill; if none exists for that engine, keep the SQL core pair and record the boundary.
 3. Choose or verify sources, source lineage, and repo/live evidence.
 4. Name the driving business grain and make joins preserve that grain.
 5. For combined fact aggregates, name each fact grain and prove the final output grain does not duplicate measures.
@@ -49,7 +49,7 @@ This skill owns engine-agnostic SQL business semantics and quality gates. `sql-s
 
 ## Final Checklist
 
-- Did I apply the required skill chain and keep database access inside `db-access`?
+- Did I keep direct database/OpenMetadata MCP access in `db-access` and any separately selected typed runtime database read in its dedicated access owner, exact approval contract, and SQL chain?
 - Did I choose sources by business semantics, repo-backed proof, live DB state, grain, and join keys?
 - Did I name the driving grain and make central joins match it?
 - For independent fact aggregates, did I name each fact grain and validate that final join/output grain cannot duplicate measures?

@@ -23,7 +23,7 @@ Use this file when the task is about Greenplum-specific query writing, runtime p
 - Greenplum does not support ClickHouse-style scalar `WITH` declarations. Wrap runtime settings in a one-row CTE such as `params AS (SELECT ...)`.
 - Keep the params CTE compact when it stays readable.
 - Do not copy ClickHouse `getSetting(...)` patterns into Greenplum queries.
-- The params CTE pattern is preferred for mart, DAG, and runtime-parameterized SQL. For standalone smoke/ad-hoc SQL with a fixed chosen period, route `EXPLAIN` through `db-access` when database access is needed and available: if params prevent static partition pruning, use explicit literals or another shape that preserves pruning.
+- The params CTE pattern is preferred for mart, DAG, and runtime-parameterized SQL. For standalone smoke/ad-hoc SQL with a fixed chosen period, route `EXPLAIN` through the selected access owner when live access is needed and available: if params prevent static partition pruning, use explicit literals or another shape that preserves pruning.
 
 Preferred params pattern:
 

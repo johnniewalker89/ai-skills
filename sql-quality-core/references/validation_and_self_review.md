@@ -16,7 +16,7 @@ When the task lets you choose a smoke period:
 Before returning or approving non-trivial SQL:
 
 - validate the central business relationship separately from final non-emptiness;
-- run lightweight validation when `db-access` validation is available and safe: metadata checks, constrained counts, `LIMIT`, aggregate sanity checks, or an execution plan;
+- run lightweight validation when the selected access owner is available and safe: metadata checks, constrained counts, `LIMIT`, aggregate sanity checks, or an execution plan;
 - treat a successful plan as "can be planned", not "ready";
 - interpret the plan with the engine-specific skill: largest scans, largest estimates, repeated work, materialization/reuse, partition/key pruning, and surprising data movement where applicable;
 - decide whether surprising plan items are accepted, reduced, or rewritten;

@@ -5,8 +5,8 @@ Use this file when the task is about speeding up or diagnosing ClickHouse SQL.
 ## Diagnostic workflow
 
 - Apply `agent-workflow-core` first for task mode, local context, and delivery rules.
-- For non-trivial production `SELECT`s, do not wait for an explicit optimization request: inspect metadata and run lightweight validation through `db-access` when database access is needed and available; see `sql_readiness.md`.
-- Do not rewrite a query blindly. Start from actual metrics in `system.query_log` when `db-access` makes those metrics available.
+- For non-trivial production `SELECT`s, do not wait for an explicit optimization request: inspect metadata and run lightweight validation through the selected access owner when live access is needed and available; see `sql_readiness.md`.
+- Do not rewrite a query blindly. Start from actual metrics in `system.query_log` when the selected access owner makes those metrics available.
 - For mart/build optimization, search `system.query_log` with more than one marker before saying no production run exists:
   - exact target write shape such as `INSERT INTO <database>.<table>` or `INSERT INTO <table>`;
   - target table name alone, excluding `system.query_log`, metadata-only tools, `DESCRIBE`, `SHOW CREATE`, `system.tables`, and `system.columns`;
@@ -21,8 +21,8 @@ Use this file when the task is about speeding up or diagnosing ClickHouse SQL.
   - `read_rows`
   - `read_bytes`
   - `memory_usage`
-- For optimization review of an existing ClickHouse mart/build/query, run `EXPLAIN` through `db-access` for the current query or for the key expensive subquery/branch when database access is available and execution is safe. If `EXPLAIN` is skipped, record the concrete blocker in the final answer or requested evidence artifact; do not silently replace plan review with metadata/query_log only.
-- Before returning substantial new or changed SQL, run `EXPLAIN` through `db-access` when database access is needed, `db-access` validation is available, and execution is safe.
+- For optimization review of an existing ClickHouse mart/build/query, run `EXPLAIN` through the selected access owner when live access is available and safe. If skipped, record the concrete blocker; do not silently replace plan review with metadata/query-log only.
+- Before returning substantial new or changed SQL, run `EXPLAIN` through the selected access owner when live validation is available and safe.
 - Read the `EXPLAIN` output, not only its exit status. Repeated heavy `ReadFromMergeTree` nodes, repeated `FINAL` scans, missing partition pruning, `PrimaryKey Condition: true` on large tables, or all-granule reads inside selected partitions are findings to address or explicitly accept.
 - For plan and index-reading diagnostics, prefer:
   - `EXPLAIN indexes = 1`
@@ -75,11 +75,11 @@ Use this file when the task is about speeding up or diagnosing ClickHouse SQL.
 ## What to verify after optimization
 
 - Check not only elapsed time but also the change in read volume.
-- For key-filter rewrites, compare source rows before and after the key filter when a cheap count is possible through `db-access`.
+- For key-filter rewrites, compare source rows before and after the key filter when a cheap count is possible through the selected access owner.
 - The minimum verification set should include:
   - `query_duration_ms`
   - `read_rows`
   - `read_bytes`
   - `memory_usage`
-  - plan changes in `EXPLAIN` output obtained through `db-access` when database access is needed
+  - plan changes in `EXPLAIN` output obtained through the selected access owner when live access is needed
 - If the query uses `FINAL`, deduplication, `ANY` semantics, dictionaries, or a rewrite from windows to aggregates or arrays, verify separately that the business result did not change.

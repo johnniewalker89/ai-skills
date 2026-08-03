@@ -1,22 +1,22 @@
 ---
 name: db-access
-description: Use for ClickHouse, Greenplum, BI OpenMetadata/catalog, or other database access through already configured MCP database tools/servers. Apply when a task needs database metadata, schema/table/column inspection, DDL reading, read-only query checks, privileged introspection, sandbox writes, catalog search, table discovery, owner/tag/domain lookup, lineage, root-cause investigation, or any database access. Use `profi-mcp` for ordinary ClickHouse/Greenplum read-only access and the configured `bi_metadata`/OpenMetadata MCP for BI catalog/OpenMetadata access. Use `privileged_access_mcp_*` only after explicit approval for the exact privileged contour/action/target. If the needed configured MCP is unavailable, stop and ask the user what to do next.
+description: Use for direct ClickHouse, Greenplum, BI OpenMetadata/catalog, or other database access through already configured database MCP tools/servers. Apply for direct MCP metadata, DDL, queries, privileged introspection, sandbox writes, catalog search, ownership, lineage, or root-cause investigation. Use `profi-mcp` for ordinary ClickHouse/Greenplum read-only access, `bi_metadata` for OpenMetadata, and approved `privileged_access_mcp_*` for privileged work. Do not use this skill for a typed remote-runtime database-read tool owned by a separately installed access skill unless a direct DB/OpenMetadata MCP contour is also in scope.
 ---
 
 # DB Access
 
-Use this skill as the single shared database access contract.
+Use this skill as the single shared direct database/OpenMetadata MCP access contract.
 
 ## Role
 
-- Purpose: provide the shared database access boundary for already configured MCP database/catalog tools.
-- Owns: MCP-first database access, default vs privileged MCP routing, metadata/catalog/query access, privileged-action approvals, and access-related blockers.
+- Purpose: provide the direct database/OpenMetadata access boundary for already configured database/catalog MCP tools.
+- Owns: direct MCP database access, default vs privileged MCP routing, metadata/catalog/query access, privileged-action approvals, and direct-access blockers.
 - Delegates to: `agent-workflow-core` for task mode/approval workflow and domain skills for interpreting database findings.
 
 ## Hard Gates
 
 1. Use `agent-workflow-core` first for task mode and stop-points.
-2. Use already configured MCP database tools/servers only; do not use any other database access path.
+2. Use already configured direct database/catalog MCP tools only. A separately installed access skill may own a typed remote-runtime database-read route; do not add this skill for that route unless the task also needs direct DB/OpenMetadata MCP access.
 3. Use `profi-mcp` first for ordinary ClickHouse/Greenplum metadata, DDL reading, `SELECT`, `EXPLAIN`, and smoke checks.
 4. Use the configured `bi_metadata`/OpenMetadata MCP first for BI catalog/OpenMetadata search, table FQN/columns/owners/tags/domains, database services/schemas, and lineage. Use read-only tools such as `search_metadata`, `semantic_search`, `get_entity_details`, `get_entity_lineage`, `root_cause_analysis`, and `get_test_definitions`. Do not use `profi-mcp` or legacy `OpenMetaData__*` tools for OpenMetadata catalog work while the dedicated BI metadata MCP is configured.
 5. Use `privileged_access_mcp_*` only after explicit approval for the exact contour, action type, target set, and rollback/cleanup expectation when relevant. Approval must be current to the task step; do not infer it from a general "continue", repo-edit approval, read-only proof request, old sandbox approval, or default MCP outage.
@@ -95,7 +95,7 @@ The returned id is the cancellable handle for that privileged flow's own query. 
 
 ## Final Checklist
 
-- Did I use only `profi-mcp`, `bi_metadata`, or approved `privileged_access_mcp_*` tools?
+- Did I use only `profi-mcp`, `bi_metadata`, or approved `privileged_access_mcp_*` tools for this direct MCP contour?
 - Did I use `profi-mcp` first for ClickHouse/Greenplum read-only access unless privileged access was explicitly approved?
 - Did I use `bi_metadata` first for BI OpenMetadata/catalog access?
 - For table investigation, did I use catalog search/details/lineage when it could clarify meaning, ownership, candidates, or impact?
@@ -106,6 +106,7 @@ The returned id is the cancellable handle for that privileged flow's own query. 
 - For long privileged actions, did I use async start/status/cancel when available instead of a single blocking call?
 - Did I avoid claiming I can kill another MCP user's query unless the current contour actually has `KILL QUERY` permission for it?
 - Did I avoid every non-MCP database access path?
+- Did I leave any typed remote-runtime database-read route to its dedicated installed access owner and SQL chain rather than treating it as a `db-access` contour?
 - Did I avoid `OpenMetaData__*` completely?
 - Did I avoid installing, repairing, or changing MCP/database configuration from this skill?
 - Did I avoid exposing or storing credentials, tokens, writable schemas, or admin paths?

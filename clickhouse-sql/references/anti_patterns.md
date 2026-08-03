@@ -7,10 +7,10 @@ For engine-agnostic SQL quality anti-patterns, use `sql-quality-core` first.
 ## ClickHouse anti-patterns
 
 - Do not generate generic cross-database SQL when a clearer ClickHouse-native pattern exists.
-- Do not return non-trivial SQL against real tables without checking metadata first through `db-access` when database access is needed, or through repo contracts when DB access is unavailable.
+- Do not return non-trivial SQL against real tables without checking metadata first through the selected access owner when live access is needed, or through repo contracts when live access is unavailable.
 - Do not return non-trivial ClickHouse SQL before applying the native-shape review pass from `native_shape.md`.
-- Do not execute a heavy production `SELECT` fully just to validate code; when database access is needed and available, prefer `EXPLAIN` through `db-access` or constrained checks through `db-access`.
-- Do not treat a successful `EXPLAIN` through `db-access` as validation until the plan shape has been interpreted.
+- Do not execute a heavy production `SELECT` fully just to validate code; when live access is needed and available, prefer `EXPLAIN` or constrained checks through the selected access owner.
+- Do not treat a successful `EXPLAIN` through the selected access owner as validation until the plan shape has been interpreted.
 - Do not keep generic SQL constructs just because they are familiar from other databases.
 - Do not copy Greenplum or Postgres idioms into ClickHouse without confirming that the pattern is valid and local.
 - Do not use `current_setting(...)` in ClickHouse marts when the local pattern is `getSetting(...)`.
@@ -24,8 +24,8 @@ For engine-agnostic SQL quality anti-patterns, use `sql-quality-core` first.
 - Assuming ClickHouse engine, key shape, right-side uniqueness, or column types without checking metadata or repo contracts.
 - Replacing `FINAL` with `GROUP BY ... HAVING sum(sign) > 0` on collapsing engines without proving the output grain and selected columns are equivalent.
 - Treating a ClickHouse CTE as materialized when it may be inlined and scanned repeatedly.
-- Ignoring repeated heavy `ReadFromMergeTree` nodes after `EXPLAIN` through `db-access`.
-- Interpreting `EXPLAIN` through `db-access` for a query with reused CTEs/subqueries without checking whether the same heavy table is read more than once.
+- Ignoring repeated heavy `ReadFromMergeTree` nodes after `EXPLAIN` through the selected access owner.
+- Interpreting `EXPLAIN` for a query with reused CTEs/subqueries without checking whether the same heavy table is read more than once.
 - Treating `EXPLAIN` parts pruning as enough while ignoring granules, primary-key conditions, or all-granule reads within selected partitions.
 - Hiding a partition key inside a dynamic predicate such as `has(array, dt)` and assuming ClickHouse can prune partitions. Prove pruning with `EXPLAIN indexes = 1` or rewrite to an explicit partition-prunable shape.
 - Raw `ASOF JOIN` over a history table before checking duplicate `(equality keys, as-of timestamp)` rows or building a deterministic tie-break.

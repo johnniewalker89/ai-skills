@@ -9,13 +9,13 @@ Before choosing source tables:
 - search candidates by exact object names and by business keywords from the task;
 - when catalog access is available, search OpenMetadata through `db-access` for candidate tables, owners, tags/domains, column names, descriptions, and lineage before settling on a non-obvious source;
 - identify the canonical source from repo contracts, model SQL/YAML, checked-in DDL, source definitions, lineage, or existing project patterns;
-- identify live DB candidates when `db-access` metadata is available;
+- identify live DB candidates when metadata is available through the selected access owner;
 - prefer candidates present in both repo and live DB when they fit the requested grain and join keys;
 - call a candidate repo-backed only after verifying a concrete local path for that exact object or an explicit checked-in alias/deployment mapping;
 - treat comments, similar names, downstream mentions, or another engine's DDL as hints, not repo-backed proof;
 - treat DB-only live objects as fallback, not the default;
 - if repo/task expectations and DB state disagree, state the mismatch and do not silently substitute a convenient live object.
-- if a selected source is unavailable through `db-access`, choose an alternative only when it preserves the requested business entity, grain, attribution, metric semantics, and validation surface. A live-accessible surrogate is not a valid replacement merely because it can be queried.
+- if a selected source is unavailable through the selected access owner, choose an alternative only when it preserves the requested business entity, grain, attribution, metric semantics, and validation surface. A live-accessible surrogate is not a valid replacement merely because it can be queried.
 
 When source choice is non-obvious, keep a compact candidate matrix in notes: candidate, repo path, live presence, grain, join keys, freshness, and selected/rejected reason.
 

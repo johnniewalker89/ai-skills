@@ -42,7 +42,7 @@ FROM some_table source
 - When runtime parameters are needed, declare them in a one-row CTE such as `params AS (SELECT ...)`.
 - Place a params CTE first in the `WITH` chain when later CTEs depend on it.
 - Reuse params values through `FROM params`, `CROSS JOIN params`, or another explicit join pattern inside downstream CTEs.
-- For standalone smoke/ad-hoc SQL with a fixed chosen period, verify plan pruning through `db-access` when database access is needed and available; if a params CTE prevents static partition pruning, use explicit literals or another shape that preserves pruning.
+- For standalone smoke/ad-hoc SQL with a fixed chosen period, verify plan pruning through the selected access owner when live access is needed and available; if a params CTE prevents static partition pruning, use explicit literals or another shape that preserves pruning.
 
 Compact runtime conversion inside a one-row params CTE:
 

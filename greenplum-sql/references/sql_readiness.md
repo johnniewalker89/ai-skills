@@ -19,7 +19,7 @@ This file owns Greenplum-specific SQL metadata and shape checks: MPP metadata sh
 
 - `sql-quality-core` owns business SQL quality.
 - `greenplum-sql` owns Greenplum syntax, MPP query shape, DDL choices, and Greenplum-specific plan interpretation.
-- Use `db-access` for database access.
+- Use `db-access` for direct database MCP access; use a separately installed typed runtime-read owner only under its exact approval contract.
 
 Use all applicable skills together for real Greenplum work.
 
@@ -28,7 +28,7 @@ Use all applicable skills together for real Greenplum work.
 Before drafting or finalizing non-trivial SQL against real Greenplum objects:
 
 1. Identify every real source table, target table, external table, temp table, and important intermediate involved.
-2. Inspect metadata through `db-access` when database access is needed:
+2. Inspect metadata through the selected access owner when live database access is needed:
    - columns and types;
    - distribution policy and distribution keys;
    - partition rules;
@@ -76,8 +76,8 @@ Before returning Greenplum DDL or load files:
 
 Before returning a non-trivial production `SELECT`:
 
-- Prefer `EXPLAIN` through `db-access` for the drafted query when database access is needed and available.
-- Use `EXPLAIN ANALYZE` only through `db-access` and only on constrained inputs or when execution is safe; do not run a heavy full query just to prove syntax or confidence.
+- Prefer `EXPLAIN` through the selected access owner for the drafted query when live access is needed and available.
+- Use `EXPLAIN ANALYZE` only through the selected access owner and only on constrained inputs or when execution is safe; do not run a heavy full query just to prove syntax or confidence.
 - Interpret the plan. A successful `EXPLAIN` only proves the query can be planned; it does not prove the shape is acceptable or make the task ready.
 - Check the optimizer line. `Optimizer: Pivotal Optimizer (GPORCA)` is expected for most analytic work. If the plan uses `Optimizer: Postgres query optimizer`, name the fallback and inspect whether a GPORCA-friendly rewrite is available.
 - Check `Motion` nodes explicitly: `Redistribute Motion`, `Broadcast Motion`, and `Gather Motion`.
@@ -94,12 +94,12 @@ Before returning a non-trivial production `SELECT`:
 - Do not round the EXPLAIN summary down to qualitative language. Write row-volume signals as concrete approximations, for example `order_service Seq Scan ~23M rows`, `client Seq Scan ~5M rows`, `Gather Motion ~190k rows`, or `orders_base estimate ~1.6M vs actual ~29k`.
 - If a full scan exceeds the constrained driving set by orders of magnitude, first try key-filtering, partition pruning, distribution-compatible joins, or pre-aggregation before accepting it as a smoke tradeoff.
 - Do not treat `EXPLAIN` as passed until surprising scans, repeated source reads, materialization points, bad estimates, and major Motion nodes are interpreted as acceptable for the constrained task or fixed.
-- If a result check is useful, run a constrained check through `db-access`, such as a narrow date window, `LIMIT`, aggregate row counts, or metadata-only checks.
-- For heavy enrichment tables, compare unfiltered date-window row counts with row counts after applying relevant business keys when a cheap count is possible through `db-access`.
+- If a result check is useful, run a constrained check through the selected access owner, such as a narrow date window, `LIMIT`, aggregate row counts, or metadata-only checks.
+- For heavy enrichment tables, compare unfiltered date-window row counts with row counts after applying relevant business keys when a cheap count is possible through the selected access owner.
 - If a reusable heavy fact/history CTE is later joined to a constrained driving set, push the driving-key filter into that CTE when semantics allow it. Do not materialize a broad date-window CTE first and reduce it only in downstream CTEs unless the wider scan is measured and accepted.
-- If validation cannot be run because `db-access` is unavailable, the query is text-only, or execution would be too risky, say so briefly.
+- If validation cannot be run because the selected access owner is unavailable, the query is text-only, or execution would be too risky, say so briefly.
 
-For optimization tasks, also inspect skew/statistics via system views or `gp_toolkit` through `db-access` when available; see `optimization.md`.
+For optimization tasks, also inspect skew/statistics via system views or `gp_toolkit` through the selected access owner when available; see `optimization.md`.
 
 ## Workload and query-log evidence
 
@@ -127,7 +127,7 @@ Fresh direct Greenplum query history requires a confirmed Greenplum source and g
 
 Rules:
 
-- Use `db-access` for live query-log checks.
+- Use the selected access owner for live query-log checks.
 - If querying the ClickHouse mirror requires non-trivial SQL, use `clickhouse-sql` for that query shape and interpretation.
 - Verify current privileges before relying on the source.
 - If SELECT is blocked, record the exact table/grant blocker.
@@ -139,7 +139,7 @@ Greenplum 6 inherits PostgreSQL 9.4-era CTE behavior: CTEs can act as optimizati
 
 - Treat every reused expensive CTE or derived subquery as a possible materialization, spill, or motion point.
 - Before finalizing, list reused CTEs/subqueries that contain heavy scans, aggregations, window functions, or central joins.
-- Check `EXPLAIN` through `db-access` for materialize/spill-like plan shape, repeated expensive subplans, and extra `Motion` around CTE boundaries.
+- Check `EXPLAIN` through the selected access owner for materialize/spill-like plan shape, repeated expensive subplans, and extra `Motion` around CTE boundaries.
 - Avoid forcing a large CTE boundary when the same logic can be expressed as a predicate-pushed subquery or a staged temp table with clear distribution.
 - If a CTE is intentionally used as a readable or reusable boundary, mention the tradeoff when it is material to performance.
 - When a shared driving CTE is reused to key-filter several large facts, verify the plan does not turn that readability boundary into an outsized materialization or row-estimate problem.

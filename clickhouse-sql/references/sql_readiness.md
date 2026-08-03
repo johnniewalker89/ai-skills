@@ -6,7 +6,7 @@ Use this file before returning non-trivial ClickHouse SQL code.
 
 This file owns ClickHouse-specific SQL metadata and shape checks: table metadata shape, MergeTree semantics, native primitives, physical pruning evidence, and ClickHouse plan interpretation. Final task status, artifact readiness, approval gates, and proof-level wording belong to `agent-workflow-core`.
 
-Precondition: apply `agent-workflow-core` first for task delivery, local context, and `environment.md` rules. If metadata inspection, `EXPLAIN`, query log checks, or bounded validation need database access, use `db-access`.
+Precondition: apply `agent-workflow-core` first. For live checks, use the selected access owner: direct database MCP through `db-access`, or a separately installed typed runtime-read owner under its exact approval contract.
 
 ## Navigation
 
@@ -21,7 +21,7 @@ Precondition: apply `agent-workflow-core` first for task delivery, local context
 
 - `sql-quality-core` owns business SQL quality.
 - `clickhouse-sql` owns ClickHouse syntax, native query shape, engine correctness, physical pruning evidence, and ClickHouse-specific plan interpretation.
-- Use `db-access` for database access, including metadata, `EXPLAIN`, query log checks, and bounded validation queries.
+- Use `db-access` for direct database MCP metadata, `EXPLAIN`, query-log, and validation access; use a separately installed typed runtime-read owner only for its explicitly approved route.
 
 Use all applicable skills together for real ClickHouse work.
 
@@ -30,7 +30,7 @@ Use all applicable skills together for real ClickHouse work.
 Before drafting or finalizing non-trivial SQL against real ClickHouse objects:
 
 1. Identify every real source table, dictionary, and target table involved.
-2. Inspect metadata through `db-access` when database access is needed:
+2. Inspect metadata through the selected access owner when live database access is needed:
    - columns and types;
    - engine;
    - `ORDER BY`;
@@ -137,8 +137,8 @@ Before returning a non-trivial production `SELECT`:
 - If the query reuses CTEs or derived subqueries, scan the plan for repeated `ReadFromMergeTree` nodes for the same heavy tables, especially `FINAL` readers and central join branches.
 - Do not execute a heavy full query just to prove syntax or confidence.
 - For bounded smoke or validation SQL that the agent creates itself, `EXPLAIN` alone is not enough. After the plan is acceptable, run the final aggregate/query on the constrained window unless it is unsafe, exceeds the contour's practical limits, or the user explicitly asked for text-only SQL. If skipped, state the concrete blocker.
-- If a result check is useful, run a constrained check through `db-access`, such as a narrow date window, `LIMIT`, aggregated row counts, or metadata-only checks.
-- For heavy enrichment tables, compare unfiltered date-window row counts with row counts after applying relevant business keys when a cheap count is possible through `db-access`.
+- If a result check is useful, run a constrained check through the selected access owner, such as a narrow date window, `LIMIT`, aggregated row counts, or metadata-only checks.
+- For heavy enrichment tables, compare unfiltered date-window row counts with row counts after applying relevant business keys when a cheap count is possible through the selected access owner.
 - For large lookup, dimension, or reference tables, key-filter the right side to the driving keys when the left set is narrow. Keep a full lookup scan only when the table is genuinely small, dictionary-like, or the full scan is measured and accepted.
 - For pointer/reference-id checks, collect the relevant ids from the driving rows, deduplicate them, and check the referenced table through one key-filtered CTE. Do not run several unfiltered full-table lookups against the same referenced table for separate pointer columns.
 - Pointer/reference validation is not a substitute for bounded smoke coverage. If a query reports both pricing/fact coverage and pointer existence from the same heavy table, check that the coverage branch is bounded and the pointer branch is explicitly named all-history when it scans history.
@@ -146,7 +146,7 @@ Before returning a non-trivial production `SELECT`:
 - If a selective key filter creates repeated CTE reads, do not drop the key filter as the first fix. Compare unfiltered vs key-filtered row counts, then try a one-flow rewrite, a minimal key-only subquery, or an explicitly accepted tradeoff.
 - If the user requested a reasoning/evidence artifact, record the material validation signals in that artifact: final smoke result counts, `EXPLAIN` parts/granules/primary-key conditions, repeated `ReadFromMergeTree`, heavy-table scan shape, and accept/rewrite decisions. Do not create such an artifact unless the user asked for it.
 - Do not write that `EXPLAIN` was "not saved" or "not run" as an acceptable validation state in a reasoning/evidence artifact. If `EXPLAIN` is absent, record the concrete blocker or error; if the final smoke query executed, `EXPLAIN indexes = 1` should normally execute too.
-- If validation cannot be run because `db-access` is unavailable, the query is text-only, or execution would be too risky, say so briefly.
+- If validation cannot be run because the selected access owner is unavailable, the query is text-only, or execution would be too risky, say so briefly.
 
 For optimization tasks, also use `system.query_log` metrics when available; see `optimization.md`.
 
@@ -156,7 +156,7 @@ ClickHouse CTEs are query text abstractions, not guaranteed materialized temp re
 
 - Treat every reused expensive CTE or derived subquery as a possible repeated scan.
 - Before finalizing, list reused CTEs/subqueries that contain `FINAL`, heavy MergeTree reads, or central joins.
-- Check `EXPLAIN` output obtained through `db-access` for duplicated `ReadFromMergeTree` nodes when one of those CTEs/subqueries is referenced more than once.
+- Check `EXPLAIN` output obtained through the selected access owner for duplicated `ReadFromMergeTree` nodes when one of those CTEs/subqueries is referenced more than once.
 - Do not treat `EXPLAIN` as passed until duplicated heavy reads are interpreted as either acceptable for the constrained task or fixed.
 - Avoid reusing heavy CTEs multiple times in standalone `SELECT`s when the same logic can be expressed in one flow.
 - If `EXPLAIN indexes = 1` shows repeated reads of heavy CTEs or repeated `FINAL` scans, rewrite the query or explicitly state why the repeated reads are acceptable.

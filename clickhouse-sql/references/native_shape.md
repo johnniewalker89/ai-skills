@@ -15,7 +15,7 @@ The goal is not to force every ClickHouse feature into every query. The goal is 
 
 ## Mandatory pass
 
-Before finalizing SQL, classify every non-trivial query shape by business intent. This is a local review pass; database checks mentioned here still go through `db-access`.
+Before finalizing SQL, classify every non-trivial query shape by business intent. This is a local review pass; live checks use direct MCP through `db-access` or a separately installed typed runtime-read owner under its exact approval contract.
 
 - joins and lookup enrichment after `sql-quality-core` defines the intended business grain and unmatched-row behavior;
 - `ASOF JOIN` and "latest state at event time" enrichment;
@@ -147,11 +147,11 @@ When a query first builds a narrow set of business keys and then enriches it fro
 
 - build a key-only CTE such as `relevant_orders` or `active_clients`;
 - apply `LEFT SEMI JOIN relevant_orders USING (order_id)` to the heavy history table before `GROUP BY`, `argMax`, `ASOF JOIN`, or wide lookup enrichment;
-- compare the filtered row count against the unfiltered date-window row count for smoke/test tasks when `db-access` validation is available;
-- if the table's `ORDER BY` starts with the key, check through `db-access` whether `EXPLAIN` improves primary-key/granule pruning.
+- compare the filtered row count against the unfiltered date-window row count for smoke/test tasks when selected live access is available;
+- if the table's `ORDER BY` starts with the key, check through the selected access owner whether `EXPLAIN` improves primary-key/granule pruning.
 - If the key filter causes repeated CTE reads, do not remove it as the default fix. Prefer a one-flow rewrite, a minimal key-only subquery, or a documented row-count tradeoff.
 
-Do not add the key filter if it would remove rows that are required for the business result. If the filter is intentionally skipped on a heavy table, state the reason and compare unfiltered versus key-filtered row counts when `db-access` validation is available.
+Do not add the key filter if it would remove rows that are required for the business result. If the filter is intentionally skipped on a heavy table, state the reason and compare unfiltered versus key-filtered row counts when selected live access is available.
 
 For smoke or lifecycle checks, combine the key filter with the narrowest semantically valid date window when the heavy table is date-partitioned. A key-only scan across all history is acceptable only when the metric is explicitly all-history and the added scan is justified.
 

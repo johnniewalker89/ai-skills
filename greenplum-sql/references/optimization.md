@@ -5,16 +5,16 @@ Use this file when the task is about speeding up or diagnosing Greenplum SQL.
 ## Diagnostic workflow
 
 - Do not rewrite a query blindly. Start from the actual plan.
-- For non-trivial production `SELECT`s, do not wait for an explicit optimization request: inspect metadata and run lightweight validation through `db-access` when database access is needed and available; see `sql_readiness.md`.
-- For Greenplum, first use `EXPLAIN` through `db-access`; use `EXPLAIN ANALYZE` only when `db-access` and task safety allow it.
+- For non-trivial production `SELECT`s, inspect metadata and run lightweight validation through the selected access owner when live access is needed and available; see `sql_readiness.md`.
+- For Greenplum, prefer `EXPLAIN`; use `EXPLAIN ANALYZE` only when the selected access owner and task safety allow it.
 - Check the final optimizer line in every material `EXPLAIN`: prefer `Optimizer: Pivotal Optimizer (GPORCA)`. If it says `Optimizer: Postgres query optimizer`, treat this as a performance finding and identify the feature that likely forced legacy planning.
-- If configured MCP permissions block `EXPLAIN` or metadata for a referenced schema, stop at the `db-access` boundary, record the exact blocked schema/object, and mark the validation as partial. Do not call an optimization proven when the material plan is unavailable.
+- If the selected access owner blocks `EXPLAIN` or metadata for a referenced schema, stop at that access boundary, record the exact blocked schema/object and contour, and mark the validation as partial. Do not switch from the typed runtime-read contour to `db-access` unless direct database MCP access is separately in scope, and do not call an optimization proven when the material plan is unavailable.
 - When reading `EXPLAIN ANALYZE`, check at least:
   - whether there is `Motion`
   - where the most expensive steps are
   - whether there is skew across segments
   - whether there is a full `Seq Scan` where narrower reading was expected
-- When needed, use system views and `gp_toolkit` through `db-access` to inspect skew and distribution instead of guessing.
+- When needed, use system views and `gp_toolkit` through the selected access owner to inspect skew and distribution instead of guessing.
 - Read the plan, not only its exit status. Extra `Redistribute Motion`, broad `Broadcast Motion`, missing partition pruning, large `Seq Scan`, suspicious row estimates, or CTE materialization boundaries are findings to address or explicitly accept.
 - For smoke and validation queries, compare important plan estimates with cheap actual counts for the chosen window. If the plan estimates millions of rows for a narrow smoke window with tens of thousands of actual rows, call that out and decide whether statistics, filters, or query shape need attention.
 - Treat `Shared Scan` and `Materialize` as named plan features. They are often normal with CTEs, but a large shared CTE reused across several fact joins can become the main cost center.
@@ -78,7 +78,7 @@ For tuple-hash rewrites, do not stop at "concat returns GPORCA". Save compact be
 ## What to verify after optimization
 
 - Check not only elapsed time but also how the execution plan changed.
-- For key-filter rewrites, compare source rows before and after the key filter when a cheap count is possible through `db-access`.
+- For key-filter rewrites, compare source rows before and after the key filter when a cheap count is possible through the selected access owner.
 - For bounded-history rewrites, compare coverage before and after widening as well as partition/row volume. A faster query that silently drops required keys is wrong; a full-history query that recovers only a tiny tail may still be a poor smoke shape.
 - The minimum verification set should include:
   - `EXPLAIN` / `EXPLAIN ANALYZE` before and after

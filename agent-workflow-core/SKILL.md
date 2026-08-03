@@ -9,13 +9,13 @@ Use this skill as the top-level delivery layer for real work, before domain-spec
 
 This skill owns how to run the task. Other skills own domain rules, SQL style, database access, dbt project details, code syntax, and tool details.
 
-Any database access must go through `db-access`. Do not use any other database access path from this skill or any companion skill.
+Direct database/OpenMetadata MCP access must go through `db-access`. A separate database path is allowed only when an installed dedicated access skill owns a typed read-only tool and an exact current-approval contract; raw database commands over SSH remain forbidden.
 
 ## Role
 
 - Purpose: provide the top-level delivery workflow for non-trivial engineering, data, SQL, dbt, investigation, review, or project work.
 - Owns: task mode, local context workspace, `environment.md` lifecycle, task snapshots, optional agent logs, planning, stop/approval behavior, validation framing, and final self-review.
-- Delegates to: the context-research owner selected by the entry skill for bounded external discovery, entry/domain skills for domain work, and `db-access` for any database access.
+- Delegates to: the context-research owner selected by the entry skill for bounded external discovery, entry/domain skills for domain work, `db-access` for direct database/OpenMetadata MCP access, and any separately installed typed runtime-read access owner plus its required SQL chain.
 
 ## Hard Gates
 
@@ -25,7 +25,7 @@ These gates are mandatory. If a gate applies, read the named reference before ac
 2. **Context bootstrap gate.** Establish or restore local task context before domain work when the user provides a task id, explicitly asks for durable context or agent logging, or asks to continue an established context-backed task. Without a task id or explicit context request, do not create new task context by default; work autonomously and update no durable context unless a later user instruction enables it. Read `references/context_and_decisions.md` before context work, `environment.md` work, agent-log work, or continuing an established context task.
 3. **External context research gate.** Keep saved-context bootstrap and task-file lifecycle in this skill. When missing requirements, prior decisions, ownership, project documentation, table meaning, lineage, or discussion history can materially change the work, delegate to an available context-research owner selected by the entry skill instead of performing broad external discovery from this core. If none is available, report the evidence gap.
 4. **Agent-log gate.** Agent logs are optional. A task id alone does not enable agent logging. Create or append `agent_logs/<TASK_ID>.agent_log.md` only when agent logging was explicitly requested or already established, and only inside the established context workspace.
-5. **Database access gate.** Use `db-access` for metadata, DDL, `EXPLAIN`, query-log checks, smoke queries, privileged read-only introspection, and any database access. If `db-access` is unavailable or insufficient, stop under its escalation rules.
+5. **Database access gate.** Use `db-access` for direct MCP metadata, DDL, `EXPLAIN`, query-log checks, smoke queries, privileged introspection, and OpenMetadata. A non-`db-access` route is valid only when a separately installed access owner defines a typed read-only tool, its complete SQL dependency chain, and exact current approval for the call. A missing or denied contour never authorizes raw SSH database commands.
 6. **Privileged/sandbox action gate.** Before any database state-changing action, sandbox CTAS/materialization, cleanup/drop, rebuild, recalculation, or `privileged_access_mcp_*` use, the current task must have explicit approval for the exact database contour, action type, target set, and cleanup/rollback expectation. General approval to continue, edit repo files, prove an idea, or use a sandbox is not enough for privileged database actions. A default MCP outage or timeout is a blocker/escalation question, not permission to switch contours.
 7. **Project gate.** For `project` mode, risky/expensive work, destructive/hard-to-reverse work, unclear business rules, or cross-system work, read `references/safety_and_stop_points.md` before implementation or approval requests.
 8. **New production-like data artifact gate.** For new marts, models, tables, reports, data contracts, or test/sandbox equivalents of production-like artifacts, choose `project` mode and read both `references/safety_and_stop_points.md` and `references/validation_and_review.md` before creating solution artifacts or asking for approval.
@@ -79,7 +79,7 @@ This gate applies before any solution SQL/DDL/config/task note that embodies a p
 - If the work was non-tiny, did my first user-facing update start with `Режим:` before skills or plan, with the mode value in backticks?
 - Did I establish or update durable context only when task id, explicit context request, agent logging, or established context required it?
 - Did I keep saved-context lifecycle here and route material external context discovery to an available research owner rather than implementing it in this core?
-- Did all database access go through `db-access`?
+- Did direct database/OpenMetadata MCP access go through `db-access`, and any separately selected typed runtime database read go through its dedicated access owner, exact approval contract, and SQL chain?
 - Before any sandbox write, cleanup, rebuild, or privileged database action, did I have exact current approval for contour, action, target set, and cleanup/rollback expectation?
 - Before any commit/push, did I verify branch, upstream, exact remote target, and repo-specific user workflow?
 - Did I keep code artifacts in the target repo/workspace unless a context-only output was requested?

@@ -8,7 +8,7 @@ For engine-agnostic SQL quality anti-patterns, use `sql-quality-core` first.
 
 - Do not copy modern PostgreSQL syntax or planner expectations into Greenplum without checking compatibility.
 - Do not copy ClickHouse runtime patterns such as `getSetting(...)` into Greenplum.
-- Do not return non-trivial SQL against real tables without checking metadata first through `db-access` when database access is needed, or through repo contracts when DB access is unavailable.
+- Do not return non-trivial SQL against real tables without checking metadata first through the selected access owner when live access is needed, or through repo contracts when live access is unavailable.
 - Do not treat a successful `EXPLAIN` as validation until the MPP plan shape has been interpreted.
 - Do not ignore the optimizer line in `EXPLAIN`. `Optimizer: Postgres query optimizer` is a material finding for Greenplum optimization/review work; name the likely fallback feature or state that it is unknown.
 - Do not summarize `EXPLAIN` only as "planned", "partition pruning works", or "Motion is expected"; name the largest scans, materialization points, major motions, and suspicious row estimates.

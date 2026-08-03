@@ -90,14 +90,14 @@ Allowed checks:
 - targeted diff/readback for low-risk text, config, or documentation;
 - local tests, lint, compile, type checks, dry-runs, or command help/version checks;
 - repository contracts, model definitions, DDL text, and existing implementation review;
-- database validation through `db-access` plus the relevant SQL skills, such as metadata, DDL, `EXPLAIN`, constrained `SELECT`, smoke aggregate, or bounded comparison queries;
+- database validation through the relevant SQL skills plus either direct MCP access in `db-access` or an exactly approved typed runtime database read through its separately installed dedicated access owner;
 - small sanity comparisons that do not change database state.
 
 Expectations:
 
 - state the read-only validation plan before using database access when the task is non-trivial;
 - for new production-like artifacts, it is acceptable to state a short reconnaissance intent, perform safe bounded discovery/probes, and then present the full proof strategy after concrete sources and grain are known;
-- keep all database work inside `db-access`;
+- keep direct database/OpenMetadata MCP work inside `db-access`; use any separately installed typed runtime-read route only through its dedicated access owner, exact current approval contract, and SQL chain;
 - do not run `dbt run`, `dbt build`, rebuilds, creates, drops, inserts, deletes, or cleanup actions in this mode;
 - for code changes, run the narrowest relevant check or explain the blocker;
 - for SQL, data, or modeling logic, try to prove correctness with read-only evidence first;

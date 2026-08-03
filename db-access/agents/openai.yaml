@@ -1,4 +1,4 @@
 interface:
   display_name: "DB Access"
-  short_description: "Use databases through configured MCP access"
-  default_prompt: "Use $db-access for safe database access through already configured MCP tools/servers. Use profi-mcp for ordinary read-only access; use privileged_access_mcp_* only after explicit approval for the exact contour, action, and target."
+  short_description: "Use direct database MCP access safely"
+  default_prompt: "Use $db-access for direct database or OpenMetadata MCP access; leave any separately owned typed remote-runtime database read to its installed access owner."

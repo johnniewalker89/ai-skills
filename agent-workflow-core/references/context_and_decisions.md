@@ -97,7 +97,7 @@ Minimal local environment map for skills. Store only machine-specific facts need
 ## Notes
 
 - discovered values: `<draft/unconfirmed or user-confirmed>`
-- database access: `through db-access only; <available/unknown/not used>`
+- database access: `direct MCP via db-access / approved typed runtime read via selected dedicated access owner + SQL chain / not used`
 ```
 
 Keep unknown values explicit as `<unknown>` or `unknown`; do not invent paths or env names. If the user allows read-only discovery, propose a draft, label it unconfirmed, and ask the user to validate it. Treat discovered values as unconfirmed until the user accepts them.
@@ -155,7 +155,7 @@ When durable context is required or already established for the current task, in
 - relevant task notes in `tasks/` or another local context file;
 - recent decisions, open questions, known blockers, and validation status;
 - known project conventions and implementation pointers already present in saved context or the scoped target repo;
-- database contour/account only through `db-access`.
+- database contour/account through its selected owner: direct MCP via `db-access`, or an approved typed runtime read via a separately installed dedicated access owner + the SQL chain.
 
 Do not ask the user to repeat context that can be recovered safely from local files, git state, or metadata.
 
@@ -167,7 +167,7 @@ Keep this reference responsible for saved local context and its lifecycle. Do no
 
 Use the context-research owner selected by the active entry skill when missing requirements, prior decisions, ownership, project documentation, table meaning, lineage, or work discussions can materially change scope, design, implementation, or validation. The research owner handles research questions, bounded source selection, source reconciliation, and the compact task brief. If no such owner is available, preserve the evidence gap instead of expanding this core into an external-search workflow.
 
-Keep all OpenMetadata and database access in `db-access`. After research, this workflow decides what decision-grade facts belong in the task snapshot or agent log.
+Keep OpenMetadata and direct database MCP access in `db-access`. Keep any separately approved typed runtime database-read route in its installed dedicated access owner + SQL chain. After research, this workflow decides what decision-grade facts belong in the task snapshot or agent log.
 
 ## Workspace Guardrails
 
