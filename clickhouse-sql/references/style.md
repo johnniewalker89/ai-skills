@@ -2,6 +2,13 @@
 
 Use this file after `sql-style-core/references/style.md`. It contains only ClickHouse-specific or local ClickHouse style rules.
 
+## Navigation
+
+- [Expressions and aliases](#clickhouse-expressions-and-aliases)
+- [Scalar and mixed WITH](#scalar-with-and-mixed-with)
+- [Multiline expressions](#clickhouse-multiline-expressions)
+- [DDL formatting](#clickhouse-ddl-formatting)
+
 ## ClickHouse Expressions And Aliases
 
 - SQL functions should be lower-case.

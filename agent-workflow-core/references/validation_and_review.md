@@ -2,6 +2,15 @@
 
 Use this reference before final delivery for `focused`, `project`, `investigation`, and `review` tasks.
 
+## Navigation
+
+- [Validation modes](#validation-modes)
+- [Read-only validation](#read-only-validation)
+- [Extended sandbox validation](#extended-sandbox-validation)
+- [Self-review before delivery](#self-review-before-delivery)
+- [Explaining rationale](#explaining-rationale)
+- [Handoff](#handoff)
+
 ## Validation Modes
 
 Choose the lightest validation mode that can prove the result.

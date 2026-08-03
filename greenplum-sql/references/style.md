@@ -2,6 +2,13 @@
 
 Use this file after `sql-style-core/references/style.md`. It contains only Greenplum-specific or local Greenplum style rules.
 
+## Navigation
+
+- [Expressions and aliases](#greenplum-expressions-and-aliases)
+- [WITH and runtime parameters](#with-and-runtime-parameters)
+- [Multiline expressions](#greenplum-multiline-expressions)
+- [DDL formatting](#greenplum-ddl-formatting)
+
 ## Greenplum Expressions And Aliases
 
 - SQL functions should be lower-case.

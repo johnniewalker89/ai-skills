@@ -2,6 +2,16 @@
 
 Use this reference for `project` work, destructive/hard-to-reverse goals, risky/expensive actions, unclear business rules, production-like validation assumptions, or extended sandbox validation.
 
+## Navigation
+
+- [Project gate](#project-gate)
+- [Artifact destination](#artifact-destination)
+- [Extended sandbox validation](#extended-sandbox-validation)
+- [Business rules](#business-rules)
+- [Destructive or hard-to-reverse goals](#destructive-or-hard-to-reverse-goals)
+- [Cleanup and deletion usage proof](#cleanup-and-deletion-usage-proof)
+- [Approval hygiene](#approval-hygiene)
+
 ## Project Gate
 
 For `project` mode, first restore context and do safe bounded read-only reconnaissance when needed. Do not make the user approve the agent's first look at local files, metadata, existing contracts, or small bounded read-only checks when they are necessary to form a concrete proposal.

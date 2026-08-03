@@ -7,7 +7,7 @@ Use this reference for source choice, lineage explanation, driving grain, joins,
 Before choosing source tables:
 
 - search candidates by exact object names and by business keywords from the task;
-- when catalog access is available, use `db-access`/`bi_metadata` to search OpenMetadata for candidate tables, owners, tags/domains, column names, descriptions, and lineage before settling on a non-obvious source;
+- when catalog access is available, search OpenMetadata through `db-access` for candidate tables, owners, tags/domains, column names, descriptions, and lineage before settling on a non-obvious source;
 - identify the canonical source from repo contracts, model SQL/YAML, checked-in DDL, source definitions, lineage, or existing project patterns;
 - identify live DB candidates when `db-access` metadata is available;
 - prefer candidates present in both repo and live DB when they fit the requested grain and join keys;

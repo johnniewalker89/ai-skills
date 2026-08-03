@@ -21,16 +21,17 @@ Any database access must go through `db-access`.
 
 1. **Skill-chain gate.** Use `agent-workflow-core` first and `sql-quality-core` before or alongside this style pass.
 2. **Reference gate.** Read `references/style.md` for SQL writing, editing, or review tasks.
-3. **Style-only gate.** Do not change business semantics from this skill. Route semantic concerns to `sql-quality-core` and engine concerns to the target engine skill.
-4. **Self-review gate.** Before returning SQL, run a formatting-only self-review after semantic and engine-specific checks are complete.
+3. **Target-owner gate.** Identify the target engine before SQL writing, editing, review, or optimization and include its engine owner; add the matching dbt owner when the SQL is inside a dbt model/project. Do not treat a style pass as a complete SQL review without those owners.
+4. **Style-only gate.** Do not change business semantics from this skill. Route semantic concerns to `sql-quality-core` and engine/dbt concerns to their target owners.
+5. **Self-review gate.** Before returning SQL, run this skill's Final Checklist as a formatting-only self-review after semantic and engine-specific checks are complete.
 
 ## Workflow
 
 1. Always use `agent-workflow-core` first for task mode and delivery rules.
 2. Always use `sql-quality-core` before or alongside this skill for SQL semantics.
-3. Apply this skill before engine-specific SQL skills, then apply the target engine style overlay.
+3. Identify and activate the target engine owner and, when applicable, the matching dbt owner; apply this skill before their target-specific style overlays.
 4. Read `references/style.md` for SQL writing, editing, or review tasks.
-5. Before returning SQL, run a formatting-only self-review after semantic and engine-specific checks are complete.
+5. Before returning SQL, run this skill's Final Checklist as a formatting-only self-review after semantic and engine-specific checks are complete.
 
 ## Reference Triggers
 
@@ -38,7 +39,7 @@ Any database access must go through `db-access`.
 
 ## Final Checklist
 
-- Did I use `agent-workflow-core` and `sql-quality-core` with this style pass?
+- Did I use `agent-workflow-core`, `sql-quality-core`, the target engine owner, and the matching dbt owner when applicable?
 - Did every selected column in a multi-table query have a clear source?
 - Did aliases use `AS` and preserve a readable common `AS` column where practical?
 - Did I use comma-leading formatting consistently for `SELECT`, `WITH`, and multiline `GROUP BY` blocks?

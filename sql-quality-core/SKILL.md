@@ -27,7 +27,7 @@ This skill owns engine-agnostic SQL business semantics and quality gates. `sql-s
 8. **Sequential/entity gate.** For funnels or child-entity metrics, each step and metric name must match the declared entity grain. If this check fails for a production-like artifact, SQL-quality-check fails.
 9. **Validation gate.** Before returning non-trivial SQL, run the lightest safe SQL-quality validation or state the blocker. A plan/smoke only proves what it actually checks.
 10. **Return gate.** Before returning any non-trivial SQL, ask whether there is an obvious safer, simpler, or cheaper semantics-preserving shape. Apply it or explain the tradeoff.
-11. **Self-review gate.** Before reporting SQL-quality-check passed for production-like SQL/DDL/load/validation artifacts, review the final artifacts themselves. P1/P2 correctness, refresh, naming, or executability issues block pass and sandbox escalation.
+11. **Self-review gate.** Before reporting SQL-quality-check passed for production-like SQL/DDL/load/validation artifacts, run this skill's Final Checklist against the final artifacts themselves. P1/P2 correctness, refresh, naming, or executability issues block pass and sandbox escalation.
 
 ## Workflow
 
@@ -38,7 +38,7 @@ This skill owns engine-agnostic SQL business semantics and quality gates. `sql-s
 5. For combined fact aggregates, name each fact grain and prove the final output grain does not duplicate measures.
 6. Check metric semantics: categories, windows, proxy timestamp coverage, durations, mutable sources, funnel sequence, and entity level.
 7. Choose bounded validation that can check the requested behavior within the current access boundary.
-8. Run final SQL self-review and report SQL-quality pass/fail/blockers to `agent-workflow-core`; do not decide final proof status from this skill.
+8. Run this skill's Final Checklist as the final SQL self-review and report SQL-quality pass/fail/blockers to `agent-workflow-core`; do not decide final proof status from this skill.
 
 ## Reference Triggers
 

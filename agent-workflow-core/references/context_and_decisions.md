@@ -2,6 +2,16 @@
 
 Use this reference for work that depends on previous state, local repos, task files, database contours, or long-running decisions.
 
+## Navigation
+
+- [Local context workspace and bootstrap](#local-context-workspace)
+- [Restore context](#restore-context)
+- [External research handoff](#external-research-handoff)
+- [Workspace guardrails](#workspace-guardrails)
+- [Maintain task snapshots](#maintain-context)
+- [Agent logs](#agent-logs)
+- [Decision hygiene and scope](#decision-hygiene)
+
 ## Local Context Workspace
 
 Use the user's configured local context workspace/folder as the task memory area when the user refers to local context, task context, personal context, environment notes, or long-running local notes.
@@ -138,18 +148,26 @@ Meta-task files use a lighter structure than task snapshots. Keep the current fo
 
 ## Restore Context
 
-When durable context is required or already established for the current task, inspect the minimum durable context needed:
+When durable context is required or already established for the current task, inspect the minimum saved local context needed:
 
 - `environment.md` for local repo roots and runtime choices when the task may need project files, SQL/dbt models, Python code, database contours, or repo discovery;
 - current repo, branch, and dirty worktree;
 - relevant task notes in `tasks/` or another local context file;
 - recent decisions, open questions, known blockers, and validation status;
-- project conventions, existing implementation patterns, and source-of-truth files;
+- known project conventions and implementation pointers already present in saved context or the scoped target repo;
 - database contour/account only through `db-access`.
 
 Do not ask the user to repeat context that can be recovered safely from local files, git state, or metadata.
 
 If a failure looks like `ModuleNotFoundError`, dependency mismatch, wrong command behavior, or another runtime/import problem, check the active runtime before changing code or installing packages. Use `environment.md` when available and verify the path to the relevant `python`, `dbt`, or shell command.
+
+## External Research Handoff
+
+Keep this reference responsible for saved local context and its lifecycle. Do not implement broad external context discovery here.
+
+Use the context-research owner selected by the active entry skill when missing requirements, prior decisions, ownership, project documentation, table meaning, lineage, or work discussions can materially change scope, design, implementation, or validation. The research owner handles research questions, bounded source selection, source reconciliation, and the compact task brief. If no such owner is available, preserve the evidence gap instead of expanding this core into an external-search workflow.
+
+Keep all OpenMetadata and database access in `db-access`. After research, this workflow decides what decision-grade facts belong in the task snapshot or agent log.
 
 ## Workspace Guardrails
 

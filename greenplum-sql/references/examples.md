@@ -2,6 +2,14 @@
 
 Short examples that define the preferred Greenplum style and idioms.
 
+## Navigation
+
+- [Aggregates and CTEs](#grouped-aggregate)
+- [JOIN layouts](#short-join)
+- [Filtering and expression layout](#heavy-enrichment-key-filter)
+- [Runtime parameters and staging](#compact-runtime-settings-in-params-cte)
+- [Greenplum DDL](#greenplum-create-table)
+
 ## Grouped aggregate
 
 ```sql

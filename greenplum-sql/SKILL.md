@@ -23,6 +23,7 @@ Use this skill for Greenplum SQL/DDL work in repositories that follow our databa
 6. **Telemetry gate.** For Greenplum workload history in our environment, use only the confirmed telemetry sources in `references/sql_readiness.md`. Fresh Greenplum signals in `profi` are limited to confirmed live views; missing grants/sources are blockers. Use telemetry only as Greenplum workload evidence, not as ClickHouse business data, Greenplum metadata, repo evidence, or a shortcut around missing direct Greenplum logs.
 7. **Lineage gate.** Repo-backed cross-engine source flow is not telemetry. If repo evidence proves a Greenplum object is loaded from ClickHouse, analyze that source layer through `clickhouse-sql`; keep Greenplum target metadata, DDL, and plan evidence in this skill.
 8. **Evidence-artifact gate.** If the user requested a reasoning/evidence artifact, include exact Greenplum repo-backed paths or a clear `DB-only fallback`, plus concrete plan/validation signals. Do not use another engine's DDL as proof for a live Greenplum object.
+9. **Self-review gate.** Before returning SQL or findings or reporting engine-check passed, run this skill's Final Checklist. If it finds a blocker in this skill's `Owns` area, fix it or stop/downgrade the result.
 
 ## Workflow
 
@@ -31,7 +32,7 @@ Use this skill for Greenplum SQL/DDL work in repositories that follow our databa
 3. Identify the task type: writing, editing, review, optimization, DDL, load, runtime investigation, or lineage.
 4. Load the mandatory references from the hard gates, then any task-specific reference listed below.
 5. Inspect metadata/DDL and draft SQL only after grain, business semantics, refresh scope, and MPP shape are clear.
-6. Run Greenplum metadata, MPP-plan, load-readiness, validation, and style-overlay self-review before returning SQL or findings.
+6. Run Greenplum metadata, MPP-plan, load-readiness, validation, and style-overlay self-review, then this skill's Final Checklist, before returning SQL or findings.
 7. If the task touches Greenplum runtime history, keep the ClickHouse telemetry bridge narrow and call out freshness lag or missing fresh-log blockers.
 
 ## Reference Triggers

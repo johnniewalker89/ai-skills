@@ -8,6 +8,15 @@ This file owns ClickHouse-specific SQL metadata and shape checks: table metadata
 
 Precondition: apply `agent-workflow-core` first for task delivery, local context, and `environment.md` rules. If metadata inspection, `EXPLAIN`, query log checks, or bounded validation need database access, use `db-access`.
 
+## Navigation
+
+- [Responsibility split](#responsibility-split)
+- [Metadata and physical shape](#metadata-pass)
+- [Engine correctness](#engine-correctness)
+- [Partition and DDL/load safety](#partition-replacement-safety)
+- [Lightweight validation](#lightweight-validation)
+- [CTE behavior and red flags](#cte-reuse-and-inlining)
+
 ## Responsibility split
 
 - `sql-quality-core` owns business SQL quality.

@@ -2,6 +2,14 @@
 
 Use this file when the task is about ClickHouse-native query writing rather than only formatting.
 
+## Navigation
+
+- [Compatibility mindset](#compatibility-mindset)
+- [Native ClickHouse thinking](#think-in-clickhouse-not-generic-sql)
+- [Runtime settings](#runtime-settings-in-marts)
+- [Native expression patterns](#native-expression-patterns)
+- [Latest-row, ASOF, array, and dictionary patterns](#argmax--argmin-before-windows)
+
 ## Compatibility mindset
 
 - Treat the working ClickHouse contour as compatible with `25.3.6.56` until proven otherwise.

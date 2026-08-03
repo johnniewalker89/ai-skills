@@ -2,6 +2,14 @@
 
 Short examples that define the preferred ClickHouse style and idioms.
 
+## Navigation
+
+- [Aggregates and CTEs](#grouped-aggregate)
+- [JOIN layouts](#short-join)
+- [Native latest-row and lookup patterns](#native-latest-row-aggregate-before-window)
+- [Expressions and aliases](#compact-expression)
+- [ClickHouse DDL](#clickhouse-create-table)
+
 ## Grouped aggregate
 
 ```sql

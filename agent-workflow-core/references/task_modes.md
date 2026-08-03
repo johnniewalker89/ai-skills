@@ -2,6 +2,14 @@
 
 Choose the lightest mode that protects quality. For non-tiny work, make the chosen mode the first user-facing sentence so the user can correct it before the work proceeds.
 
+## Navigation
+
+- [`quick`](#quick)
+- [`focused`](#focused)
+- [`project`](#project)
+- [`investigation`](#investigation)
+- [`review`](#review)
+
 The mode set is closed: `quick`, `focused`, `project`, `investigation`, and `review`.
 Use the mode as an exact literal token. Do not append or prepend qualifiers, checklist names, phases, or task labels.
 Do not invent synonyms or phase names such as `quick-check`, `edit`, `implementation`, `development`, `analysis`, `audit`, `research`, or `review-pass`. If a task is implementation work, its mode is still `quick`, `focused`, or `project` depending on risk. If a task is a check, proof, or assessment pass, its mode is still one of the five allowed values.

@@ -2,6 +2,14 @@
 
 Use this file when the task is about Greenplum-specific query writing, runtime patterns, or DDL concerns rather than only formatting.
 
+## Navigation
+
+- [Compatibility mindset](#compatibility-mindset)
+- [Runtime settings and windows](#runtime-settings-and-windows)
+- [Greenplum vs generic PostgreSQL](#think-in-greenplum-not-generic-postgresql)
+- [Distribution and small tables](#distribution-and-small-tables)
+- [Loading from ClickHouse](#loading-from-clickhouse)
+
 ## Compatibility mindset
 
 - Treat the working Greenplum contour as compatible with `Greenplum 6.25.1` on top of `PostgreSQL 9.4.26` until proven otherwise.

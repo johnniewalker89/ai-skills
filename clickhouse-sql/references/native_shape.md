@@ -4,6 +4,15 @@ Use this file before returning any non-trivial ClickHouse SQL.
 
 The goal is not to force every ClickHouse feature into every query. The goal is to make generic SQL unacceptable until ClickHouse-native alternatives have been considered and rejected for a concrete reason.
 
+## Navigation
+
+- [Mandatory pass](#mandatory-pass)
+- [Decision table](#decision-table)
+- [Required rejection checks](#required-rejection-checks)
+- [Latest-row patterns](#latest-row-per-group)
+- [Key-filter and lookup shapes](#key-filter-heavy-enrichment-before-reducing-it)
+- [Existence, absence, enrichment, and sequence](#existence-filtering)
+
 ## Mandatory pass
 
 Before finalizing SQL, classify every non-trivial query shape by business intent. This is a local review pass; database checks mentioned here still go through `db-access`.

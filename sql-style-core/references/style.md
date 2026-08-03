@@ -2,6 +2,15 @@
 
 Use this file for common SQL code style and readability. Engine-specific skills may add stricter rules or exceptions.
 
+## Navigation
+
+- [General rules](#general-rules)
+- [Alignment and compactness](#alignment-and-compactness)
+- [SELECT formatting](#select-formatting)
+- [WITH and CTE readability](#with-and-cte-readability)
+- [JOIN and clause layout](#join-where-having-group-by)
+- [Multiline expressions](#multiline-expressions)
+
 ## General Rules
 
 - SQL keywords and logical operators should be upper-case.

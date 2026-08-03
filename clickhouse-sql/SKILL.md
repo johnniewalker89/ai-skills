@@ -24,6 +24,7 @@ Use this skill for ClickHouse SQL work in repositories that follow our database 
 7. **Validation gate.** For non-trivial production `SELECT`s, route lightweight validation through `db-access` when database access is needed and available. Prefer `EXPLAIN indexes = 1` or `EXPLAIN PLAN`; execute bounded smoke only when safe. Interpret the plan, not only its success.
 8. **Telemetry gate.** `system.query_log` is the freshest ClickHouse runtime source in our environment. `monitoring.clickhouse__query_log` is a historical persisted copy and may lag. Treat both as telemetry only, not business data or a replacement for DDL/source/plan evidence.
 9. **Lineage gate.** For lineage/business-logic explanations, ClickHouse mirror evidence is only evidence after the `sql-quality-core` lineage pass. If repo evidence reaches another engine, use that engine skill for that layer.
+10. **Self-review gate.** Before returning SQL or findings or reporting engine-check passed, run this skill's Final Checklist. If it finds a blocker in this skill's `Owns` area, fix it or stop/downgrade the result.
 
 ## Workflow
 
@@ -32,7 +33,7 @@ Use this skill for ClickHouse SQL work in repositories that follow our database 
 3. Identify the task type: writing, editing, review, optimization, DDL, load, or lineage.
 4. Load the mandatory references from the hard gates, then any task-specific reference listed below.
 5. Inspect metadata/DDL and draft SQL only after grain, business semantics, and refresh scope are clear.
-6. Run ClickHouse native-shape, load-readiness, validation, and style-overlay self-review before returning SQL or findings.
+6. Run ClickHouse native-shape, load-readiness, validation, and style-overlay self-review, then this skill's Final Checklist, before returning SQL or findings.
 7. If the user requested a reasoning/evidence artifact, save the material validation summary there: smoke counts, parts/granules or primary-key conditions, repeated `ReadFromMergeTree`, heavy scan shape, and accept/rewrite decisions.
 
 ## Reference Triggers

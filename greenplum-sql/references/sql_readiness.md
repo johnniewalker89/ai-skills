@@ -6,6 +6,15 @@ Use this file before returning non-trivial Greenplum SQL code.
 
 This file owns Greenplum-specific SQL metadata and shape checks: MPP metadata shape, distribution, partition pruning, CTE/materialization behavior, and Greenplum plan interpretation. Final task status, artifact readiness, approval gates, and proof-level wording belong to `agent-workflow-core`.
 
+## Navigation
+
+- [Responsibility split](#responsibility-split)
+- [Metadata pass](#metadata-pass)
+- [DDL/load self-review](#ddlload-syntax-self-review)
+- [Lightweight validation](#lightweight-validation)
+- [Workload evidence](#workload-and-query-log-evidence)
+- [CTE awareness and red flags](#cte-and-materialization-awareness)
+
 ## Responsibility split
 
 - `sql-quality-core` owns business SQL quality.
