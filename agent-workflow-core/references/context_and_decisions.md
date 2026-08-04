@@ -5,6 +5,7 @@ Use this reference for work that depends on previous state, local repos, task fi
 ## Navigation
 
 - [Local context workspace and bootstrap](#local-context-workspace)
+- [Runtime resolution](#runtime-resolution)
 - [Restore context](#restore-context)
 - [External research handoff](#external-research-handoff)
 - [Workspace guardrails](#workspace-guardrails)
@@ -65,13 +66,24 @@ Use these locations:
 
 Keep local markdown context files (`context.md`, task snapshots, agent logs, meta-task files, `notes.md`, and similar `.md` files) in UTF-8. Do not mix UTF-8 with `cp1251` or another encoding in the same file.
 
-When durable context is required or explicitly selected for the task, treat `environment.md` as the first local map for repo roots and runtimes. Read it before searching the filesystem for project repos, dbt projects, Python package roots, SQL model locations, validation runtimes, or shell commands.
+## Runtime Resolution
 
-When durable context is required or explicitly selected and the task depends on local runtime environment, repo paths, Python/dbt env names, shell choice, or import/runtime failures, consult `environment.md` in the configured local context workspace before probing filesystem, shells, Python/dbt commands, or repo roots. Treat it as machine-specific local configuration, not as portable skill behavior. If a local context workspace exists but `environment.md` does not, use the same context-workspace flow: ask whether to create an environment template, let the user fill it manually, or inspect local project/config/filesystem read-only and propose a draft.
+Treat a configured `environment.md` as the first local map for repo roots and runtimes. It may come from an established context workspace, an explicit path, or a workspace instruction. Reading an existing map is read-only and does not by itself authorize creating task snapshots, agent logs, or a new context workspace.
 
-When durable context is required or explicitly selected, after discovering a stable local environment fact, update or propose updating `environment.md` instead of leaving the fact only in chat, task notes, or logs. If the fact was discovered by the agent rather than provided by the user, mark it as draft/unconfirmed in `environment.md` or in a nearby note, and ask the user to validate it in the final response before relying on it as stable context for future tasks. The final response must name the `environment.md` path and ask the user to confirm or correct the draft values.
+Before the first local runtime-backed command, including incidental helper/validator use:
 
-When durable context is required or explicitly selected for Airflow, CI, runner, command, import, or runtime-log investigations, check `environment.md` before proposing code changes or choosing a validation command. Logs that mention deployed paths, virtualenv/pyenv names, `PYTHONPATH`, missing modules, or wrapper commands are enough to trigger this check.
+1. Use the target repo/project runtime when its config or environment map defines one.
+2. Otherwise use the exact generic validation runtime mapped for that host and workload.
+3. Use a bundled workspace runtime only for the artifact/tooling workflows it explicitly supports, not as a universal fallback.
+4. Run bounded discovery only when no applicable mapping exists.
+
+Do not invoke a bare executable or probe an alias recorded as unavailable, forbidden, or a shim. A later successful fallback does not make the initial known-bad attempt acceptable. Verify that the selected runtime matches the intended shell, repo, dependency surface, and task type before changing code or installing packages.
+
+Keep `environment.md` a compact current-state lookup. Store exact paths/commands, selection constraints, access-config pointers, and explicit unknowns. Do not store task status, branches/commits, install history, dated smoke results, repo anatomy, package inventories owned by requirements/locks, Git remotes discoverable from the repo, or policy text owned by another skill/server document.
+
+After discovering a stable local environment fact, update or propose updating `environment.md` instead of leaving it only in chat, task notes, or logs. Mark agent-discovered values as draft/unconfirmed and ask the user to validate them before treating them as stable future configuration. For Airflow, CI, runner, command, import, or runtime-log investigations, resolve the environment before proposing code changes or commands.
+
+If a configured context workspace lacks `environment.md`, ask whether to create the template, let the user fill it, or inspect local project/config/filesystem read-only and propose a draft. Do not invent paths or runtimes.
 
 Use this minimal `environment.md` template when initializing a new local context workspace:
 
@@ -80,7 +92,18 @@ Use this minimal `environment.md` template when initializing a new local context
 
 Minimal local environment map for skills. Store only machine-specific facts needed to choose the correct runtime and avoid guessing.
 
-## Paths
+## Runtime Resolution
+
+- preferred shell: `<shell or unknown>`
+- forbidden aliases: `<aliases and reason, or none>`
+- selection precedence: `project/repo runtime -> exact generic validation runtime -> bounded discovery`
+
+| Workload | Exact runtime/command | Scope/status |
+| --- | --- | --- |
+| Generic validation | `<exact path/command or unknown>` | `<user-confirmed, draft/unconfirmed, or unknown>` |
+| Project runtime | `<exact path/command or unknown>` | `<project/shell constraints>` |
+
+## Repository Roots
 
 - context workspace: `<path or unknown>`
 - primary repo: `<path or unknown>`
@@ -88,16 +111,15 @@ Minimal local environment map for skills. Store only machine-specific facts need
 - Python project root: `<path or unknown>`
 - extra repo roots: `<path(s) or unknown>`
 
-## Runtimes
+## Access Configuration
 
-- Python runtime: `<command/path or unknown>`
-- dbt runtime: `<command/path or unknown>`
-- preferred shell: `<shell or unknown>`
-
-## Notes
-
-- discovered values: `<draft/unconfirmed or user-confirmed>`
+- access-config pointers: `<path(s) or unknown>`
 - database access: `direct MCP via db-access / approved typed runtime read via selected dedicated access owner + SQL chain / not used`
+
+## Boundaries
+
+- current configuration only; task/project history lives in its owning context
+- discovered values: `<draft/unconfirmed or user-confirmed>`
 ```
 
 Keep unknown values explicit as `<unknown>` or `unknown`; do not invent paths or env names. If the user allows read-only discovery, propose a draft, label it unconfirmed, and ask the user to validate it. Treat discovered values as unconfirmed until the user accepts them.
@@ -159,7 +181,7 @@ When durable context is required or already established for the current task, in
 
 Do not ask the user to repeat context that can be recovered safely from local files, git state, or metadata.
 
-If a failure looks like `ModuleNotFoundError`, dependency mismatch, wrong command behavior, or another runtime/import problem, check the active runtime before changing code or installing packages. Use `environment.md` when available and verify the path to the relevant `python`, `dbt`, or shell command.
+If a failure looks like `ModuleNotFoundError`, dependency mismatch, wrong command behavior, or another runtime/import problem, verify the already selected runtime before changing code or installing packages. Do not retry through a different environment until the project/runtime mapping and dependency surface are understood.
 
 ## External Research Handoff
 
