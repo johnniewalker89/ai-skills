@@ -17,14 +17,14 @@ A read leaves this class when it changes provider state or user-authored reposit
 
 ## Technical Grant
 
-Each grant belongs to one immutable repository id, one exact workspace/Git dir, and one branch. Approval for repository A never applies to repository B in the same chat. Direct commit/push to an unprotected default branch is allowed only when server-side policy explicitly names that personal repository; otherwise default-branch mutation is denied. Work instances should keep this exception empty.
+Each grant belongs to one immutable repository id, one exact workspace/Git dir, and one branch. Approval for repository A never applies to repository B in the same chat. Direct commit/push to an unprotected default branch is allowed only when server-side policy explicitly names that personal repository. For an explicitly server-enabled personal protected default branch, a grant may cover local stage/commit/amend only; each normal non-force push requires its own exact approval bound to expected local/remote SHA plus authoritative readback. No PR/MR is required by this contract. Other protected/default/work repositories keep their stricter policy and fail closed; work instances should keep both personal exceptions empty.
 
 One short approval may cover an ordinary technical loop only when bound to:
 
 - provider/host plus provider-reported immutable account id and repository id;
 - workspace realpath plus resolved Git-dir/common-dir identity;
 - current task or named project slice;
-- exact branch; default is allowed only by the explicit personal-repository exception and protected branches remain excluded;
+- exact branch; an unprotected default is allowed for commit/push only by the explicit personal-repository exception, while an explicitly enabled personal protected default is allowed only for local stage/commit/amend and every push remains excluded from the grant;
 - exact allowed action set and repository-relative path allowlist;
 - expected local HEAD SHA and remote branch SHA, including the expected absent-remote state for a new branch;
 - short TTL, current process nonce, finite use cap, and monotonic use counter.
@@ -38,8 +38,8 @@ Within those bindings it may cover:
 - create or switch the named local feature branch, or remain on an explicitly enabled personal default branch;
 - stage exact task files and create normal commits;
 - amend an unpushed task commit;
-- normal non-force push to the exact granted branch and set its upstream when appropriate;
-- later technical commits and normal pushes for the same task/branch;
+- normal non-force push to the exact granted branch and set its upstream when appropriate only while the target is unprotected;
+- later technical commits and, while the target remains unprotected, normal pushes for the same task/branch;
 - safe fast-forward synchronization that neither rewrites published history nor targets a protected branch;
 - retry an allowlisted validation/test job for the same commit when it has no deploy, publish, release, environment, secret, or other side effect;
 - inspect the resulting CI state and continue the technical fix loop.
@@ -72,6 +72,8 @@ Risky Git and lifecycle:
 - merge a PR/MR or perform a published-history squash/rebase;
 - force push, delete a remote branch/tag, or discard user changes;
 - create a fork or repository, or archive, rename, transfer, change visibility, or delete a repository.
+
+For the explicitly server-enabled personal protected-default contour, one exact approval may authorize one normal non-force push from the named expected local SHA against the named expected remote SHA. Read authoritative branch state back after that push; every later push needs a new exact approval. This path does not require a PR/MR. Do not generalize it to another account, repository, branch, or work contour. Exact approval is necessary but not sufficient for any other protected/default push: when the bound server policy exposes no exact action, fail closed.
 
 Control plane and administration:
 
