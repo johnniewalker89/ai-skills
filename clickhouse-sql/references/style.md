@@ -16,6 +16,7 @@ Use this file after `sql-style-core/references/style.md`. It contains only Click
 - If business attributes were already defined earlier in the same `SELECT`, they may be reused in later technical expressions such as `row_id` when the result is clearer.
 - Alias reuse inside one `SELECT` is allowed only after the reused alias was defined earlier in the same `SELECT`.
 - Reusing aliases inside the same `SELECT` is allowed only when this is supported by ClickHouse and already matches project patterns.
+- If an output alias has the same name as a source column, qualify every later expression or predicate that must still bind to the source column (for example, `source.clicks`) or choose a distinct alias. Do not rely on implicit ClickHouse name resolution for this case.
 - Prefer ClickHouse-native type and null handling functions such as `toLowCardinality`, `nullIf`, `ifNull`, and `coalesce` according to existing project style.
 - For hashing or technical ids, prefer existing project ClickHouse patterns such as `cityHash64(...)`.
 

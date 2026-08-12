@@ -264,6 +264,13 @@ Update `context.md` as navigation. Keep separate `Активные задачи`
 - link related agent logs from the log section when useful;
 - keep only short status text there.
 
+If the task registry carries a reviewer-owned learning, study, or evaluation status, keep it independent from technical closure:
+
+- ordinary delivery may add `skills: не изучено` only when the review marker is absent;
+- preserve any existing reviewer-owned status, including partial or completed review;
+- never advance the status from task completion, merge, approval, runtime success, or a closure summary alone;
+- only the configured review owner may advance it after saving the required review evidence.
+
 When the task snapshot becomes too long to be a quick-start file, archive it:
 
 1. Rename the current snapshot to `tasks/<TASK_ID>.archive-YYYYMMDD-HHMM.md` using local time.
@@ -314,6 +321,8 @@ The agent log is an audit trail, not hidden chain-of-thought. Record concise evi
 ```
 
 Keep detailed evidence and rejected alternatives in `agent_logs/...`; keep `tasks/<TASK_ID>.md` compact.
+
+Keep append order and event time explicit. Use a timestamp for every appended event; if late evidence describes an older event, label the observed/event time separately instead of placing it as if it were current. When a final proof claim depends on raw output, save a durable non-secret path, URL/id, or content hash rather than referring only to an attachment that cannot be found later.
 
 When the established local task context is in Russian, write new task context entries in Russian. Keep SQL identifiers, file paths, command names, and quoted source terms unchanged.
 

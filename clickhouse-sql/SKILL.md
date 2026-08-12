@@ -10,7 +10,7 @@ Use this skill for ClickHouse SQL work in repositories that follow our database 
 ## Role
 
 - Purpose: handle ClickHouse SQL writing, review, and optimization.
-- Owns: ClickHouse syntax/functions, native query shape, engine correctness, MergeTree/partition/order choices, physical pruning evidence for chosen filters, metadata/plan interpretation, repeated heavy-source reads, `EXPLAIN indexes`, temporary/staging table shape, and engine-local style overlays.
+- Owns: ClickHouse syntax/functions, alias/name resolution, native query shape, engine correctness, MergeTree/partition/order choices, physical pruning evidence for chosen filters, metadata/plan interpretation, repeated heavy-source reads, `EXPLAIN indexes`, temporary/staging table shape, and engine-local style overlays.
 - Delegates to: `agent-workflow-core` for delivery/proof wording, `sql-quality-core` for SQL semantics, `sql-style-core` for shared style, `db-access` for direct database MCP access, and a separately installed typed runtime-read access owner when selected.
 
 ## Hard Gates
@@ -62,4 +62,5 @@ Use this skill for ClickHouse SQL work in repositories that follow our database 
 - For non-trivial SQL, did I run or explicitly block `EXPLAIN`/bounded validation and interpret repeated reads, primary-key/granule pruning, and heavy scans?
 - Did I keep query-log sources as telemetry only and avoid using mirrors as business proof without lineage evidence?
 - Did I return to `sql-style-core` plus the ClickHouse style overlay before final SQL?
+- Did I avoid ambiguous same-name output aliases, or explicitly qualify every later reference that must still bind to the source column?
 - If a blocker remains in this skill's `Owns` area, did I stop or downgrade instead of reporting engine-check passed?

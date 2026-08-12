@@ -10,7 +10,7 @@ Use this skill as the single shared direct database/OpenMetadata MCP access cont
 ## Role
 
 - Purpose: provide the direct database/OpenMetadata access boundary for already configured database/catalog MCP tools.
-- Owns: direct MCP database access, default vs privileged MCP routing, metadata/catalog/query access, privileged-action approvals, and direct-access blockers.
+- Owns: direct MCP database access, configured contour and effective connection identity, default vs privileged MCP routing, metadata/catalog/query access, privileged-action approvals, and direct-access blockers.
 - Delegates to: `agent-workflow-core` for task mode/approval workflow and domain skills for interpreting database findings.
 
 ## Hard Gates
@@ -18,15 +18,16 @@ Use this skill as the single shared direct database/OpenMetadata MCP access cont
 1. Use `agent-workflow-core` first for task mode and stop-points.
 2. Use already configured direct database/catalog MCP tools only. A separately installed access skill may own a typed remote-runtime database-read route; do not add this skill for that route unless the task also needs direct DB/OpenMetadata MCP access.
 3. Use `profi-mcp` first for ordinary ClickHouse/Greenplum metadata, DDL reading, `SELECT`, `EXPLAIN`, and smoke checks.
-4. Use the configured `bi_metadata`/OpenMetadata MCP first for BI catalog/OpenMetadata search, table FQN/columns/owners/tags/domains, database services/schemas, and lineage. Use read-only tools such as `search_metadata`, `semantic_search`, `get_entity_details`, `get_entity_lineage`, `root_cause_analysis`, and `get_test_definitions`. Do not use `profi-mcp` or legacy `OpenMetaData__*` tools for OpenMetadata catalog work while the dedicated BI metadata MCP is configured.
-5. Use `privileged_access_mcp_*` only after explicit approval for the exact contour, action type, target set, and rollback/cleanup expectation when relevant. Approval must be current to the task step; do not infer it from a general "continue", repo-edit approval, read-only proof request, old sandbox approval, or default MCP outage.
-6. If the needed default or privileged MCP is unavailable, stop and ask the user what to do next. Do not install, repair, or change MCP/database configuration from this skill.
-7. Never print, copy, or store credentials, passwords, tokens, writable-schema secrets, or admin paths.
-8. For potentially long privileged actions, prefer configured async privileged tools when available: start the query, poll status, and keep the returned query/job id for cleanup/cancel evidence. Do not rely on a single long blocking tool call as the control mechanism.
-9. Do not assume one MCP user/session can cancel another MCP user/session's query. The configured async flow is expected to control only its own returned query/job ids; cancelling queries started outside that flow needs separate database permission. If a kill/cancel operation fails, report the access blocker instead of retrying through unrelated access paths.
-10. Do not call `OpenMetaData__*` tools. Use the dedicated `bi_metadata`/OpenMetadata MCP for OpenMetadata catalog work, or report a missing configured MCP blocker.
-11. OpenMetadata write/admin tools such as `create_lineage`, `create_test_case`, `create_glossary`, `create_glossary_term`, and `patch_entity` are state-changing. Use them only after explicit approval for the exact action and target entity.
-12. Before reporting database-access pass, blocker, escalation need, or privileged-action readiness, run the final checklist.
+4. Before an environment-scoped pass or readiness claim, identify the configured MCP contour/tool and the available non-secret effective connection identity: service/cluster/environment plus database/schema where exposed. A successful query or matching database/schema name alone is not environment proof. If identity cannot be established, scope the claim to the selected configured contour and report the unknown.
+5. Use the configured `bi_metadata`/OpenMetadata MCP first for BI catalog/OpenMetadata search, table FQN/columns/owners/tags/domains, database services/schemas, and lineage. Use read-only tools such as `search_metadata`, `semantic_search`, `get_entity_details`, `get_entity_lineage`, `root_cause_analysis`, and `get_test_definitions`. Do not use `profi-mcp` or legacy `OpenMetaData__*` tools for OpenMetadata catalog work while the dedicated BI metadata MCP is configured.
+6. Use `privileged_access_mcp_*` only after explicit approval for the exact contour, action type, target set, and rollback/cleanup expectation when relevant. Approval must be current to the task step; do not infer it from a general "continue", repo-edit approval, read-only proof request, old sandbox approval, or default MCP outage.
+7. If the needed default or privileged MCP is unavailable, stop and ask the user what to do next. Do not install, repair, or change MCP/database configuration from this skill.
+8. Never print, copy, or store credentials, passwords, tokens, writable-schema secrets, or admin paths.
+9. For potentially long privileged actions, prefer configured async privileged tools when available: start the query, poll status, and keep the returned query/job id for cleanup/cancel evidence. Do not rely on a single long blocking tool call as the control mechanism.
+10. Do not assume one MCP user/session can cancel another MCP user/session's query. The configured async flow is expected to control only its own returned query/job ids; cancelling queries started outside that flow needs separate database permission. If a kill/cancel operation fails, report the access blocker instead of retrying through unrelated access paths.
+11. Do not call `OpenMetaData__*` tools. Use the dedicated `bi_metadata`/OpenMetadata MCP for OpenMetadata catalog work, or report a missing configured MCP blocker.
+12. OpenMetadata write/admin tools such as `create_lineage`, `create_test_case`, `create_glossary`, `create_glossary_term`, and `patch_entity` are state-changing. Use them only after explicit approval for the exact action and target entity.
+13. Before reporting database-access pass, blocker, escalation need, or privileged-action readiness, run the final checklist.
 
 ## Configured MCP Access
 
@@ -96,6 +97,7 @@ The returned id is the cancellable handle for that privileged flow's own query. 
 ## Final Checklist
 
 - Did I use only `profi-mcp`, `bi_metadata`, or approved `privileged_access_mcp_*` tools for this direct MCP contour?
+- Before an environment-scoped claim, did I establish non-secret contour/connection identity instead of inferring it from query success or a database/schema name?
 - Did I use `profi-mcp` first for ClickHouse/Greenplum read-only access unless privileged access was explicitly approved?
 - Did I use `bi_metadata` first for BI OpenMetadata/catalog access?
 - For table investigation, did I use catalog search/details/lineage when it could clarify meaning, ownership, candidates, or impact?

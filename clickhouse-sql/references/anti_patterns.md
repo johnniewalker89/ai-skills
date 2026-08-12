@@ -49,6 +49,7 @@ For engine-agnostic SQL quality anti-patterns, use `sql-quality-core` first.
 ## ClickHouse style overlay anti-patterns
 
 - Reusing an alias inside `SELECT` before it is defined earlier in the same `SELECT`.
+- Reusing a source-column name as an output alias and then leaving later source references unqualified.
 - Writing scalar `WITH` declarations as `alias AS expression` instead of `expression AS alias`.
 - Mixing scalar `WITH` and subquery CTE separator patterns in the same chain.
 
