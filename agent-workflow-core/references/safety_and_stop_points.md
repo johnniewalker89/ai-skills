@@ -63,7 +63,7 @@ Proof strategy/evidence boundary:
 
 After presenting the plan, stop and wait for explicit user approval such as "go", "continue", "approved", "согласен", "продолжай", or an equivalent instruction.
 
-Do not bundle approval gates. Approval for creating repository artifacts is not approval for sandbox validation, database writes, expensive runs, commits, or pushes. If both are likely needed, ask first for the next concrete step only; after that step and its self-review/read-only validation, ask separately for sandbox/write actions.
+Do not bundle unrelated approval gates. Approval for creating implementation artifacts is not approval for sandbox validation, database writes, or expensive runs. Classify Git/provider actions through `repository-operations`; retain its bounded technical grant or exact action approval separately from database/sandbox approval.
 
 Safe autonomous reconnaissance may include:
 
@@ -103,7 +103,7 @@ Use the context workspace for solution code only when the user explicitly asks f
 
 Separate production database writes from repository edits: "no production writes" blocks database DDL/DML or other live-environment mutations, but does not automatically forbid code edits in the repo unless the user says not to touch the repo.
 
-Never commit or push repository changes without explicit user approval for that commit/push.
+For Git/provider/CI/PR/MR/release/admin actions, obtain and retain the approval required by `repository-operations`; leave action classification, identity/target checks, enforcement, and readback to that owner.
 
 The checkpoint should name the intended code destination when files will be created or edited: target repo paths, target workspace paths, or context-only draft/package.
 

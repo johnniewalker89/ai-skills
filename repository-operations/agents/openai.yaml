@@ -1,0 +1,4 @@
+interface:
+  display_name: "Repository Operations"
+  short_description: "Control Git, CI, review, and repository actions"
+  default_prompt: "Use $repository-operations to inspect or safely operate this repository under the correct identity and approval scope."

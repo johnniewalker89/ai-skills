@@ -193,11 +193,9 @@ Keep OpenMetadata and direct database MCP access in `db-access`. Keep any separa
 
 ## Workspace Guardrails
 
-Do not create git commits or push changes without explicit user approval. If the user asks for a commit or push, inspect status/diff first and state what will be included before acting.
+Route Git and provider operations through `repository-operations`. This workflow records and retains the active approval; the repository owner classifies the operation, verifies identity/target, enforces the approval scope, and reads final state back.
 
-Before any push, inspect the current branch, upstream, and exact remote target. If the branch is intended as a feature branch but tracks the default branch such as `origin/master` or `origin/main`, stop and ask the user to correct the branch/upstream or approve the exact safe target before pushing.
-
-Repo-specific workflow from durable context or user instruction is authoritative. If the user owns branch creation, commits, pushes, or merge requests for a repo, default to working-tree changes only and do not create those git artifacts unless the user explicitly asks for that exact action.
+Repo-specific workflow from durable context or user instruction remains authoritative. Pass any user-reserved branch, commit, push, review, or merge ownership boundary to `repository-operations`; do not reinterpret it here.
 
 Do not touch unrelated dirty files or revert changes you did not make. If unrelated dirty files exist, work around them and mention only the relevant risk.
 
