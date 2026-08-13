@@ -51,4 +51,5 @@ Use this skill as the neutral repository control layer shared by Engineering and
 - Did I stop on scope or identity drift without falling back to global credentials, arbitrary APIs, raw MCP shell, or protection bypass?
 - Did staging/commit/push include only intended files and the exact approved branch?
 - Did I bound and sanitize CI logs, artifacts, repository metadata, and tool output?
+- Did I use head-bound repository-provider checks for PR/MR readiness and explicitly report any conflict with external-CI aggregate or stage results?
 - Did I read authoritative state back and distinguish completed, accepted-but-unproven, blocked, and remaining actions?
