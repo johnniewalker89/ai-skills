@@ -1,6 +1,6 @@
 ---
 name: repository-operations
-description: "Use for local or remote repository operations across Git, GitHub, or GitLab: identity/provider resolution, clone/fetch/status/diff/history, branches/commits/pushes, CI pipelines/jobs/logs/artifacts, PR/MR/issues/reviews/comments, releases, repository settings, permissions, rulesets, secrets metadata, and administrative actions. Use with the active Engineering or Game workflow owner so approvals remain direction-local."
+description: "Use for local or remote repository and CI operations across Git, GitHub, GitLab, or Jenkins: identity/provider resolution, clone/fetch/status/diff/history, branches/commits/pushes, pipelines/jobs/checks/logs/artifacts, PR/MR/issues/reviews/comments, releases, repository settings, permissions, rulesets, secrets metadata, and administrative actions. Use with the active Engineering or Game workflow owner so approvals remain direction-local."
 ---
 
 # Repository Operations
@@ -25,6 +25,7 @@ Use this skill as the neutral repository control layer shared by Engineering and
 8. **Forbidden gate.** Never read or reveal stored secret/token values, use a mismatched identity, fall back to global credentials after identity failure, expose an arbitrary provider API or shell through MCP, execute wildcard destructive actions, silently bypass protection, or reuse approval across accounts, repositories, branches, or tasks.
 9. **Readback gate.** Before a write, capture the safe relevant baseline or preview. After it, read authoritative resulting state. A command exit code or accepted API response alone is not proof.
 10. **Self-review gate.** Before reporting repository success, readiness, blocker, or completed action, run this skill's Final Checklist.
+11. **External-CI gate.** When a repository status/check targets Jenkins, use the configured identity-bound Jenkins tool for job/build/stage/log evidence. Read `references/jenkins_execution.md` before the first Jenkins operation or any Jenkins control action.
 
 ## Workflow
 
@@ -39,6 +40,7 @@ Use this skill as the neutral repository control layer shared by Engineering and
 
 - Read `references/action_and_approval_policy.md` before any repository write, communication, CI control, publish/release, risky Git, control-plane, or administrative action, or when deciding whether an existing approval applies.
 - Read `references/identity_and_execution.md` before the first remote operation, account/provider selection or switch, clone/fetch/pull/push, provider-tool use, or final-state proof.
+- Read `references/jenkins_execution.md` before following a Jenkins status link, reading Jenkins evidence, or preparing any Jenkins build control.
 
 ## Final Checklist
 

@@ -9,7 +9,7 @@ Keep reads bounded, secret-safe, and non-communicating:
 - resolve provider, repository, effective identity, permissions, remotes, upstreams, branches, tags, status, diff, and history;
 - fetch refs or run `ls-remote`; clone an explicitly named repository into an already configured workspace without changing provider state;
 - read repository files, PR/MR/issue/review/comment threads, settings, collaborators, permissions, rulesets, and protection state;
-- inspect pipeline/workflow/check/job status, bounded sanitized logs, artifact manifests, releases, tags, and asset digests;
+- inspect pipeline/workflow/check/Jenkins job status, bounded sanitized logs, stage and artifact manifests, releases, tags, and asset digests;
 - inspect secret/variable names, scope, and update timestamps when exposed, never their values;
 - prepare local drafts, proposed payloads, dry runs, and exact action plans without publishing them.
 
@@ -61,7 +61,7 @@ Communications:
 
 CI, deploy, and publication:
 
-- start a manual workflow/job, rerun anything with side effects, cancel work, or alter CI through provider APIs;
+- start a manual workflow/Jenkins job, submit a fresh re-run, stop/cancel work, or alter CI through provider APIs;
 - run deploy/staging/production/environment jobs;
 - create, move, or delete tags; publish, edit, or delete releases, notes, or assets.
 
