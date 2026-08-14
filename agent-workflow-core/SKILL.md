@@ -14,7 +14,7 @@ Direct database/OpenMetadata MCP access must go through `db-access`. A separate 
 ## Role
 
 - Purpose: provide the top-level delivery workflow for non-trivial engineering, data, SQL, dbt, investigation, review, or project work.
-- Owns: task mode, local context workspace, `environment.md` lifecycle and local runtime resolution, task snapshots, optional agent logs, planning, approval acquisition/retention and stop behavior, validation framing, and final self-review.
+- Owns: task mode, local context workspace, `environment.md` lifecycle and local runtime resolution, task snapshots, optional agent logs, planning, approval acquisition/retention and stop behavior, concise repository-checkpoint delivery, validation framing, and final self-review.
 - Delegates to: the context-research owner selected by the entry skill for bounded external discovery, entry/domain skills for domain work, `repository-operations` for repository action classification/execution/readback, `db-access` for direct database/OpenMetadata MCP access, and any separately installed typed runtime-read access owner plus its required SQL chain.
 
 ## Hard Gates
@@ -33,7 +33,7 @@ These gates are mandatory. If a gate applies, read the named reference before ac
 10. **Artifact destination gate.** Code artifacts belong in the target repo/workspace after approval. The context workspace is for task notes, agent logs, decisions, and evidence unless the user explicitly asks for a context-only draft/package. Read `references/safety_and_stop_points.md` before creating solution artifacts.
 11. **Cleanup/deletion usage-proof gate.** For repo cleanup, deletion, deprecation, DAG/report/job removal, live cleanup/drop lists, or hard-to-reverse cleanup recommendations, read `references/safety_and_stop_points.md` before editing or recommending removal. Prove ownership and usage with read-only evidence first; keep repo cleanup separate from live state changes.
 12. **Validation/proof gate.** Before final delivery for `focused`, `project`, `investigation`, `review`, SQL/dbt/data-pipeline work, or production-like artifacts, read `references/validation_and_review.md`. Final status must match the strongest completed proof level.
-13. **Repository-operations gate.** Route Git, provider, CI, PR/MR, review/comment, release, repository-setting, permission, and administrative operations through `repository-operations`. This workflow obtains and retains the approval class that owner requires; it does not redefine repository action classes or grant scope.
+13. **Repository-operations gate.** Route Git, provider, CI, PR/MR, review/comment, release, repository-setting, permission, and administrative operations through `repository-operations`. Present that owner's concise checkpoint, obtain and retain only its exact approval scope while all bindings remain unchanged, and stop on owner-reported drift; this workflow does not redefine repository action classes or grant scope.
 
 ## New Production-Like Data Artifacts
 
@@ -85,7 +85,7 @@ This gate applies before any solution SQL/DDL/config/task note that embodies a p
 - Did I keep saved-context lifecycle here and route material external context discovery to an available research owner rather than implementing it in this core?
 - Did direct database/OpenMetadata MCP access go through `db-access`, and any separately selected typed runtime database read go through its dedicated access owner, exact approval contract, and SQL chain?
 - Before any sandbox write, cleanup, rebuild, or privileged database action, did I have exact current approval for contour, action, target set, and cleanup/rollback expectation?
-- Did I route repository operations to `repository-operations`, obtain/retain its required approval, and avoid redefining its action classes here?
+- Did I route repository operations to `repository-operations`, present its concise checkpoint, obtain/retain only its unchanged approval scope, and avoid redefining its action classes here?
 - Did I keep code artifacts in the target repo/workspace unless a context-only output was requested?
 - Did I keep repo-artifact approval separate from sandbox/write approval?
 - For cleanup/deletion, did I prove ownership and usage limits before removing or recommending removal, and keep live state changes as a separate approved step?

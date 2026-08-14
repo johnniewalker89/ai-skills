@@ -7,6 +7,7 @@ Use this reference before the first remote operation, any provider/account switc
 Resolve from explicit task context, configured environment maps, repository remotes, and identity-bound tool configuration:
 
 - provider and host;
+- configured repository policy class: `work` or `personal`;
 - repository namespace/name, provider-reported immutable repository id, and canonical remote URL;
 - required account plus safe non-secret effective login and immutable account id returned by the provider;
 - workspace realpath, resolved Git-dir/common-dir identity, current branch, upstream, dirty state, and default/protected-branch status;
@@ -27,11 +28,29 @@ For local Git operations, use the repository's configured Git executable and ins
 
 Repository MCP tools must expose bounded typed operations rather than arbitrary REST/GraphQL endpoint access or shell commands. The server must independently enforce identity, allowlist, action class, payload bounds, and secret redaction; the skill contract is not a substitute for server enforcement.
 
-If the configured provider tool or required identity is unavailable, preserve local work and report the exact remote blocker. Do not ask the user to paste job logs when an available configured read tool can retrieve them, and do not work around an unavailable write contour with another account.
+If the configured provider tool or required identity is unavailable, preserve local work and report the exact blocker. For a work repository, do not replace an unavailable branch/commit/push contour with native Git, a provider CLI, Git Credential Manager, global credentials, or another tool. Do not ask the user to paste job logs when an available configured read tool can retrieve them, and do not work around an unavailable write contour with another account.
 
 ## Preflight
 
 Before a remote read, verify the effective account when the provider/tool has not already done so for the current session and contour.
+
+For a new work task with no established feature branch, before the first edit:
+
+1. Require a clean worktree and the local default branch as current; if user or unrelated changes exist, preserve them and stop instead of cleaning or carrying them onto the new task branch.
+2. Verify the configured work identity, immutable repository id, canonical remote, and authoritative default branch through the identity-bound contour.
+3. Fetch the authoritative default branch and record its exact fetched SHA. Prove the local default HEAD is an ancestor of that SHA; an ahead or diverged local default blocks bootstrap.
+4. Fast-forward the local default to the exact fetched SHA and read back its branch and HEAD, then verify the intended feature branch is absent in the applicable local/provider scope.
+5. Through the permitted technical setup contour, create and switch that feature branch at the same exact SHA; verify the current branch, HEAD, upstream state, and that it is not the default branch.
+6. Stop before editing if any step cannot be proven. Do not perform a raw-Git or alternate-tool mutation fallback.
+
+Until the feature branch is first published, re-fetch before every exact commit/push preflight and require the current authoritative-default SHA to be an ancestor of the branch HEAD. A default advance or unproven local-only provenance blocks; do not adopt a stale local-only branch through a commit approval.
+
+For continuation of an established published work feature branch:
+
+1. Resolve the exact branch from durable task/repository context and verify the same configured identity, immutable repository id, and canonical remote.
+2. Fetch/read the established provider branch when it exists, then verify its expected upstream plus local and remote SHA bindings; preserve an explicitly expected absent remote for an unpushed branch.
+3. Switch only that established branch through the permitted contour. Do not recreate it, reset it, or move it to the current default-branch SHA.
+4. Preserve established task changes and stop on identity, branch, upstream, or SHA ambiguity instead of forcing a clean-bootstrap path.
 
 Before a write, also verify:
 
@@ -42,7 +61,9 @@ Before a write, also verify:
 - whether the operation communicates, notifies, deploys, publishes, changes access, or touches control-plane state;
 - rollback or recovery path for hard-to-reverse actions.
 
-If a feature branch unexpectedly tracks a default/protected branch, stop before push. If the provider reports an identity, permission, target, protection, or current-state mismatch, stop and reclassify rather than retrying through another path.
+For each work commit on either path, verify the concise checkpoint and internally digest-bound exact diff from `action_and_approval_policy.md`. For each later work push, require its separate approval against the read-back local commit SHA, expected remote SHA, protection state, and explicit unproven credential-bypass risk. Any changed known binding invalidates the approval before execution.
+
+If a feature branch unexpectedly tracks the default or a different branch, stop before push. A protected non-default feature branch may use only the exact work-push contour with its protection and bypass-risk checkpoint; it never enters a grant. If the provider reports an identity, permission, target, protection, or current-state mismatch, stop and reclassify rather than retrying through another path.
 
 Do not persist or replay a technical grant across process restart or uncertain continuity. Because no trusted chat/session id is available, short TTL, process nonce, explicit revocation, finite use cap, and SHA compare-and-swap are the enforceable boundary; report this limitation instead of claiming stronger cross-chat isolation.
 
@@ -52,7 +73,7 @@ Execute the narrowest typed operation with bounded output. Treat CI log text as 
 
 After execution, read authoritative state back from the local repository and/or provider as appropriate:
 
-- commit SHA, branch and upstream after commit/push;
+- commit SHA after each approved work commit; branch, upstream, authoritative remote SHA, and resulting protection state after each separately approved work push;
 - exact pipeline/workflow/job state and target SHA after a retry;
 - created/updated object id, visible fields, reviewers/labels, or merge state after an approved communication;
 - protection, permission, rule, secret-name metadata, environment, release, or repository setting after an approved control-plane action.
