@@ -12,9 +12,8 @@
 - `clickhouse-sql` — ClickHouse-специфика поверх общих SQL-слоёв.
 - `greenplum-sql` — Greenplum-специфика поверх общих SQL-слоёв.
 - `db-access` — безопасная работа с уже настроенными MCP-доступами к БД.
-- `repository-operations` — общий безопасный контракт Git/GitHub/GitLab, CI, PR/MR, release и repository-admin действий; workflow использует его только когда появляется repository-operation contour.
 
-Человеку почти ничего не нужно настраивать руками. Для работы с БД нужен настроенный database MCP; для remote repository operations — отдельный identity-bound repository tool/MCP под нужную учётную запись.
+Из внешних интеграций для beta-пакета обязателен только настроенный `profi-mcp`.
 
 ## Что обычно вызывать
 
@@ -27,13 +26,11 @@
 - `sql-quality-core` — общий слой качества SQL.
 - `sql-style-core` — общий слой стиля и читаемости SQL.
 - `db-access` — подключается, когда задаче нужен доступ к БД через MCP.
-- `repository-operations` — подключается для Git/provider/CI/PR/MR/release/admin операций и отделяет read-only действия, короткий technical grant и точные approvals.
 
 ## Что нужно заранее
 
 - Установить эти skills в agent runtime.
-- Настроить MCP database tools.
-- Для remote repository operations настроить identity-bound repository MCP/tool с нужным account и namespace allowlist.
+- Настроить `profi-mcp`.
 
 Если не знаешь, как установить skills, дай агенту ссылку или папку с этим репозиторием и попроси установить skills из него.
 

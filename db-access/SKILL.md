@@ -7,6 +7,8 @@ description: Use for direct ClickHouse, Greenplum, BI OpenMetadata/catalog, or o
 
 Use this skill as the single shared direct database/OpenMetadata MCP access contract.
 
+The public/open-beta baseline requires only configured `profi-mcp` access for ordinary read-only ClickHouse/Greenplum work. Other database or catalog contours are optional and are used only when already configured; their absence does not block that baseline.
+
 ## Role
 
 - Purpose: provide the direct database/OpenMetadata access boundary for already configured database/catalog MCP tools.

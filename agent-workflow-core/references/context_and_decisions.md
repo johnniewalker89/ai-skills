@@ -193,9 +193,7 @@ Keep OpenMetadata and direct database MCP access in `db-access`. Keep any separa
 
 ## Workspace Guardrails
 
-Route Git and provider operations through `repository-operations`. This workflow records and retains the active approval; the repository owner classifies the operation, verifies identity/target, enforces the approval scope, and reads final state back.
-
-Repo-specific workflow from durable context or user instruction remains authoritative. Pass any user-reserved branch, commit, push, review, or merge ownership boundary to `repository-operations`; do not reinterpret it here.
+Repo-specific workflow from durable context or user instruction remains authoritative. Do not reinterpret user-reserved branch, commit, push, review, or merge ownership boundaries; pass them unchanged to the operational owner selected by the active entry or domain skill when one is active.
 
 Do not touch unrelated dirty files or revert changes you did not make. If unrelated dirty files exist, work around them and mention only the relevant risk.
 

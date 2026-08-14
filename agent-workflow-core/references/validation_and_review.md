@@ -97,7 +97,7 @@ Expectations:
 
 - state the read-only validation plan before using database access when the task is non-trivial;
 - for new production-like artifacts, it is acceptable to state a short reconnaissance intent, perform safe bounded discovery/probes, and then present the full proof strategy after concrete sources and grain are known;
-- keep direct database/OpenMetadata MCP work inside `db-access`; use any separately installed typed runtime-read route only through its dedicated access owner, exact current approval contract, and SQL chain;
+- keep direct database/catalog MCP work inside `db-access`; use any separately installed typed runtime-read route only through its dedicated access owner, exact current approval contract, and SQL chain;
 - do not run `dbt run`, `dbt build`, rebuilds, creates, drops, inserts, deletes, or cleanup actions in this mode;
 - for code changes, run the narrowest relevant check or explain the blocker;
 - for SQL, data, or modeling logic, try to prove correctness with read-only evidence first;
@@ -132,7 +132,7 @@ Extended sandbox validation is `project`-gated. Before any action, propose:
 
 Then stop and wait for explicit approval.
 
-If the validation will use `privileged_access_mcp_*`, the approval request must name the privileged contour and the state-changing action class, such as CTAS/materialization, DML, rebuild, diff artifact creation, or cleanup. A prior approval for repo changes, read-only checks, or a non-privileged sandbox plan does not authorize privileged database actions.
+If validation will use a separately configured privileged database contour, the approval request must name that contour and the state-changing action class, such as CTAS/materialization, DML, rebuild, diff artifact creation, or cleanup. A prior approval for repo changes, read-only checks, or a non-privileged sandbox plan does not authorize privileged database actions.
 
 After approved sandbox actions run, compare the result with the success criteria. A successful run, build, create, or rebuild is not validation by itself.
 

@@ -63,7 +63,7 @@ Proof strategy/evidence boundary:
 
 After presenting the plan, stop and wait for explicit user approval such as "go", "continue", "approved", "согласен", "продолжай", or an equivalent instruction.
 
-Do not bundle unrelated approval gates. Approval for creating implementation artifacts is not approval for sandbox validation, database writes, or expensive runs. Classify Git/provider actions through `repository-operations`; retain its bounded technical grant or exact action approval separately from database/sandbox approval.
+Do not bundle unrelated approval gates. Approval for creating implementation artifacts is not approval for sandbox validation, database writes, expensive runs, or another selected operational contour. Preserve every selected owner's approval scope separately.
 
 Safe autonomous reconnaissance may include:
 
@@ -103,7 +103,7 @@ Use the context workspace for solution code only when the user explicitly asks f
 
 Separate production database writes from repository edits: "no production writes" blocks database DDL/DML or other live-environment mutations, but does not automatically forbid code edits in the repo unless the user says not to touch the repo.
 
-For Git/provider/CI/PR/MR/release/admin actions, obtain and retain the approval required by `repository-operations`; leave action classification, identity/target checks, enforcement, and readback to that owner.
+When an entry or domain owner selects a narrower action-specific operational owner, preserve that owner's exact approval scope and leave action classification, identity/target checks, enforcement, and readback to it.
 
 The checkpoint should name the intended code destination when files will be created or edited: target repo paths, target workspace paths, or context-only draft/package.
 
@@ -115,7 +115,7 @@ Extended sandbox validation always requires explicit user approval before any sa
 
 Before running it, define the sandbox contour, exact target set, short validation window, comparison baseline, expected artifacts, `db-access` escalation path, and cleanup/rollback plan. Then stop for explicit approval.
 
-Approval for repository edits, read-only validation, or the abstract idea of "sandbox proof" is not approval to use privileged database tools. If the proof requires `privileged_access_mcp_*`, ask for that exact contour, action type, target set, and cleanup/rollback expectation before the first privileged call. If ordinary MCP access is down or times out, stop and ask whether to switch to the privileged contour; do not infer that switch from the outage.
+Approval for repository edits, read-only validation, or the abstract idea of "sandbox proof" is not approval to use a separately configured privileged database contour. Ask for that exact contour, action type, target set, and cleanup/rollback expectation before the first privileged call. If ordinary MCP access is down or times out, stop and ask whether to switch contours; do not infer that switch from the outage.
 
 ## Business Rules
 
