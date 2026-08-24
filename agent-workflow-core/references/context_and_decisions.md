@@ -260,12 +260,15 @@ Update `context.md` as navigation. Keep separate `Активные задачи`
 - link related agent logs from the log section when useful;
 - keep only short status text there.
 
-If the task registry carries a reviewer-owned learning, study, or evaluation status, keep it independent from technical closure:
+When the established context workspace defines a task-log review register, keep one current-state row per task there. The recommended portable location is `skills/skill_reviews/STATUS.md`; an explicitly configured workspace location takes precedence.
 
-- ordinary delivery may add `skills: не изучено` only when the review marker is absent;
-- preserve any existing reviewer-owned status, including partial or completed review;
-- never advance the status from task completion, merge, approval, runtime success, or a closure summary alone;
-- only the configured review owner may advance it after saving the required review evidence.
+- keep `context.md` as navigation only and do not duplicate review or remediation status there;
+- on task creation, add one row with task state `active`, review `pending`, and remediation `unknown`;
+- on task closure, change only the task state to `closed` and preserve review and remediation exactly;
+- never advance review or remediation from task completion, merge, approval, runtime success, or a closure summary alone;
+- only the configured review owner may advance review coverage after saving and indexing the required evidence; remediation validation follows that owner's evidence contract.
+
+If no task-log review register is configured, do not invent a workspace-specific status convention. Keep the short active/closed navigation entry in `context.md` and preserve any existing external review ledger unchanged.
 
 When the task snapshot becomes too long to be a quick-start file, archive it:
 
