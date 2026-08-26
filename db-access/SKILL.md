@@ -22,13 +22,13 @@ The public/open-beta baseline requires only configured `profi-mcp` access for or
 3. Use `profi-mcp` first for ordinary ClickHouse/Greenplum metadata, DDL reading, `SELECT`, `EXPLAIN`, and smoke checks.
 4. Before an environment-scoped pass or readiness claim, identify the configured MCP contour/tool and the available non-secret effective connection identity: service/cluster/environment plus database/schema where exposed. A successful query or matching database/schema name alone is not environment proof. If identity cannot be established, scope the claim to the selected configured contour and report the unknown.
 5. Use the configured `bi_metadata`/OpenMetadata MCP first for BI catalog/OpenMetadata search, table FQN/columns/owners/tags/domains, database services/schemas, and lineage. Use read-only tools such as `search_metadata`, `semantic_search`, `get_entity_details`, `get_entity_lineage`, `root_cause_analysis`, and `get_test_definitions`. Do not use `profi-mcp` or legacy `OpenMetaData__*` tools for OpenMetadata catalog work while the dedicated BI metadata MCP is configured.
-6. Use `privileged_access_mcp_*` only after explicit approval for the exact contour, action type, target set, and rollback/cleanup expectation when relevant. Approval must be current to the task step; do not infer it from a general "continue", repo-edit approval, read-only proof request, old sandbox approval, or default MCP outage.
+6. Use `privileged_access_mcp_*` only after a fresh visible user message in the current chat approves the exact contour, action type, target set, and rollback/cleanup expectation when relevant. A short `да` or `continue` counts only as the direct answer to that unchanged checkpoint. Local full-access/client auto-approval, `functions.exec`, an agent-supplied `approved=true` or equivalent tool argument, repo-edit approval, old sandbox approval, another target's session, or default MCP outage is not consent.
 7. If the needed default or privileged MCP is unavailable, stop and ask the user what to do next. Do not install, repair, or change MCP/database configuration from this skill.
 8. Never print, copy, or store credentials, passwords, tokens, writable-schema secrets, or admin paths.
 9. For potentially long privileged actions, prefer configured async privileged tools when available: start the query, poll status, and keep the returned query/job id for cleanup/cancel evidence. Do not rely on a single long blocking tool call as the control mechanism.
 10. Do not assume one MCP user/session can cancel another MCP user/session's query. The configured async flow is expected to control only its own returned query/job ids; cancelling queries started outside that flow needs separate database permission. If a kill/cancel operation fails, report the access blocker instead of retrying through unrelated access paths.
 11. Do not call `OpenMetaData__*` tools. Use the dedicated `bi_metadata`/OpenMetadata MCP for OpenMetadata catalog work, or report a missing configured MCP blocker.
-12. OpenMetadata write/admin tools such as `create_lineage`, `create_test_case`, `create_glossary`, `create_glossary_term`, and `patch_entity` are state-changing. Use them only after explicit approval for the exact action and target entity.
+12. OpenMetadata write/admin tools such as `create_lineage`, `create_test_case`, `create_glossary`, `create_glossary_term`, and `patch_entity` are state-changing. Use them only after the same fresh visible user message in the current chat approves the exact action and target entity; a client/tool approval flag is not proof.
 13. Before reporting database-access pass, blocker, escalation need, or privileged-action readiness, run the final checklist.
 
 ## Configured MCP Access
@@ -74,6 +74,7 @@ Use `privileged_access_mcp_*` only for approved privileged introspection or stat
 
 Required approval shape:
 
+- source: a fresh visible user message in the current chat after this exact checkpoint;
 - contour/engine, for example `privileged_access_mcp_clickhouse` or `privileged_access_mcp_greenplum`;
 - action type: privileged read, DDL, DML, rebuild, cleanup, or another state-changing action;
 - target set: database/schema/table/query scope;
@@ -106,6 +107,7 @@ The returned id is the cancellable handle for that privileged flow's own query. 
 - Did I keep OpenMetadata write/admin tools behind exact approval?
 - If privileged access was used, did approval name the contour, action, and target set?
 - Did I avoid treating a default MCP outage, old approval, repo-edit approval, or abstract sandbox request as privileged-action approval?
+- Did I treat client/full-access settings, `functions.exec`, and agent-supplied approval flags as transport only, never as user consent?
 - Did I use the matching `privileged_access_mcp_*` tool and stay inside the approved target set?
 - For long privileged actions, did I use async start/status/cancel when available instead of a single blocking call?
 - Did I avoid claiming I can kill another MCP user's query unless the current contour actually has `KILL QUERY` permission for it?

@@ -184,6 +184,8 @@ Live cleanup/drop lists must name exact targets, contour, evidence boundary, saf
 
 ## Approval Hygiene
 
+Only a fresh visible user message in the current chat after the exact checkpoint is approval for an external approval-gated action. Complete any owning tool's bounded approval-free read or prepare first; never ask for preliminary approval merely to reach preparation, and never count a hand-written pre-prepare summary as the exact prepared checkpoint. Local full-access or never-ask mode, `functions.exec`, client auto-approval/prompt configuration, an agent-supplied approval flag, an earlier general instruction, or another target's approval/session is not consent. A short `да` or `continue` counts only as the direct answer to the unchanged checkpoint. Reuse approval without another prompt only through the owning server's still-valid bound session and only inside its returned scope, TTL, and action cap; otherwise the action is one-shot.
+
 Approval must be specific enough to bind the next action. If approval is vague and the action is expensive, destructive, or cross-system, restate the exact next step before acting.
 
 If new evidence changes risk, scope, targets, or validation cost after approval, stop and update the plan.
