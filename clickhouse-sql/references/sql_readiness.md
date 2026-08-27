@@ -64,7 +64,7 @@ Do not mark such a candidate `read_only_validated` for a response-date or event-
 
 Operational handoff gate for ClickHouse mart-build:
 
-- if the final artifact is business-date scoped, proxy pruning evidence alone cannot put the object in `proof_targets.md`;
+- if the final artifact is business-date scoped, proxy pruning evidence alone cannot qualify the object for a sandbox-proof handoff;
 - coverage counts must compare rows in the business window with rows retained by the proxy guard for the same proposed rebuild window;
 - if the proxy guard intentionally defines the cohort, the target name/columns/notes must use cohort or proxy wording rather than claiming the original business-date window;
 - if neither proof is safe, save the rejected business-timestamp and proxy-coverage proof designs and keep the object below sandbox handoff.

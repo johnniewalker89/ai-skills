@@ -42,6 +42,7 @@ When creating or initializing a local context workspace, ask for permission to c
 
 Create only the minimum baseline by default:
 
+- `README.md`
 - `context.md`
 - `environment.md`
 - `tasks/`
@@ -57,12 +58,41 @@ If the user prefers to fill environment details manually, create a template or a
 
 Use these locations:
 
+- `README.md`: compact root owner map and quick entry to the current context
+  surfaces; it must not become a journal, package catalog, or debt duplicate.
 - `context.md`: navigation and active/closed task index, not a full journal.
 - `environment.md`: local machine-specific environment map for repo paths, shells, Python/dbt runtimes, database contours, and other local runtime facts.
 - `tasks/<TASK_ID>.md`: current task snapshot for continuing in a new chat.
 - `agent_logs/<TASK_ID>.agent_log.md`: optional audit trail for agent behavior, decisions, evidence, rejected alternatives, and validation.
 - `airflow_logs/airflow_logs.md`: shared Airflow failure analysis context when no task id exists.
 - `meta/...`: optional long-lived local notes when explicitly requested by the user.
+
+When an existing context workspace has a root `README.md`, read it before the
+individual context files and follow its current owner map. Do not infer an old
+flat layout from historical links when the owner map routes installation,
+development debt, review state, or evidence elsewhere.
+
+Use this compact root-map shape when initializing a context workspace. Include
+only rows for surfaces that exist or are created in the current scope, and
+localize headings to the user's/workspace language:
+
+```markdown
+# <Local context map>
+
+## <Quick entry>
+
+- <Task navigation>: [`context.md`](context.md)
+- <Machine environment>: [`environment.md`](environment.md)
+
+## <Information owners>
+
+| Information | Single owner |
+| --- | --- |
+| Active and closed task navigation | `context.md` |
+| Current task snapshot | `tasks/<TASK_ID>.md` |
+| Machine-specific runtime and paths | `environment.md` |
+| Optional append-only agent log | `agent_logs/<TASK_ID>.agent_log.md` |
+```
 
 Keep local markdown context files (`context.md`, task snapshots, agent logs, meta-task files, `notes.md`, and similar `.md` files) in UTF-8. Do not mix UTF-8 with `cp1251` or another encoding in the same file.
 
@@ -79,13 +109,25 @@ Before the first local runtime-backed command, including incidental helper/valid
 
 Do not invoke a bare executable or probe an alias recorded as unavailable, forbidden, or a shim. A later successful fallback does not make the initial known-bad attempt acceptable. Verify that the selected runtime matches the intended shell, repo, dependency surface, and task type before changing code or installing packages.
 
-Keep `environment.md` a compact current-state lookup. Store exact paths/commands, selection constraints, access-config pointers, and explicit unknowns. Do not store task status, branches/commits, install history, dated smoke results, repo anatomy, package inventories owned by requirements/locks, Git remotes discoverable from the repo, or policy text owned by another skill/server document.
+Keep `environment.md` a compact current-state lookup. Store exact
+paths/commands, repo roots, local executable paths/versions, selection
+constraints, secret-safe configuration-file pointers, and explicit unknowns.
+Do not store credential values, account identities, access/approval policy,
+task status, branches/commits, install history, dated smoke results, repo
+anatomy, package inventories owned by requirements/locks, Git remotes
+discoverable from the repo, or policy text owned by another skill/server
+document. A `Local executables` section is a machine tool/runtime map, not an
+inventory of installed skills or MCP servers.
 
 After discovering a stable local environment fact, update or propose updating `environment.md` instead of leaving it only in chat, task notes, or logs. Mark agent-discovered values as draft/unconfirmed and ask the user to validate them before treating them as stable future configuration. For Airflow, CI, runner, command, import, or runtime-log investigations, resolve the environment before proposing code changes or commands.
 
 If a configured context workspace lacks `environment.md`, ask whether to create the template, let the user fill it, or inspect local project/config/filesystem read-only and propose a draft. Do not invent paths or runtimes.
 
 Use this minimal `environment.md` template when initializing a new local context workspace:
+
+Localize the headings and explanatory labels in this example to the
+user's/workspace language. Keep paths, executable names, identifiers, and
+status tokens unchanged.
 
 ```markdown
 # Local Environments
@@ -111,14 +153,21 @@ Minimal local environment map for skills. Store only machine-specific facts need
 - Python project root: `<path or unknown>`
 - extra repo roots: `<path(s) or unknown>`
 
-## Access Configuration
+## Local Executables
 
-- access-config pointers: `<path(s) or unknown>`
-- database access: `direct MCP via db-access / approved typed runtime read via selected dedicated access owner + SQL chain / not used`
+| Tool | Exact path/version | Scope/status |
+| --- | --- | --- |
+| `<tool>` | `<exact path/version or unknown>` | `<selection constraint or status>` |
+
+## Local Config Pointers
+
+- `<purpose>`: `<secret-safe file path or unknown>`
 
 ## Boundaries
 
 - current configuration only; task/project history lives in its owning context
+- local executables are not an inventory of installed skills or MCP servers
+- no credential values, account identities, or access/approval policy
 - discovered values: `<draft/unconfirmed or user-confirmed>`
 ```
 
@@ -142,6 +191,11 @@ Use this minimal `context.md` template when initializing a new local context wor
 
 ## Закрытые задачи
 ```
+
+Inside `Активные задачи` and `Закрытые задачи`, use stable `-` bullets and
+sort DP-style task identifiers by descending numeric id. Do not use sequential
+list numbering that must be renumbered when a new task is inserted. Keep
+initiatives without a DP-style id in separate active/closed non-DP sections.
 
 Add optional `context.md` sections only when needed:
 
@@ -172,6 +226,8 @@ Meta-task files use a lighter structure than task snapshots. Keep the current fo
 
 When durable context is required or already established for the current task, inspect the minimum saved local context needed:
 
+- the existing root `README.md` owner map before choosing individual context
+  documents;
 - `environment.md` for local repo roots and runtime choices when the task may need project files, SQL/dbt models, Python code, database contours, or repo discovery;
 - current repo, branch, and dirty worktree;
 - relevant task notes in `tasks/` or another local context file;
@@ -256,11 +312,15 @@ Update `context.md` as navigation. Keep separate `Активные задачи`
 
 - add new ongoing work to `Активные задачи`;
 - move completed work to `Закрытые задачи` with a short outcome;
+- use stable `-` bullets and sort DP-style task ids by descending numeric id in
+  each section; never introduce sequential ordinals;
+- keep initiatives without a DP-style task id in separate active/closed non-DP
+  sections;
 - keep Airflow analyses or other long-lived work without a task id in a separate meta-task section, not in the task list;
 - link related agent logs from the log section when useful;
 - keep only short status text there.
 
-When the established context workspace defines a task-log review register, keep one current-state row per task there. The recommended portable location is `skills/skill_reviews/STATUS.md`; an explicitly configured workspace location takes precedence.
+When the established context workspace defines a task-log review register, keep one current-state row per task there. Follow the root owner map or another explicitly configured workspace location; if neither exists, use a neutral `reviews/STATUS.md` path.
 
 - keep `context.md` as navigation only and do not duplicate review or remediation status there;
 - on task creation, add one row with task state `active`, review `pending`, and remediation `unknown`;
