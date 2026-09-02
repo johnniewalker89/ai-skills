@@ -320,15 +320,27 @@ Update `context.md` as navigation. Keep separate `Активные задачи`
 - link related agent logs from the log section when useful;
 - keep only short status text there.
 
-When the established context workspace defines a task-log review register, keep one current-state row per task there. Follow the root owner map or another explicitly configured workspace location; if neither exists, use a neutral `reviews/STATUS.md` path.
+When the established context workspace defines a task-log review register or a
+skill-review/evaluation tree, ordinary task delivery must not write there. This
+includes task creation, task closure, agent-log link changes, row backfill, and
+review or remediation fields.
 
-- keep `context.md` as navigation only and do not duplicate review or remediation status there;
-- on task creation, add one row with task state `active`, review `pending`, and remediation `unknown`;
-- on task closure, change only the task state to `closed` and preserve review and remediation exactly;
-- never advance review or remediation from task completion, merge, approval, runtime success, or a closure summary alone;
-- only the configured review owner may advance review coverage after saving and indexing the required evidence; remediation validation follows that owner's evidence contract.
+- keep `context.md` as active/closed task navigation and do not duplicate review
+  or remediation status there;
+- keep current task state in `tasks/<TASK_ID>.md` and append only to an enabled
+  `agent_logs/<TASK_ID>.agent_log.md`;
+- leave the configured review tree byte-for-byte unchanged throughout ordinary
+  delivery, including technical closure;
+- a separate configured review owner discovers tasks from navigation, snapshots,
+  and logs, then creates or reconciles exactly one current-state row during the
+  review pass;
+- task completion, merge, approval, runtime success, or a closure summary is
+  evidence for task state only and never advances review or remediation by
+  itself.
 
-If no task-log review register is configured, do not invent a workspace-specific status convention. Keep the short active/closed navigation entry in `context.md` and preserve any existing external review ledger unchanged.
+If no task-log review register is configured, do not invent one. Keep the short
+active/closed navigation entry in `context.md` and preserve any existing review
+tree unchanged.
 
 When the task snapshot becomes too long to be a quick-start file, archive it:
 
