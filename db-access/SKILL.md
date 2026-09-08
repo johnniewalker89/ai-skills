@@ -1,6 +1,6 @@
 ---
 name: db-access
-description: Use for direct ClickHouse, Greenplum, BI OpenMetadata/catalog, or other database access through already configured database MCP tools/servers. Apply for direct MCP metadata, DDL, queries, privileged introspection, sandbox writes, catalog search, ownership, lineage, or root-cause investigation. Use `profi-mcp` for ordinary ClickHouse/Greenplum read-only access, `bi_metadata` for OpenMetadata, and approved `privileged_access_mcp_*` for privileged work. Do not use this skill for a typed remote-runtime database-read tool owned by a separately installed access skill unless a direct DB/OpenMetadata MCP contour is also in scope.
+description: Access configured direct database and OpenMetadata MCP for metadata, catalog, bounded queries and approved privileged work. Use with agent-workflow-core; a separately owned typed runtime database read does not activate this skill.
 ---
 
 # DB Access
@@ -31,89 +31,23 @@ The public/open-beta baseline requires only configured `profi-mcp` access for or
 12. OpenMetadata write/admin tools such as `create_lineage`, `create_test_case`, `create_glossary`, `create_glossary_term`, and `patch_entity` are state-changing. Use them only after the same fresh visible user message in the current chat approves the exact action and target entity; a client/tool approval flag is not proof.
 13. Before reporting database-access pass, blocker, escalation need, or privileged-action readiness, run the final checklist.
 
-## Configured MCP Access
+## Workflow
 
-Use the host agent's already configured `profi-mcp` tools for ordinary read-only ClickHouse/Greenplum database access. Common tool namespaces are:
+1. Resolve the configured contour and effective non-secret identity.
+2. Use bounded `profi-mcp` Clickhouse__/GreenPlum__ reads for database evidence, or `bi_metadata` for catalog evidence.
+3. Read the matching procedure for catalog discovery or privileged work. Reuse sufficient current metadata; page only until the required coverage is complete.
+4. Interpret results with domain owners; report access, evidence and cleanup limits after the Final Checklist.
 
-- ClickHouse: `Clickhouse__*`
-- Greenplum: `GreenPlum__*`
+## Reference Triggers
 
-Use the configured `bi_metadata`/OpenMetadata MCP tools for BI OpenMetadata catalog access.
-
-- `search_metadata`
-- `semantic_search`
-- `get_entity_details`
-- `get_entity_lineage`
-- `root_cause_analysis`
-- `get_test_definitions`
-
-Do not use `OpenMetaData__*`; those legacy tools are not the supported catalog path.
-
-Do not use OpenMetadata write/admin tools such as `create_lineage`,
-`create_test_case`, `create_glossary`, `create_glossary_term`, or `patch_entity`
-without exact approval for the action and target entity.
-
-If the needed default MCP database access is not available in the current host agent, state that configured MCP access is unavailable and ask the user what to do next. Do not switch to direct access or change tool configuration from this skill.
-
-## OpenMetadata Investigation Workflow
-
-Use `bi_metadata` as the first catalog step when a task asks to find, understand, compare, explain, or debug tables, marts, dashboards, owners, tags, domains, columns, upstream/downstream dependencies, or data-quality impact.
-
-- Start with `search_metadata` for exact names, FQNs, services, owners, tags, tiers, domains, known column names, or structured filters.
-- Use `semantic_search` for vague business-language requests, unknown table names, or exploratory source discovery.
-- Pass the returned `fullyQualifiedName` and `entityType` unchanged into `get_entity_details` or `get_entity_lineage`; do not construct or normalize FQNs manually.
-- Use `get_entity_details` to inspect descriptions, columns, owners, tags, service/database/schema, domains, data products, and available table metadata before choosing or documenting a source.
-- Use `get_entity_lineage` for normal upstream/downstream explanation and impact checks; use `root_cause_analysis` only when investigating data-quality failures or suspected upstream breakage.
-- Keep catalog evidence separate from live DB proof: OpenMetadata can identify candidates, ownership, meaning, and lineage, but DDL, row counts, query behavior, freshness, and runtime proof still require the appropriate read-only database tools when needed.
-- Page search results deliberately. Prefer a narrow query or small candidate set over dumping broad catalog results into chat.
-- If OpenMetadata and live DB/repo evidence disagree, report the mismatch and do not silently treat catalog metadata as runtime truth.
-
-## Privileged MCP Access
-
-Use `privileged_access_mcp_*` only for approved privileged introspection or state-changing actions.
-
-Required approval shape:
-
-- source: a fresh visible user message in the current chat after this exact checkpoint;
-- contour/engine, for example `privileged_access_mcp_clickhouse` or `privileged_access_mcp_greenplum`;
-- action type: privileged read, DDL, DML, rebuild, cleanup, or another state-changing action;
-- target set: database/schema/table/query scope;
-- rollback/cleanup expectation when the action creates, changes, or removes state.
-
-If ordinary `profi-mcp` access fails or is too limited, report the blocker and ask whether to use the privileged contour. The outage itself does not approve privileged access.
-
-After approval:
-
-1. Use only the matching `privileged_access_mcp_*` tool.
-2. Keep actions inside the approved target set.
-3. If any generated SQL, target, cleanup, or dependency resolves outside approval, stop.
-4. Record the approved contour/action/target set in the task note, agent log, or final handoff before or with the first privileged action.
-5. Report the proof and cleanup result honestly.
-
-For long-running sandbox writes or expensive proof checks, use async privileged MCP tools when they are configured:
-
-- ClickHouse: `start_async_query`, `get_query_status`, `kill_query`; keep the returned `query_id`.
-- Greenplum: `start_async_query`, `get_query_status`, `cancel_query`; keep the returned `job_id`.
-
-The returned id is the cancellable handle for that privileged flow's own query. If async tools are unavailable, keep the query bounded enough for a normal tool call or stop with a blocker.
+- Read `references/catalog.md` for OpenMetadata source discovery, details, lineage or root cause; do not repeat catalog discovery when current known identities/evidence suffice.
+- Read `references/privileged.md` before privileged approval/execution or async cleanup/cancel.
 
 ## Final Checklist
 
-- Did I use only `profi-mcp`, `bi_metadata`, or approved `privileged_access_mcp_*` tools for this direct MCP contour?
-- Before an environment-scoped claim, did I establish non-secret contour/connection identity instead of inferring it from query success or a database/schema name?
-- Did I use `profi-mcp` first for ClickHouse/Greenplum read-only access unless privileged access was explicitly approved?
-- Did I use `bi_metadata` first for BI OpenMetadata/catalog access?
-- For table investigation, did I use catalog search/details/lineage when it could clarify meaning, ownership, candidates, or impact?
-- Did I keep OpenMetadata write/admin tools behind exact approval?
-- If privileged access was used, did approval name the contour, action, and target set?
-- Did I avoid treating a default MCP outage, old approval, repo-edit approval, or abstract sandbox request as privileged-action approval?
-- Did I treat client/full-access settings, `functions.exec`, and agent-supplied approval flags as transport only, never as user consent?
-- Did I use the matching `privileged_access_mcp_*` tool and stay inside the approved target set?
-- For long privileged actions, did I use async start/status/cancel when available instead of a single blocking call?
-- Did I avoid claiming I can kill another MCP user's query unless the current contour actually has `KILL QUERY` permission for it?
-- Did I avoid every non-MCP database access path?
-- Did I leave any typed remote-runtime database-read route to its dedicated installed access owner and SQL chain rather than treating it as a `db-access` contour?
-- Did I avoid `OpenMetaData__*` completely?
-- Did I avoid installing, repairing, or changing MCP/database configuration from this skill?
-- Did I avoid exposing or storing credentials, tokens, writable schemas, or admin paths?
-- Did I report blockers, proof, and cleanup state accurately?
+- Allowed configured direct MCP used; establish non-secret contour/connection identity before environment claims?
+- Catalog uses bi_metadata and unchanged returned FQNs; catalog meaning kept separate from live proof?
+- Privileged or catalog-write actions have exact contour/action/target approval; no outage-based escalation?
+- Async handles control only their own queries; cleanup and blockers reported?
+- No non-MCP fallback, legacy OpenMetaData__*, configuration repair or secret output?
+- Separate typed runtime reads remain with their dedicated owner and SQL chain?

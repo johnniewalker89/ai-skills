@@ -1,6 +1,6 @@
 ---
 name: greenplum-sql
-description: Use when writing, editing, reviewing, or optimizing Greenplum SQL queries or DDL. MUST be used together with `agent-workflow-core`, `sql-quality-core`, and `sql-style-core`. Apply Greenplum-compatible idioms and MPP-aware patterns. Use `db-access` for direct database MCP access; if a separately installed typed runtime-read owner is selected, follow its exact approval contract instead.
+description: Write, review and optimize Greenplum SQL/DDL with MPP, distribution, partitioning and load-readiness proof. Use with agent-workflow-core, sql-quality-core and sql-style-core; access follows its selected owner.
 ---
 
 # Greenplum SQL
@@ -27,13 +27,10 @@ Use this skill for Greenplum SQL/DDL work in repositories that follow our databa
 
 ## Workflow
 
-1. Establish task mode and delivery rules through `agent-workflow-core`.
-2. Run the shared SQL semantic and style passes through `sql-quality-core` and `sql-style-core`.
-3. Identify the task type: writing, editing, review, optimization, DDL, load, runtime investigation, or lineage.
-4. Load the mandatory references from the hard gates, then any task-specific reference listed below.
-5. Inspect metadata/DDL and draft SQL only after grain, business semantics, refresh scope, and MPP shape are clear.
-6. Run Greenplum metadata, MPP-plan, load-readiness, validation, and style-overlay self-review, then this skill's Final Checklist, before returning SQL or findings.
-7. If the task touches Greenplum runtime history, keep the ClickHouse telemetry bridge narrow and call out freshness lag or missing fresh-log blockers.
+1. Resolve SQL scope and current target metadata with the shared SQL owners.
+2. Check MPP plan and relevant DDL/load/refresh mechanics; reuse unchanged metadata/plan evidence for the same scope.
+3. Keep the ClickHouse query-history bridge narrow telemetry with freshness limits; cross-engine business lineage uses its engine owner.
+4. Run the Final Checklist and report concrete plan evidence, repo paths or DB-only fallback.
 
 ## Reference Triggers
 
@@ -52,12 +49,8 @@ Use this skill for Greenplum SQL/DDL work in repositories that follow our databa
 
 ## Final Checklist
 
-- Did I use the required chain and route direct MCP access through `db-access` or a selected typed runtime read through its dedicated access owner and exact approval contract?
-- Did I read every reference required by the hard gates that matched this task?
-- Did I inspect or explicitly fallback for Greenplum metadata: columns, types, distribution, partitioning, storage, and row-volume/statistics?
-- Did I interpret the MPP plan with optimizer choice, `Motion`, distribution, partition pruning, materialization/reuse, estimates, and largest scans instead of only saying the query planned?
-- For DDL/load/rebuild work, did I prove storage/distribution/partition/refresh mechanics avoid stale or full-target mistakes and include needed stats/`ANALYZE` points?
-- Did I keep Greenplum query-history in ClickHouse as narrow telemetry only, without replacing Greenplum metadata/repo evidence or business lineage?
-- Did I keep cross-engine lineage separate from telemetry and use the relevant engine skill for upstream source layers?
-- Did I return to `sql-style-core` plus the Greenplum style overlay before final SQL?
-- If a blocker remains in this skill's `Owns` area, did I stop or downgrade instead of reporting engine-check passed?
+- Required SQL/access chain, references, target metadata/statistics or fallback established?
+- MPP plan covers optimizer/Motion/distribution, pruning, estimates, reuse and heavy scans?
+- Load/staging/storage/partition refresh and ANALYZE implications resolved?
+- Telemetry bridge kept separate from target metadata and business lineage?
+- Final common/engine style checked; owner blockers prevent pass?

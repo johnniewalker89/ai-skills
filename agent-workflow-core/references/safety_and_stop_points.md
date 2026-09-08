@@ -61,7 +61,7 @@ Proof strategy/evidence boundary:
 - Success criteria:
 ```
 
-After presenting the plan, stop and wait for explicit user approval such as "go", "continue", "approved", "согласен", "продолжай", or an equivalent instruction.
+If implementation approval is not already present, after presenting the concrete plan stop and wait for explicit user approval such as "go", "continue", "approved", "согласен", "продолжай", or an equivalent instruction.
 
 Do not bundle unrelated approval gates. Approval for creating implementation artifacts is not approval for sandbox validation, database writes, expensive runs, or another selected operational contour. Preserve every selected owner's approval scope separately.
 
@@ -111,7 +111,7 @@ The checkpoint should name the intended code destination when files will be crea
 
 Use read-only validation first. If validation requires database writes, object creation, rebuilds, recalculation, or cleanup, treat it as extended sandbox validation.
 
-Extended sandbox validation always requires explicit user approval before any sandbox action. This applies even when the target is a test schema, temporary table, local-looking dbt target, or supposedly isolated validation contour.
+Extended sandbox validation requires explicit user approval for its concrete contour/actions before execution; retain approval already covering that exact work. This applies even when the target is a test schema, temporary table, local-looking dbt target, or supposedly isolated validation contour.
 
 Before running it, define the sandbox contour, exact target set, short validation window, comparison baseline, expected artifacts, `db-access` escalation path, and cleanup/rollback plan. Then stop for explicit approval.
 
@@ -184,8 +184,8 @@ Live cleanup/drop lists must name exact targets, contour, evidence boundary, saf
 
 ## Approval Hygiene
 
-Only a fresh visible user message in the current chat after the exact checkpoint is approval for an external approval-gated action. Complete any owning tool's bounded approval-free read or prepare first; never ask for preliminary approval merely to reach preparation, and never count a hand-written pre-prepare summary as the exact prepared checkpoint. Local full-access or never-ask mode, `functions.exec`, client auto-approval/prompt configuration, an agent-supplied approval flag, an earlier general instruction, or another target's approval/session is not consent. A short `да` or `continue` counts only as the direct answer to the unchanged checkpoint. Reuse approval without another prompt only through the owning server's still-valid bound session and only inside its returned scope, TTL, and action cap; otherwise the action is one-shot.
+Apply instruction priority and retain the user's already authorized scope. The selected operational owner defines which exact action/target/payload or live session must be bound to consent, plus expiry, identity checks and readback. Follow its preparation contract before asking; never request preliminary permission for safe reconnaissance or a prepare call.
 
-Approval must be specific enough to bind the next action. If approval is vague and the action is expensive, destructive, or cross-system, restate the exact next step before acting.
+Ask only for missing authorization. An unchanged next implementation step is not a new approval boundary. Client/full-access settings and agent-supplied flags cannot supply user consent. If scope, risk or binding changes, return to the operational owner before the dependent action.
 
-If new evidence changes risk, scope, targets, or validation cost after approval, stop and update the plan.
+All subagent launches have a separate explicit batch approval under the workflow's economy/depth procedure. Project or implementation approval does not authorize agents or a larger test budget.

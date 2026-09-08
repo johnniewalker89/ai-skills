@@ -1,6 +1,6 @@
 ---
 name: clickhouse-sql
-description: Use when writing, editing, reviewing, or optimizing ClickHouse SQL queries. MUST be used together with `agent-workflow-core`, `sql-quality-core`, and `sql-style-core`. Apply ClickHouse-native idioms and performance-oriented query patterns. Use `db-access` for direct database MCP access; if a separately installed typed runtime-read owner is selected, follow its exact approval contract instead.
+description: Write, review and optimize ClickHouse SQL and DDL with native shapes, physical pruning and load-readiness proof. Use with agent-workflow-core, sql-quality-core and sql-style-core; access follows its selected owner.
 ---
 
 # ClickHouse SQL
@@ -28,13 +28,10 @@ Use this skill for ClickHouse SQL work in repositories that follow our database 
 
 ## Workflow
 
-1. Establish task mode and delivery rules through `agent-workflow-core`.
-2. Run the shared SQL semantic and style passes through `sql-quality-core` and `sql-style-core`.
-3. Identify the task type: writing, editing, review, optimization, DDL, load, or lineage.
-4. Load the mandatory references from the hard gates, then any task-specific reference listed below.
-5. Inspect metadata/DDL and draft SQL only after grain, business semantics, and refresh scope are clear.
-6. Run ClickHouse native-shape, load-readiness, validation, and style-overlay self-review, then this skill's Final Checklist, before returning SQL or findings.
-7. If the user requested a reasoning/evidence artifact, save the material validation summary there: smoke counts, parts/granules or primary-key conditions, repeated `ReadFromMergeTree`, heavy scan shape, and accept/rewrite decisions.
+1. Resolve SQL scope and current metadata/source contracts with the shared SQL owners.
+2. Apply native-shape and relevant load-readiness checks, then inspect the bounded plan/output.
+3. Reuse unchanged DDL and exact plan evidence across checks; refresh after query/settings/source changes or when freshness requires it.
+4. Save requested evidence artifacts with smoke/parts/granules, repeated ReadFromMergeTree, heavy scans and accept/rewrite decisions; run the Final Checklist.
 
 ## Reference Triggers
 
@@ -53,14 +50,10 @@ Use this skill for ClickHouse SQL work in repositories that follow our database 
 
 ## Final Checklist
 
-- Did I use the required chain and route direct MCP access through `db-access` or a selected typed runtime read through its dedicated access owner and exact approval contract?
-- Did I read every reference required by the hard gates that matched this task?
-- Did I inspect or explicitly fallback for ClickHouse metadata: columns, types, engine, `ORDER BY`, `PARTITION BY`, and row-volume shape?
-- Did I compare chosen filters with source `PARTITION BY`/primary-key pruning shape, and avoid treating pruning evidence as business-window coverage proof?
-- Did I complete the native-shape pass and challenge generic SQL where ClickHouse has a safer/faster primitive?
-- For DDL/load/rebuild work, did I prove target/staging/partition/refresh mechanics avoid stale or partial-partition results?
-- For non-trivial SQL, did I run or explicitly block `EXPLAIN`/bounded validation and interpret repeated reads, primary-key/granule pruning, and heavy scans?
-- Did I keep query-log sources as telemetry only and avoid using mirrors as business proof without lineage evidence?
-- Did I return to `sql-style-core` plus the ClickHouse style overlay before final SQL?
-- Did I avoid ambiguous same-name output aliases, or explicitly qualify every later reference that must still bind to the source column?
-- If a blocker remains in this skill's `Owns` area, did I stop or downgrade instead of reporting engine-check passed?
+- Mandatory SQL/access chain and references applied; metadata or fallback explicit?
+- Filters fit PARTITION BY/primary/sorting keys; pruning not misreported as business-window coverage?
+- Native alternatives and repeated heavy reads checked without changing semantics?
+- DDL/staging/partition refresh prevents stale or partial results?
+- EXPLAIN/bounded proof interpreted; query logs remain telemetry and cross-engine lineage uses its owner?
+- Final style and alias binding clear: avoid ambiguous same-name output aliases or qualify intended source references?
+- Owner blockers fixed or result downgraded?

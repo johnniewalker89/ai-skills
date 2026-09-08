@@ -76,23 +76,7 @@ Use this compact root-map shape when initializing a context workspace. Include
 only rows for surfaces that exist or are created in the current scope, and
 localize headings to the user's/workspace language:
 
-```markdown
-# <Local context map>
-
-## <Quick entry>
-
-- <Task navigation>: [`context.md`](context.md)
-- <Machine environment>: [`environment.md`](environment.md)
-
-## <Information owners>
-
-| Information | Single owner |
-| --- | --- |
-| Active and closed task navigation | `context.md` |
-| Current task snapshot | `tasks/<TASK_ID>.md` |
-| Machine-specific runtime and paths | `environment.md` |
-| Optional append-only agent log | `agent_logs/<TASK_ID>.agent_log.md` |
-```
+When creating this artifact, use the matching example in `references/context_templates.md`; do not load templates during ordinary restore/update.
 
 Keep local markdown context files (`context.md`, task snapshots, agent logs, meta-task files, `notes.md`, and similar `.md` files) in UTF-8. Do not mix UTF-8 with `cp1251` or another encoding in the same file.
 
@@ -129,68 +113,13 @@ Localize the headings and explanatory labels in this example to the
 user's/workspace language. Keep paths, executable names, identifiers, and
 status tokens unchanged.
 
-```markdown
-# Local Environments
-
-Minimal local environment map for skills. Store only machine-specific facts needed to choose the correct runtime and avoid guessing.
-
-## Runtime Resolution
-
-- preferred shell: `<shell or unknown>`
-- forbidden aliases: `<aliases and reason, or none>`
-- selection precedence: `project/repo runtime -> exact generic validation runtime -> bounded discovery`
-
-| Workload | Exact runtime/command | Scope/status |
-| --- | --- | --- |
-| Generic validation | `<exact path/command or unknown>` | `<user-confirmed, draft/unconfirmed, or unknown>` |
-| Project runtime | `<exact path/command or unknown>` | `<project/shell constraints>` |
-
-## Repository Roots
-
-- context workspace: `<path or unknown>`
-- primary repo: `<path or unknown>`
-- dbt root: `<path or unknown>`
-- Python project root: `<path or unknown>`
-- extra repo roots: `<path(s) or unknown>`
-
-## Local Executables
-
-| Tool | Exact path/version | Scope/status |
-| --- | --- | --- |
-| `<tool>` | `<exact path/version or unknown>` | `<selection constraint or status>` |
-
-## Local Config Pointers
-
-- `<purpose>`: `<secret-safe file path or unknown>`
-
-## Boundaries
-
-- current configuration only; task/project history lives in its owning context
-- local executables are not an inventory of installed skills or MCP servers
-- no credential values, account identities, or access/approval policy
-- discovered values: `<draft/unconfirmed or user-confirmed>`
-```
+When creating this artifact, use the matching example in `references/context_templates.md`; do not load templates during ordinary restore/update.
 
 Keep unknown values explicit as `<unknown>` or `unknown`; do not invent paths or env names. If the user allows read-only discovery, propose a draft, label it unconfirmed, and ask the user to validate it. Treat discovered values as unconfirmed until the user accepts them.
 
 Use this minimal `context.md` template when initializing a new local context workspace:
 
-```markdown
-# Локальный контекст задач
-
-В этом файле хранится навигация по локальному контексту задач. Подробности ведутся в отдельных файлах, а не здесь.
-
-## Как вести контекст
-
-- Каждую отдельную задачу с task id вести в `tasks/<TASK_ID>.md`.
-- `context.md` использовать как индекс и точку входа, а не как журнал.
-- Новые незавершённые задачи добавлять в `Активные задачи`.
-- Завершённые задачи переносить в `Закрытые задачи` с кратким итогом.
-
-## Активные задачи
-
-## Закрытые задачи
-```
+When creating this artifact, use the matching example in `references/context_templates.md`; do not load templates during ordinary restore/update.
 
 Inside `Активные задачи` and `Закрытые задачи`, use stable `-` bullets and
 sort DP-style task identifiers by descending numeric id. Do not use sequential
@@ -204,23 +133,7 @@ Add optional `context.md` sections only when needed:
 
 Meta-task files use a lighter structure than task snapshots. Keep the current focus near the top, keep history below, and use this shape when creating or reworking a meta-task file:
 
-```markdown
-# <Meta-task name>
-
-## Назначение
-
-## Текущий фокус
-
-## Открытые вопросы
-
-## Архитектура контекста
-
-## Как вести контекст
-
-## Текущее состояние
-
-## Журнал
-```
+When creating this artifact, use the matching example in `references/context_templates.md`; do not load templates during ordinary restore/update.
 
 ## Restore Context
 
@@ -275,31 +188,7 @@ For tasks that will continue across chats, keep `tasks/<TASK_ID>.md` as a curren
 
 Use this default task snapshot shape when creating a new file:
 
-```markdown
-# <TASK_ID> - short title
-
-## Текущий статус
-
-## Цель
-
-## План
-
-## Валидация
-
-## Контекст
-
-## Решения
-
-## Проверки
-
-## Изменения
-
-## Риски и стоп-точки
-
-## Следующий шаг
-
-## Архив
-```
+When creating this artifact, use the matching example in `references/context_templates.md`; do not load templates during ordinary restore/update.
 
 Keep `tasks/<TASK_ID>.md` short enough to start a new chat quickly. It is a snapshot, not a full transcript.
 
@@ -365,31 +254,7 @@ Do not archive agent logs. Keep `agent_logs/<TASK_ID>.agent_log.md` as an append
 
 The agent log is an audit trail, not hidden chain-of-thought. Record concise evidence-backed reasoning:
 
-```markdown
-# <TASK_ID> Agent Log
-
-## YYYY-MM-DD HH:MM MSK
-
-### Mode
-
-### Active skills
-
-### Skill routing updates
-
-### Facts
-
-### Hypotheses
-
-### Checks
-
-### Decisions
-
-### Rejected alternatives
-
-### Validation
-
-### Self-review
-```
+When creating this artifact, use the matching example in `references/context_templates.md`; do not load templates during ordinary restore/update.
 
 Keep detailed evidence and rejected alternatives in `agent_logs/...`; keep `tasks/<TASK_ID>.md` compact.
 

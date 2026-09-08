@@ -1,6 +1,6 @@
 ---
 name: sql-style-core
-description: Mandatory engine-agnostic SQL style and readability layer. MUST be used for every SQL writing, editing, review, or optimization task together with `agent-workflow-core` and `sql-quality-core`, before applying ClickHouse, Greenplum, dbt, or other engine-specific SQL skills. Covers formatting/layout, aliases, source qualification, compact vs expanded expressions, named CTE/expression readability, and formatting-only self-review without engine-specific syntax.
+description: Apply shared SQL formatting and readability for SQL writing, editing, review or optimization. Use with agent-workflow-core, sql-quality-core and available engine/dbt owners; this skill changes no business semantics.
 ---
 
 # SQL Style Core
@@ -27,11 +27,9 @@ Direct database/OpenMetadata MCP access must go through `db-access`; a separatel
 
 ## Workflow
 
-1. Always use `agent-workflow-core` first for task mode and delivery rules.
-2. Always use `sql-quality-core` before or alongside this skill for SQL semantics.
-3. Identify and activate the target engine owner and, when applicable, the matching dbt owner; apply this skill before their target-specific style overlays.
-4. Read `references/style.md` for SQL writing, editing, or review tasks.
-5. Before returning SQL, run this skill's Final Checklist as a formatting-only self-review after semantic and engine-specific checks are complete.
+1. Apply the shared style reference to the final semantic shape, then the target owner's overlay.
+2. For formatting-only changes, verify the changed SQL surface once and reuse semantic proof only when unaffected.
+3. Run the formatting-only Final Checklist before returning SQL.
 
 ## Reference Triggers
 
@@ -39,12 +37,8 @@ Direct database/OpenMetadata MCP access must go through `db-access`; a separatel
 
 ## Final Checklist
 
-- Did I use `agent-workflow-core`, `sql-quality-core`, every available target engine/dbt owner, and the explicit MySQL/PostgreSQL no-engine-owner boundary when applicable?
-- Did every selected column in a multi-table query have a clear source?
-- Did aliases use `AS` and preserve a readable common `AS` column where practical?
-- Did I use comma-leading formatting consistently for `SELECT`, `WITH`, and multiline `GROUP BY` blocks?
-- Did long expressions expand only when compact form hurt readability or broke alignment?
-- Did named CTEs or expressions explain meaningful calculation steps instead of hiding business logic in repeated inline expressions?
-- Did I avoid re-aliasing CTEs unnecessarily in `FROM` / `JOIN`?
-- Did I keep the first `ON` on the same physical line as its `JOIN`, with later join conditions continuing on `AND` lines?
-- Did I run a separate formatting-only self-review after semantic and engine-specific review?
+- Required SQL companions and every available target engine/dbt owner present?
+- Qualified multi-table columns, readable AS alignment and comma-leading layout?
+- Expression expansion and named CTEs improve readability; no unnecessary CTE re-aliasing?
+- First ON shares its JOIN line, later conditions use AND lines?
+- Formatting-only pass preserved meaning after semantic/engine checks?

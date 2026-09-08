@@ -1,6 +1,6 @@
 ---
 name: sql-quality-core
-description: Mandatory engine-agnostic SQL quality framework. MUST be used for every SQL writing, editing, review, or optimization task before applying ClickHouse, Greenplum, dbt, or other engine-specific SQL skills. Always use with `agent-workflow-core` as the base workflow layer for task mode and delivery rules and `sql-style-core` as the shared SQL style layer. Covers source choice, driving grain, join sanity, multi-row fact semantics, category-safe metrics, date/window and proxy timestamp coverage, duration/time-to-stage semantics, smoke scale, and validation mindset without engine-specific syntax or formatting rules.
+description: Check source choice, grain, joins, metrics, windows and lineage for every SQL write, edit, review or optimization. Use with agent-workflow-core, sql-style-core and the available target engine/dbt owners.
 ---
 
 # SQL Quality Core
@@ -31,14 +31,10 @@ This skill owns engine-agnostic SQL business semantics and quality gates. `sql-s
 
 ## Workflow
 
-1. Identify whether the task is writing, editing, review, optimization, DDL, validation, lineage, or explanation.
-2. Identify the target engine and activate every available matching engine/dbt skill; if none exists for that engine, keep the SQL core pair and record the boundary.
-3. Choose or verify sources, source lineage, and repo/live evidence.
-4. Name the driving business grain and make joins preserve that grain.
-5. For combined fact aggregates, name each fact grain and prove the final output grain does not duplicate measures.
-6. Check metric semantics: categories, windows, proxy timestamp coverage, durations, mutable sources, funnel sequence, and entity level.
-7. Choose bounded validation that can check the requested behavior within the current access boundary.
-8. Run this skill's Final Checklist as the final SQL self-review and report SQL-quality pass/fail/blockers to `agent-workflow-core`; do not decide final proof status from this skill.
+1. Resolve source lineage and driving grain; load references for the affected semantic decisions.
+2. Check central match/multiplication behavior, independent fact grains and metric/window/entity contracts against final SQL.
+3. Use the smallest proof-capable window/case set. Reuse one exact output for multiple invariants when sufficient, keeping every claim's scope visible.
+4. Run the Final Checklist and hand SQL-quality pass/fail/blockers to workflow; this skill does not decide overall readiness.
 
 ## Reference Triggers
 
@@ -49,18 +45,9 @@ This skill owns engine-agnostic SQL business semantics and quality gates. `sql-s
 
 ## Final Checklist
 
-- Did I keep direct database/OpenMetadata MCP access in `db-access` and any separately selected typed runtime database read in its dedicated access owner, exact approval contract, and SQL chain?
-- Did I choose sources by business semantics, repo-backed proof, live DB state, grain, and join keys?
-- Did I name the driving grain and make central joins match it?
-- For independent fact aggregates, did I name each fact grain and validate that final join/output grain cannot duplicate measures?
-- Did I validate central match coverage with right-side keys or explicit match flags?
-- Did I avoid fake representative rows from independent aggregates over multi-row facts?
-- Did category-specific metrics cover material categories or include `other_*` / `unknown_*`?
-- Did date/window logic express business semantics and use both lower and upper lifecycle bounds when needed?
-- If a proxy timestamp/filter was used for validation or performance, did I prove full business-window coverage or downgrade the claim to the proxy/guarded surface?
-- Did duration/time-to-stage metrics subtract from the actual lifecycle start timestamp, not a truncated bucket?
-- Did sequential funnel logic search each step from the accepted previous step?
-- Did child-entity metric names match whether all children or only first children are counted?
-- Did mutable-source or current-state enrichment risk get an explicit freshness/reprocessing contract or business-semantics warning?
-- Did smoke scale stay bounded unless a broader window was justified?
-- Did final SQL self-review pass without P1/P2 issues before I reported SQL-quality-check passed?
+- Source/lineage and driving grain supported by repo/live evidence?
+- Central joins have right-key/flag match coverage; independent fact aggregates cannot multiply measures?
+- No fake representative rows; categories include material other/unknown cases?
+- Business windows and proxy coverage honest; duration starts at lifecycle timestamp?
+- Funnel steps follow accepted prior events, names match entity grain, mutable enrichment has refresh/reprocessing semantics?
+- Bounded final-SQL checks and owner chain complete; P1/P2 blockers prevent pass?
