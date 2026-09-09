@@ -82,7 +82,6 @@ initiatives without a DP-style id in separate active/closed non-DP sections.
 Add optional `context.md` sections only when needed:
 
 - `Мета-задачи`: long-lived areas without a normal task id, such as Airflow analyses or project notes.
-- `Логи агента`: only when agent logging is explicitly enabled.
 
 Meta-task files use a lighter structure than task snapshots. Keep the current focus near the top, keep history below, and use this shape when creating or reworking a meta-task file:
 
@@ -128,8 +127,11 @@ Update `context.md` as navigation. Keep separate `Активные задачи`
 - keep initiatives without a DP-style task id in separate active/closed non-DP
   sections;
 - keep Airflow analyses or other long-lived work without a task id in a separate meta-task section, not in the task list;
-- link related agent logs from the log section when useful;
 - keep only short status text there.
+
+Link enabled agent logs from the corresponding task snapshot or meta-task file.
+Keep `context.md` focused on task/direction navigation; do not maintain a separate
+agent-log index there.
 
 When the established context workspace defines a task-log review register or a
 skill-review/evaluation tree, ordinary task delivery must not write there. This
