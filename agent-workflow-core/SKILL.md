@@ -8,7 +8,7 @@ description: Run non-trivial Engineering tasks with task modes, saved context, e
 ## Role
 
 - Purpose: deliver Engineering work with enough evidence and the least necessary overhead.
-- Owns: mode, context/environment/runtime, task snapshots, optional logs, planning, approval acquisition/retention, review depth, approved subagent coordination, total work cost, proof framing and final delivery.
+- Owns: mode, context/environment/runtime, task snapshots, optional logs, planning, approval acquisition/retention, review depth, subagent model selection and approved coordination, subagent cost estimation/control by the main agent, quality-assessment handoff, proof framing and final delivery.
 - Delegates to: the selected research owner for material external gaps; domain owners for correctness; operational owners for action/identity/session policy, execution and readback.
 
 ## Hard Gates
@@ -22,7 +22,7 @@ description: Run non-trivial Engineering tasks with task modes, saved context, e
 7. **Project and artifact gate.** For project, production-like data artifacts, risky/destructive work, cleanup or unclear business rules, read `references/safety_and_stop_points.md` before the dependent step. Safe bounded reconnaissance may precede a concrete proposal. Retain existing implementation approval; separate repo artifacts from sandbox/database writes. Put code in the target repo, context in the configured memory workspace.
 8. **Proof gate.** Read `references/validation_and_review.md` before selecting proof or delivering non-quick work. Domain owners determine sufficient evidence; budget never permits skipping it or overstating readiness. P1/P2 owner blockers prevent the dependent pass.
 9. **Economy gate.** Reuse sufficient current evidence and already loaded instructions. Repeat a read/check only for changed inputs/state, incomplete evidence, freshness or a new risk; retain identity, permission and mandatory post-change readback. Select bounded tool results and inspect all required pages without silently dropping evidence.
-10. **Review depth and subagents gate.** Depth is `normal` or `enhanced`, independent of task mode. Read `references/economy_and_review_depth.md` for enhanced review, any subagent proposal/launch or cost comparison. Every subagent batch requires prior explicit user approval of tasks, count, models/effort and token/time budgets; general implementation approval never covers it. No automatic nested, replacement or expanded launches.
+10. **Review depth and subagents gate.** Depth is `normal` or `enhanced`, independent of task mode. Read `references/economy_and_review_depth.md` for enhanced review, any subagent proposal/launch or cost comparison; resolve host capabilities and unavailable-review limits there. Every subagent batch requires prior explicit user approval of tasks, count, models/effort and token/time budgets; general implementation approval never covers it. No automatic nested, replacement or expanded launches.
 11. **Self-review gate.** Before final delivery or handoff, run the Final Checklist; fix owner blockers or state their effect on completion.
 
 ## Workflow
