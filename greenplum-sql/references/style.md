@@ -11,29 +11,17 @@ Use this file after `sql-style-core/references/style.md`. It contains only Green
 
 ## Greenplum Expressions And Aliases
 
-- SQL functions should be lower-case.
-- Data types in SQL and DDL should be upper-case.
 - Do not reuse a newly defined alias inside the same `SELECT` list.
 - If a derived value is needed by another expression, move it into an inner CTE/subquery or repeat the expression when it is still simple.
 - Use PostgreSQL/Greenplum casts consistently with existing project style, including `::DATE`, `::TEXT`, and `NUMERIC(...)` patterns.
 
 Compact Greenplum expressions are fine when they stay readable:
 
-```sql
-SELECT
-      coalesce(nullif(source.city, ''), 'None')                                          AS city
-    , md5(coalesce(source.dt::TEXT, '') || '|' || coalesce(source.client_id::TEXT, ''))  AS row_id
-FROM some_table source
-```
+[Example 1](style_examples.md#example-1).
 
 Compact null handling is also acceptable:
 
-```sql
-SELECT
-      coalesce(nullif(source.country, ''), 'None') AS country
-    , coalesce(nullif(source.region, ''), 'None')  AS region
-FROM some_table source
-```
+[Example 2](style_examples.md#example-2).
 
 ## WITH And Runtime Parameters
 
@@ -46,68 +34,20 @@ FROM some_table source
 
 Compact runtime conversion inside a one-row params CTE:
 
-```sql
-WITH
-   params AS (
-    SELECT
-          current_setting('etl.dt_from')::DATE AS report_dt_from
-        , current_setting('etl.dt_to')::DATE   AS report_dt_to
-)
-SELECT
-      params.report_dt_from AS report_dt_from
-    , params.report_dt_to   AS report_dt_to
-FROM params
-```
+[Example 3](style_examples.md#example-3).
 
 ## Greenplum Multiline Expressions
 
-- For multiline function or `CASE` expressions, keep `AS alias` on the final line of the full expression.
 - Expand long `coalesce` / `nullif` / `CASE` expressions when compact form hides fallback semantics.
 - For md5 technical ids, keep concatenated parts auditable and source-qualified.
 
 Preferred expanded null-handling expression:
 
-```sql
-SELECT
-      coalesce(
-          nullif(source.shop_name, '')
-        , 'Unknown shop'
-      )                                  AS shop_name
-    , coalesce(
-          nullif(source.shop_city, '')
-        , 'Unknown city'
-      )                                  AS shop_city
-FROM some_table source
-```
+[Example 4](style_examples.md#example-4).
 
 Preferred expanded `CASE` with technical id:
 
-```sql
-WITH
-   payments AS (
-    SELECT
-          source.order_id AS order_id
-        , source.shop_id  AS shop_id
-        , CASE
-              WHEN coalesce(source.paid_amount, 0) = 0
-                  THEN 'no_payment'
-              WHEN coalesce(source.paid_amount, 0) < source.order_amount * 0.5
-                  THEN 'partial_payment'
-              WHEN coalesce(source.paid_amount, 0) >= source.order_amount
-                  THEN 'full_payment'
-              ELSE 'other'
-          END             AS payment_bucket
-    FROM some_table source
-)
-SELECT
-      payments.payment_bucket AS payment_bucket
-    , md5(
-          coalesce(payments.order_id::TEXT, '')       || '|' ||
-          coalesce(payments.shop_id::TEXT, '')        || '|' ||
-          coalesce(payments.payment_bucket::TEXT, '')
-      )                       AS row_id
-FROM payments
-```
+[Example 5](style_examples.md#example-5).
 
 ## Greenplum DDL Formatting
 
@@ -122,16 +62,4 @@ FROM payments
 
 Preferred `CREATE TABLE` pattern:
 
-```sql
-CREATE TABLE sandbox.some_metrics
-(
-      report_dt         DATE
-    , client_id         BIGINT
-    , channel           TEXT
-    , revenue           NUMERIC(38, 6)
-    , row_id            TEXT
-)
-WITH (appendoptimized = true, orientation = column, compresstype = zstd, compresslevel = 1)
-DISTRIBUTED BY (client_id)
-;
-```
+[Example 6](style_examples.md#example-6).

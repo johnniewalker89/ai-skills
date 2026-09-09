@@ -12,7 +12,7 @@ This skill owns engine-agnostic SQL business semantics and quality gates. `sql-s
 ## Role
 
 - Purpose: provide engine-agnostic SQL quality checks before any engine-specific SQL layer.
-- Owns: source choice, driving grain, join sanity, independent fact aggregate combination, multi-row fact semantics, category-safe metrics, metric/window semantics, proxy timestamp coverage, duration/time-to-stage semantics, sequential funnel logic, mutable-source risk, smoke scale, validation mindset, and SQL-quality blockers.
+- Owns: source choice, driving grain, join sanity, independent fact aggregate combination, multi-row fact semantics, category-safe metrics, metric/window semantics, proxy timestamp coverage, duration/time-to-stage semantics, sequential funnel logic, mutable-source risk, smoke scale, validation mindset, required efficiency-evidence coverage, and SQL-quality blockers.
 - Delegates to: `agent-workflow-core` for delivery workflow/proof status, `sql-style-core` for shared SQL style, `db-access` for direct database/OpenMetadata MCP access, a separately installed typed runtime-read access owner when selected, and engine/dbt skills for target-specific rules.
 
 ## Hard Gates
@@ -27,7 +27,8 @@ This skill owns engine-agnostic SQL business semantics and quality gates. `sql-s
 8. **Sequential/entity gate.** For funnels or child-entity metrics, each step and metric name must match the declared entity grain. If this check fails for a production-like artifact, SQL-quality-check fails.
 9. **Validation gate.** Before returning non-trivial SQL, run the lightest safe SQL-quality validation or state the blocker. A plan/smoke only proves what it actually checks.
 10. **Return gate.** Before returning any non-trivial SQL, ask whether there is an obvious safer, simpler, or cheaper semantics-preserving shape. Apply it or explain the tradeoff.
-11. **Self-review gate.** Before reporting SQL-quality-check passed for production-like SQL/DDL/load/validation artifacts, run this skill's Final Checklist against the final artifacts themselves. P1/P2 correctness, refresh, naming, or executability issues block pass and sandbox escalation.
+11. **Efficiency evidence gate.** Every SQL task requires an evidence-based efficiency assessment of the final SQL, including writing, edits, review, validation and DDL/load. Read `references/validation_and_self_review.md`; the engine owner interprets physical cost and alternatives. Reuse applicable exact evidence. Missing material proof leaves efficiency unproven and blocks an optimality claim; successful execution alone is insufficient.
+12. **Self-review gate.** Before reporting SQL-quality-check passed for production-like SQL/DDL/load/validation artifacts, run this skill's Final Checklist against the final artifacts themselves. P1/P2 correctness, refresh, naming, or executability issues block pass and sandbox escalation.
 
 ## Workflow
 
@@ -40,7 +41,7 @@ This skill owns engine-agnostic SQL business semantics and quality gates. `sql-s
 
 - Read `references/source_grain_and_joins.md` when source choice, lineage, grain, joins, unmatched rows, or row multiplication matter.
 - Read `references/metrics_windows_and_funnels.md` when metrics use categories, dates/windows, lifecycle/funnel steps, child entities, mutable sources, or optimization candidates.
-- Read `references/validation_and_self_review.md` before returning non-trivial SQL, reviewing production-like artifacts, validating SQL, or classifying SQL-quality blockers.
+- Read `references/validation_and_self_review.md` in every SQL task before choosing proof or returning SQL/findings; efficiency evidence is required alongside semantic checks.
 - Read `references/examples.md` when source choice, driving grain, or category-safe metric decisions need a compact example.
 
 ## Final Checklist
@@ -51,3 +52,4 @@ This skill owns engine-agnostic SQL business semantics and quality gates. `sql-s
 - Business windows and proxy coverage honest; duration starts at lifecycle timestamp?
 - Funnel steps follow accepted prior events, names match entity grain, mutable enrichment has refresh/reprocessing semantics?
 - Bounded final-SQL checks and owner chain complete; P1/P2 blockers prevent pass?
+- Final SQL efficiency supported by applicable evidence and assessed alternatives; missing proof explicit, no unsupported optimality claim?

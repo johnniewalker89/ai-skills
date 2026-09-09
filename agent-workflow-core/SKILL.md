@@ -14,7 +14,7 @@ description: Run non-trivial Engineering tasks with task modes, saved context, e
 ## Hard Gates
 
 1. **Task mode gate.** Choose exactly one mode: `quick`, `focused`, `project`, `investigation`, `review`. For non-tiny work start with Режим: followed by the mode in backticks; put descriptive labels after that sentence. Correct an invalid mode before continuing. Choose by risk, scope, uncertainty, validation and rollback cost.
-2. **Context bootstrap gate.** Restore context before continuing an established task or when a task id, durable-context request or enabled logging requires it. Otherwise create no durable context by default. Read `references/context_and_decisions.md` before context/environment/log work. Ordinary delivery must not create, update, or reconcile a task-log review row or write anywhere in a configured skill-review/evaluation tree; a separate evaluator owns that tree.
+2. **Context bootstrap gate.** Restore context before continuing an established task or when a task id, durable-context request or enabled logging requires it. Otherwise create no durable context by default. Read `references/context_and_decisions.md` for restore/runtime and `references/context_maintenance.md` before durable writes. Ordinary delivery must not create, update, or reconcile a task-log review row or write anywhere in a configured skill-review/evaluation tree; a separate evaluator owns that tree.
 3. **Local runtime resolution gate.** Before the first local runtime-backed command, including an incidental helper or validator, resolve the exact command/runtime from configured environment. Prefer the target repo/project runtime over a generic validation runtime; never probe or invoke an alias recorded as unavailable or forbidden. Discover only missing mappings.
 4. **Agent-log gate.** Append an agent log only when explicitly requested or already enabled, inside the established context workspace. A task id alone does not enable logging.
 5. **Owner and access gate.** Hand material external-context gaps to the selected research owner. Direct database/catalog MCP uses `db-access`; a separate typed runtime read requires its dedicated access owner and complete SQL chain. Never use raw database commands over SSH or an unavailable/denied contour as fallback authorization.
@@ -36,7 +36,8 @@ description: Run non-trivial Engineering tasks with task modes, saved context, e
 ## Reference Triggers
 
 - `references/task_modes.md`: when mode choice is unclear.
-- `references/context_and_decisions.md`: before context/environment/runtime/log work or established-task continuation.
+- `references/context_and_decisions.md`: before established-task restore or environment/runtime lookup.
+- `references/context_maintenance.md`: before creating/updating context, environment notes, task snapshots or enabled logs; not for read-only restore.
 - `references/context_templates.md`: only when creating a context workspace/map, task snapshot or log from a template.
 - `references/safety_and_stop_points.md`: before project checkpoints, new data artifacts, destructive cleanup, sandbox work or unresolved business decisions.
 - `references/validation_and_review.md`: before proof selection, non-quick final delivery or readiness claims.

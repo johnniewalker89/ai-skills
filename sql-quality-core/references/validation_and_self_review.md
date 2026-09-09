@@ -1,6 +1,28 @@
 # Validation And Self-Review
 
-Use this reference before returning non-trivial SQL, reviewing production-like artifacts, validating SQL, or classifying SQL-quality blockers.
+Use this reference in every SQL task before selecting proof or returning SQL/findings.
+
+## Efficiency Evidence For Every SQL Task
+
+Assess the efficiency of the final SQL while preserving its required semantics.
+The engine owner interprets the physical checks; this skill requires their coverage.
+
+- Bind evidence to final SQL, settings, source shape, data window and relevant scale.
+  Use plans, current metadata/statistics, measured query history or bounded execution
+  as needed to assess scans/pruning, joins, sort/aggregate cost and repeated work.
+- Interpret the evidence and assess plausible cheaper alternatives. Explain the
+  accepted shape or tradeoff; a valid query, small LIMIT or successful run alone
+  does not prove efficiency. Avoid claiming a global optimum from a bounded check.
+- For a simple expression with no material data access, a concrete explanation of
+  its work and relevant alternatives can suffice; a short task still needs evidence.
+  For formatting-only changes, reuse applicable proof for unchanged SQL semantics.
+- Reuse current sufficient evidence. Query logs are needed when runtime history,
+  observed cost or a before/after performance claim requires them; engine skills
+  contain known sources. Do not fetch logs mechanically when they cannot answer
+  the question or replace required plan/result proof with a log entry.
+- If necessary plan/metadata/runtime evidence is unavailable, identify the exact
+  gap and keep efficiency unproven. A correctness pass does not close that gap;
+  approval, access and sandbox boundaries remain with their owners.
 
 ## Smoke Scale
 

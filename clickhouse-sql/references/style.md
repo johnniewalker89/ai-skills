@@ -11,8 +11,6 @@ Use this file after `sql-style-core/references/style.md`. It contains only Click
 
 ## ClickHouse Expressions And Aliases
 
-- SQL functions should be lower-case.
-- Data types before and after conversions should be upper-case.
 - If business attributes were already defined earlier in the same `SELECT`, they may be reused in later technical expressions such as `row_id` when the result is clearer.
 - Alias reuse inside one `SELECT` is allowed only after the reused alias was defined earlier in the same `SELECT`.
 - Reusing aliases inside the same `SELECT` is allowed only when this is supported by ClickHouse and already matches project patterns.
@@ -22,22 +20,11 @@ Use this file after `sql-style-core/references/style.md`. It contains only Click
 
 Compact ClickHouse expressions are fine when they stay readable:
 
-```sql
-SELECT
-      toLowCardinality(coalesce(nullIf(source.city, ''), 'None')) AS city
-    , cityHash64(source.dt, source.client_id, source.channel)     AS row_id
-FROM some_table source
-```
+[Example 1](style_examples.md#example-1).
 
 Compact nested array expressions are also acceptable when they remain auditable:
 
-```sql
-SELECT
-      arrayFilter(x -> x NOT IN ('ru', 'russia', 'bel', 'kz'),
-                  arrayMap(x -> x IN ('moscow', 'mos') ? 'msk' : x,
-                           arrayIntersect(arr_sp, arr_def_geo_code))) AS arr_geo
-FROM some_table source
-```
+[Example 2](style_examples.md#example-2).
 
 ## Scalar WITH And Mixed WITH
 
@@ -55,65 +42,15 @@ FROM some_table source
 
 Preferred scalar `WITH` pattern:
 
-```sql
-WITH
-   toDate(getSetting('custom_dt_from')) AS report_dt_from
- , toDate(getSetting('custom_dt_to'))   AS report_dt_to
-SELECT
-      source.dt         AS dt
-    , source.client_id  AS client_id
-FROM some_table source
-WHERE 1 = 1
-  AND source.dt >= report_dt_from
-  AND source.dt <  report_dt_to
-```
+[Example 3](style_examples.md#example-3).
 
 Allowed multiline scalar `WITH` pattern:
 
-```sql
-WITH
-   toLowCardinality(coalesce(nullIf(source.city, ''), 'None'))      AS city_normalized
- , arrayFilter(x -> x NOT IN ('ru', 'russia', 'bel', 'kz'),
-               arrayMap(x -> x IN ('moscow', 'mos') ? 'msk' : x,
-                        arrayIntersect(arr_sp, arr_def_geo_code)))  AS arr_geo
-SELECT
-      city_normalized AS city_normalized
-    , arr_geo         AS arr_geo
-FROM some_table source
-```
+[Example 4](style_examples.md#example-4).
 
 Preferred mixed `WITH` pattern:
 
-```sql
-WITH
-   toDate(getSetting('custom_dt_from')) AS report_dt_from
- , toDate(getSetting('custom_dt_to'))   AS report_dt_to
- , orders AS (
-    SELECT
-          source.order_id   AS order_id
-        , source.client_id  AS client_id
-        , source.dt         AS dt
-    FROM some_orders source
-    WHERE 1 = 1
-      AND source.dt >= report_dt_from
-      AND source.dt <  report_dt_to
-), revenue AS (
-    SELECT
-          source.order_id     AS order_id
-        , sum(source.amount)  AS revenue
-    FROM some_payments source
-    WHERE 1 = 1
-      AND source.dt >= report_dt_from
-      AND source.dt <  report_dt_to
-    GROUP BY source.order_id
-)
-SELECT
-      orders.client_id      AS client_id
-    , sum(revenue.revenue)  AS revenue
-FROM orders
-LEFT JOIN revenue ON orders.order_id = revenue.order_id
-GROUP BY orders.client_id
-```
+[Example 5](style_examples.md#example-5).
 
 ## ClickHouse Multiline Expressions
 
@@ -123,39 +60,11 @@ GROUP BY orders.client_id
 
 Preferred expanded dictionary expression:
 
-```sql
-SELECT
-      toLowCardinality(
-          coalesce(
-              nullIf(dictGet('dicts.dim_shop', 'shop_name', toUInt64(source.shop_id)), '')
-            , 'Unknown shop'
-          )
-      )                                  AS shop_name
-    , toLowCardinality(
-          coalesce(
-              nullIf(dictGet('dicts.dim_shop', 'city_name', toUInt64(source.shop_id)), '')
-            , 'Unknown city'
-          )
-      )                                  AS shop_city
-FROM some_table source
-```
+[Example 6](style_examples.md#example-6).
 
 Preferred expanded `multiIf(...)`:
 
-```sql
-SELECT
-      multiIf(
-          ifNull(source.paid_amount, 0.) = 0.
-        , 'no_payment'
-        , ifNull(source.paid_amount, 0.) < source.order_amount * 0.5
-        , 'partial_payment'
-        , ifNull(source.paid_amount, 0.) >= source.order_amount
-        , 'full_payment'
-        , 'other'
-      )                                  AS payment_bucket
-    , cityHash64(source.order_id, payment_bucket) AS row_id
-FROM some_table source
-```
+[Example 7](style_examples.md#example-7).
 
 ## ClickHouse DDL Formatting
 
@@ -169,29 +78,8 @@ FROM some_table source
 
 Preferred `CREATE TABLE` pattern:
 
-```sql
-CREATE TABLE mart.some_metrics
-(
-      report_dt         Date
-    , client_id         UInt64
-    , channel           LowCardinality(String)
-    , revenue           Decimal(38, 6)
-    , row_id            UInt64
-)
-ENGINE = MergeTree
-ORDER BY (report_dt, client_id)
-PARTITION BY toYYYYMM(report_dt)
-SETTINGS index_granularity = 8192
-;
-```
+[Example 8](style_examples.md#example-8).
 
 Preferred multi-column comment alteration:
 
-```sql
-ALTER TABLE mart.some_metrics
-    COMMENT COLUMN report_dt 'Business report date'
-  , COMMENT COLUMN client_id 'Client identifier'
-  , COMMENT COLUMN revenue   'Revenue in source currency'
-  , COMMENT COLUMN row_id    'Technical row identifier'
-;
-```
+[Example 9](style_examples.md#example-9).

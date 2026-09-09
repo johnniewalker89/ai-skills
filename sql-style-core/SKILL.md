@@ -33,6 +33,8 @@ Direct database/OpenMetadata MCP access must go through `db-access`; a separatel
 
 ## Reference Triggers
 
+- Read `references/style_examples.md` only when a concrete formatting example is needed; choose the matching example, not the whole collection.
+
 - Read `references/style.md` for common SQL formatting, aliases, source qualification, compactness, CTE readability, joins, filters, grouping, and multiline expressions.
 
 ## Final Checklist

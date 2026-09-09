@@ -20,9 +20,9 @@ Use this skill for ClickHouse SQL work in repositories that follow our database 
 3. **Metadata gate.** Before final SQL against real tables, inspect columns, types, engine, `ORDER BY`, `PARTITION BY`, and relevant volume through the selected access owner when available, or use repo contracts/source definitions when live access is unavailable.
 4. **Source-shape gate.** For ClickHouse mart, DDL/load, or production-like SELECT design, run the physical source-shape check from `references/sql_readiness.md`: compare the chosen filters to each heavy source's `PARTITION BY`, primary/sorting key, and prunable predicate shape. If a proxy timestamp guard is used, report ClickHouse pruning evidence and route business-window coverage to `sql-quality-core`; do not call full coverage proven from pruning alone.
 5. **Native-shape gate.** For every non-trivial query, run the ClickHouse-native shape pass from `references/native_shape.md`. Challenge generic joins, subqueries, windows, deduplication, lookup enrichment, `DISTINCT`, `FINAL`, repeated CTE reads, and heavy filters against native alternatives without changing business semantics.
-6. **Load-readiness gate.** Before handing a ClickHouse DDL/load/rebuild artifact back to the workflow layer, run the load-readiness checks from `references/sql_readiness.md`: syntax, target engine/partition, staging shape, refresh mechanics, repeated heavy-source reads, lookup scans, approved event/window semantics, and physical source-shape fit. Report pass/fail/blockers; this skill does not decide final proof status or sandbox need.
+6. **Load-readiness gate.** Before handing a ClickHouse DDL/load/rebuild artifact back to the workflow layer, run the load-readiness checks from `references/load_readiness.md`: syntax, target engine/partition, staging shape, refresh mechanics, repeated heavy-source reads, lookup scans, approved event/window semantics, and physical source-shape fit. Report pass/fail/blockers; this skill does not decide final proof status or sandbox need.
 7. **Validation gate.** For non-trivial production `SELECT`s, route lightweight validation through the selected access owner when available. Prefer `EXPLAIN indexes = 1` or `EXPLAIN PLAN`; execute bounded smoke only when safe. Interpret the plan, not only its success.
-8. **Telemetry gate.** `system.query_log` is the freshest ClickHouse runtime source in our environment. `monitoring.clickhouse__query_log` is a historical persisted copy and may lag. Treat both as telemetry only, not business data or a replacement for DDL/source/plan evidence.
+8. **Efficiency and telemetry gate.** In every SQL task, apply the relevant diagnostic/query-shape sections of `references/optimization.md` to support the SQL-quality efficiency gate. For query-history evidence, read known sources in `references/telemetry.md`; no personal context document is required. Verify availability, privileges and freshness; telemetry does not replace business, DDL/source or plan evidence.
 9. **Lineage gate.** For lineage/business-logic explanations, ClickHouse mirror evidence is only evidence after the `sql-quality-core` lineage pass. If repo evidence reaches another engine, use that engine skill for that layer.
 10. **Self-review gate.** Before returning SQL or findings or reporting engine-check passed, run this skill's Final Checklist. If it finds a blocker in this skill's `Owns` area, fix it or stop/downgrade the result.
 
@@ -35,11 +35,19 @@ Use this skill for ClickHouse SQL work in repositories that follow our database 
 
 ## Reference Triggers
 
+- Read `references/telemetry.md` before selecting or interpreting query-history/workload sources.
+
+- Read `references/native_shape_recipes.md` only when a concrete code example is useful; all required pattern checks are in the mandatory `references/native_shape.md`.
+
+- Read `references/load_readiness.md` before DDL/load/rebuild/staging or partition-replacement design, review or handoff.
+
+- Read `references/style_examples.md` only when a concrete formatting example is needed; choose the matching example, not the whole collection.
+
 - Read `references/style.md` for ClickHouse-specific/local formatting and layout.
-- Read `references/sql_readiness.md` for metadata, engine shape, load-readiness, and lightweight validation.
+- Read `references/sql_readiness.md` for common metadata, engine/SELECT shape and lightweight validation.
 - Read `references/native_shape.md` for the mandatory native-shape pass.
 - Read `references/idioms.md` when choosing ClickHouse functions, joins, settings, or runtime idioms.
-- Read `references/optimization.md` for performance work, query-log evidence, explain-based rewrites, projections, indexes, and materialized view choices.
+- Read the applicable sections of `references/optimization.md` for every SQL task's efficiency evidence; projections, indexes and materialized-view details apply only to that scope.
 - Read `references/anti_patterns.md` when reviewing risky SQL or explaining why a shape is weak.
 - Read `references/examples.md` only when a project-shaped example is useful.
 

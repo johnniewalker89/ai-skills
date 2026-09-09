@@ -1,6 +1,8 @@
 # Optimization
 
-Use this file when the task is about speeding up or diagnosing Greenplum SQL.
+For every SQL task, read the diagnostic/plan sections applicable to its efficiency
+evidence. Distribution, statistics and physical-design details follow actual scope;
+reuse sufficient current proof rather than repeating unchanged diagnostics.
 
 ## Diagnostic workflow
 

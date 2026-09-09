@@ -2,16 +2,14 @@
 
 Use this file before returning any non-trivial ClickHouse SQL.
 
-The goal is not to force every ClickHouse feature into every query. The goal is to make generic SQL unacceptable until ClickHouse-native alternatives have been considered and rejected for a concrete reason.
+Review applicable ClickHouse alternatives against the required result and evidence. SQL spelling alone is not a correctness defect or a reason to rewrite a working query.
 
 ## Navigation
 
 - [Mandatory pass](#mandatory-pass)
 - [Decision table](#decision-table)
-- [Required rejection checks](#required-rejection-checks)
-- [Latest-row patterns](#latest-row-per-group)
-- [Key-filter and lookup shapes](#key-filter-heavy-enrichment-before-reducing-it)
-- [Existence, absence, enrichment, and sequence](#existence-filtering)
+- [Required pattern checks](#required-pattern-checks)
+- [Blockers and review triggers](#correctness-blockers-and-review-triggers)
 
 ## Mandatory pass
 
@@ -31,12 +29,14 @@ For each shape:
 
 1. Identify the business intent.
 2. Check the ClickHouse-native alternatives below.
-3. Use the native alternative when it preserves semantics.
-4. Keep generic SQL only when the native alternative would change results, is unsupported on the target contour, or is worse for the actual local data shape.
+3. Prefer a native alternative when it preserves semantics and is justified for this source shape.
+4. Keep an existing/generic form when justified by business semantics, target support, measured or otherwise sufficient cost/memory evidence, or clarity for a small/simple shape. Reuse sufficient current evidence; do not demand a new live benchmark for every syntax choice. Without cost proof, state the uncertainty rather than inventing a speedup.
+
+These common exceptions apply to every preference in the table, review triggers and recipes. A narrower example never cancels them. They cannot waive a correctness blocker.
 
 ## Decision table
 
-| Intent | Prefer first | Generic form to challenge | Keep generic only when |
+| Intent | Prefer first | Generic form to challenge | Example reasons to keep generic; common exceptions also apply |
 |---|---|---|---|
 | Report by a concrete business entity | drive the final query from that entity's matched rows | broad outer base plus `HAVING matched_count > 0` | unmatched coverage is explicitly part of the report and metrics are conditional |
 | One current/latest/best row per group | `argMax`, `argMin`, aggregation with explicit tie-break tuple | `row_number() OVER (...) = 1` | true row-level window semantics are required or aggregate rewrite changes the selected row |
@@ -63,70 +63,44 @@ For each shape:
 | Percentiles on large groups | approximate quantile family used by the project, for example `quantileTDigest` | `quantileExact` | exact percentile is explicitly required and memory cost is acceptable |
 | Selective filtering on wide tables | filters aligned with `PARTITION BY` / `ORDER BY`, `PREWHERE` when appropriate | late filtering after heavy reads | filter cannot be pushed or tested plan shows no benefit |
 
-## Required rejection checks
+## Correctness Blockers And Review Triggers
 
-A query shape is not acceptable if it contains any of these constructs without a semantic reason:
+Block acceptance when the final artifact has an unresolved semantic/engine risk:
 
-- `OVER (...)`;
-- final query driven by a broader entity than the requested report grain without an explicit reason;
-- central outer join whose unmatched rows are included in aggregate metrics without conditional aggregation;
-- `ASOF JOIN` whose right side is not proved unique at `(equality keys, as-of timestamp)` and is not reduced with a stable tie-break;
-- heavy history/enrichment table aggregated or ASOF-joined before checking whether it can be restricted to relevant business keys;
-- large lookup/dimension/reference table scanned whole before a lookup join when a narrow driving key set exists;
-- several unfiltered pointer/reference checks against the same large referenced table;
-- heavy date-partitioned fact read as all-history when the task is smoke/lifecycle and the metric is not named or justified as all-history;
-- one all-history branch used for both smoke coverage/category metrics and pointer/reference checks on a heavy date-partitioned fact;
-- plain `JOIN` to a driving CTE when the right side should be unique and multiplicity is not part of the result;
-- category-specific metrics that omit material actual values from the checked data without an `other_*` metric;
-- ordinary `LEFT JOIN` to a lookup-shaped right side;
-- ordinary `LEFT JOIN` to a right side already reduced to one row per key;
-- matched/unmatched counts based on `right_col IS NULL` after ClickHouse outer joins with default joined values;
-- `WHERE ... IN (SELECT ...)`;
-- `NOT IN (SELECT ...)`;
-- `SELECT DISTINCT`;
-- `FINAL`;
-- manual `GROUP BY ... HAVING sum(sign) > 0` used as a replacement for engine semantics without proving the selected grain;
-- `quantileExact` on production-sized grouped data without an exactness requirement;
-- `SELECT *` on a production mart or wide table.
+- wrong driving/output grain, unintended fact multiplication or unmatched-row metrics;
+- ASOF right-side ambiguity without uniqueness or an accepted stable tie-break;
+- default-value versus NULL match detection without a validated match contract;
+- omitted material categories or unsupported business/proxy-window coverage;
+- manual collapsing/FINAL replacement without proven grain and selected values;
+- incorrect engine readers, staging/refresh mechanics or unsupported required syntax.
 
-Do not print a long explanation for every rejected alternative unless the user asked for reasoning. Still perform the check before returning SQL.
+Review applicable windows, ordinary/ANY/SEMI/ANTI joins, IN/EXISTS filters,
+DISTINCT, FINAL, exact quantiles, broad scans and repeated heavy reads using the
+decision table. Their presence alone is not rejection. Preserve legitimate row
+multiplicity and exactness requirements; retain a justified generic/no-change
+choice under the common exceptions. Missing performance proof limits the claim,
+not the validity of a semantically supported query.
 
-## Preferred rewrites
+## Required Pattern Checks
+
+Apply the checks below whenever their SQL pattern is present, before returning
+SQL or judging it acceptable. These are required even when no code example is
+needed. All preferences inherit the common exceptions above; correctness
+conditions cannot be waived. Linked code examples are optional.
 
 ### Latest row per group
 
 Prefer:
 
-```sql
-SELECT
-      source.client_id                         AS client_id
-    , argMax(source.status, source.updated_at) AS last_status
-FROM client_status source
-GROUP BY source.client_id
-```
+[Example 1](native_shape_recipes.md#example-1).
 
 Challenge:
 
-```sql
-SELECT
-      ranked.client_id AS client_id
-    , ranked.status    AS last_status
-FROM (
-    SELECT
-          source.client_id                                                AS client_id
-        , source.status                                                   AS status
-        , row_number() OVER (PARTITION BY source.client_id
-                             ORDER BY source.updated_at DESC)             AS rn
-    FROM client_status source
-) ranked
-WHERE ranked.rn = 1
-```
+[Example 2](native_shape_recipes.md#example-2).
 
 If tie behavior matters, express it explicitly:
 
-```sql
-argMax(source.status, tuple(source.updated_at, source.event_id)) AS last_status
-```
+[Example 3](native_shape_recipes.md#example-3).
 
 ### Latest row as of another timestamp
 
@@ -161,70 +135,11 @@ Do not reserve key-filtering only for fact/history tables. If the driving set co
 
 Prefer:
 
-```sql
-WITH
-   orders_day AS (
-    SELECT
-          orders.order_id     AS order_id
-        , orders.client_id    AS client_id
-    FROM mart_product.orders orders
-    WHERE orders.received_ts >= toDateTime('2026-04-29 00:00:00')
-      AND orders.received_ts <  toDateTime('2026-04-30 00:00:00')
-), order_clients AS (
-    SELECT DISTINCT
-          orders_day.client_id AS client_id
-    FROM orders_day
-), clients AS (
-    SELECT
-          client.client_id AS client_id
-        , client.segment   AS segment
-    FROM mart_product.client client
-    LEFT SEMI JOIN order_clients ON client.client_id = order_clients.client_id
-)
-SELECT
-      orders_day.order_id AS order_id
-    , clients.segment     AS segment
-FROM orders_day
-LEFT ANY JOIN clients ON orders_day.client_id = clients.client_id
-```
+[Example 4](native_shape_recipes.md#example-4).
 
 For pointer/reference checks, collect all relevant pointer ids once, then check the referenced table once:
 
-```sql
-WITH
-   orders_day AS (
-    SELECT
-          orders.order_id              AS order_id
-        , orders.order_pricing_id      AS order_pricing_id
-        , orders.last_order_pricing_id AS last_order_pricing_id
-    FROM mart_product.orders orders
-    WHERE orders.received_ts >= toDateTime('2026-04-29 00:00:00')
-      AND orders.received_ts <  toDateTime('2026-04-30 00:00:00')
-), relevant_pricing_ids AS (
-    SELECT DISTINCT
-          orders_day.order_pricing_id AS order_pricing_id
-    FROM orders_day
-    WHERE orders_day.order_pricing_id IS NOT NULL
-
-    UNION DISTINCT
-
-    SELECT DISTINCT
-          orders_day.last_order_pricing_id AS order_pricing_id
-    FROM orders_day
-    WHERE orders_day.last_order_pricing_id IS NOT NULL
-), referenced_pricing_ids AS (
-    SELECT DISTINCT
-          pricing.order_pricing_id AS order_pricing_id
-        , toUInt8(1)               AS has_pricing_id
-    FROM mart_product.order_pricing pricing
-    LEFT SEMI JOIN relevant_pricing_ids ON pricing.order_pricing_id = relevant_pricing_ids.order_pricing_id
-)
-SELECT
-      count()                                            AS n_orders
-    , countIf(referenced_pricing_ids.has_pricing_id = 1) AS n_order_pricing_id_found
-FROM orders_day
-LEFT ANY JOIN referenced_pricing_ids ON orders_day.order_pricing_id = referenced_pricing_ids.order_pricing_id
-```
+[Example 5](native_shape_recipes.md#example-5).
 
 If the referenced table cannot be pruned by the pointer key and the check intentionally scans history, name the metric or CTE as `*_all_history` and record the scan tradeoff in validation notes.
 
@@ -236,19 +151,13 @@ If the same referenced/history table also supplies smoke coverage or category me
 
 ### Driving CTE joins that need driving columns
 
-When a heavy fact joins to a constrained driving CTE and needs columns from that CTE, do not keep plain `JOIN` by habit. If the driving CTE is one row per business key, prefer `ANY INNER JOIN` or `LEFT SEMI JOIN` after proving uniqueness at that key. Keep plain `JOIN` only when driving-side duplicates are business-significant and should multiply the fact rows.
+When a heavy fact joins to a constrained driving CTE and needs columns from that CTE, do not keep plain `JOIN` by habit. If the driving CTE is one row per business key, prefer `ANY INNER JOIN` or `LEFT SEMI JOIN` after proving uniqueness at that key. Keep plain `JOIN` when multiplicity is required or another common exception from `native_shape.md` applies.
 
 ### Existence filtering
 
 Prefer `LEFT SEMI JOIN` when the right side is used only to keep matching left rows:
 
-```sql
-SELECT
-      orders.order_id  AS order_id
-    , orders.client_id AS client_id
-FROM orders
-LEFT SEMI JOIN active_clients ON orders.client_id = active_clients.client_id
-```
+[Example 6](native_shape_recipes.md#example-6).
 
 ClickHouse allows selecting columns from the right side of `LEFT SEMI JOIN`. Do not claim those columns are unavailable. However, when right-side columns are part of the output semantics, do not treat `SEMI` as a generic enrichment join by habit:
 
@@ -260,37 +169,19 @@ For production-sized `LEFT SEMI JOIN`, also check the physical side. ClickHouse 
 
 Challenge:
 
-```sql
-WHERE orders.client_id IN (
-    SELECT client_id
-    FROM active_clients
-)
-```
+[Example 7](native_shape_recipes.md#example-7).
 
 ### Absence filtering
 
 Prefer `LEFT ANTI JOIN` when the right side is used only to remove matching left rows:
 
-```sql
-SELECT
-      orders.order_id  AS order_id
-    , orders.client_id AS client_id
-FROM orders
-LEFT ANTI JOIN blocked_clients ON orders.client_id = blocked_clients.client_id
-```
+[Example 8](native_shape_recipes.md#example-8).
 
 ### Lookup enrichment
 
 Prefer `dictGet(...)` for ready dictionaries. Prefer `LEFT ANY JOIN` for lookup-shaped tables when duplicate right-side rows are not meaningful:
 
-```sql
-SELECT
-      orders.order_id     AS order_id
-    , orders.client_id    AS client_id
-    , clients.client_name AS client_name
-FROM orders
-LEFT ANY JOIN dim_client clients ON orders.client_id = clients.client_id
-```
+[Example 9](native_shape_recipes.md#example-9).
 
 If the right side can contain several business-significant rows per key, do not use `ANY`. Pre-aggregate or select the correct row first, for example with `argMax`, then join to that reduced result.
 
@@ -298,43 +189,12 @@ If a `LEFT JOIN` is kept only to preserve unmatched left rows, still challenge i
 
 For match metrics after an outer join, do not count `right_col IS NULL` / `IS NOT NULL` on ordinary right-side columns. With ClickHouse default `join_use_nulls = 0`, unmatched non-Nullable right columns are filled with type defaults such as `0`, so `right_id IS NOT NULL` can be true even for misses. Add an explicit match flag inside the right side:
 
-```sql
-WITH
-   orders_day AS (
-    SELECT
-          orders.order_id  AS order_id
-        , orders.client_id AS client_id
-    FROM mart_product.orders orders
-    WHERE orders.received_ts >= toDateTime('2026-04-29 00:00:00')
-      AND orders.received_ts <  toDateTime('2026-04-30 00:00:00')
-), clients AS (
-    SELECT
-          client.client_id AS client_id
-        , client.segment   AS segment
-        , toUInt8(1)       AS has_client_match
-    FROM mart_product.client client
-    LEFT SEMI JOIN orders_day ON client.client_id = orders_day.client_id
-)
-SELECT
-      count()                                                AS n_orders
-    , sum(ifNull(clients.has_client_match, 0))               AS n_orders_with_client
-    , count() - sum(ifNull(clients.has_client_match, 0))     AS n_orders_without_client
-FROM orders_day
-LEFT ANY JOIN clients ON orders_day.client_id = clients.client_id
-```
+[Example 10](native_shape_recipes.md#example-10).
 
 ### Sequence logic
 
 For sequence logic inside a group, prefer an array-shaped solution before stacking windows:
 
-```sql
-SELECT
-      source.client_id                                            AS client_id
-    , arrayMap(x -> x.2,
-               arraySort(x -> x.1,
-                         groupArray((source.event_at, source.status)))) AS status_path
-FROM client_events source
-GROUP BY source.client_id
-```
+[Example 11](native_shape_recipes.md#example-11).
 
 Use a window function when the required output remains row-level or the grouped arrays would be too large.

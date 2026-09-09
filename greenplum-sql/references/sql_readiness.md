@@ -10,9 +10,9 @@ This file owns Greenplum-specific SQL metadata and shape checks: MPP metadata sh
 
 - [Responsibility split](#responsibility-split)
 - [Metadata pass](#metadata-pass)
-- [DDL/load self-review](#ddlload-syntax-self-review)
+- [DDL/load checks, only for that scope](load_readiness.md)
 - [Lightweight validation](#lightweight-validation)
-- [Workload evidence](#workload-and-query-log-evidence)
+- [Workload evidence when needed](telemetry.md)
 - [CTE awareness and red flags](#cte-and-materialization-awareness)
 
 ## Responsibility split
@@ -60,18 +60,6 @@ Use Greenplum metadata to choose:
 
 For standalone smoke/ad-hoc SQL with a fixed chosen period, verify static partition pruning. If a params CTE prevents pruning, use explicit literals or another shape that preserves pruning.
 
-## DDL/load syntax self-review
-
-Before returning Greenplum DDL or load files:
-
-- verify syntax against the expected Greenplum/PostgreSQL compatibility level, not generic modern PostgreSQL;
-- verify staging tables have a deliberate storage, distribution, and partition shape for the intended swap/delete/insert mechanics;
-- classify `UNLOGGED` tables by owner SQL/job evidence, not by table name. Full-refresh staging may stay `UNLOGGED`; partial-window, incremental, append, or update owner tables should not be `UNLOGGED` unless a recovery contract proves it is safe;
-- check that delete/truncate/exchange/swap keys match the declared rebuild grain and cannot leave stale rows;
-- for table recreation/copy/rename rollouts, restore owner, comments, and grants from migrator output or `pg_class.relacl`; do not rely only on `information_schema.role_table_grants`;
-- mark post-load target checks separately from read-only source checks;
-- if self-review finds invalid syntax or incompatible staging shape, fix the artifact before reporting engine-check passed. Sandbox validation should prove runtime/result behavior, not catch issues visible in the final SQL text.
-
 ## Lightweight validation
 
 Before returning a non-trivial production `SELECT`:
@@ -100,38 +88,6 @@ Before returning a non-trivial production `SELECT`:
 - If validation cannot be run because the selected access owner is unavailable, the query is text-only, or execution would be too risky, say so briefly.
 
 For optimization tasks, also inspect skew/statistics via system views or `gp_toolkit` through the selected access owner when available; see `optimization.md`.
-
-## Workload and query-log evidence
-
-For Greenplum runtime/workload investigations in our environment, use confirmed telemetry sources only.
-
-This is narrow telemetry only. It may be used only to inspect Greenplum query-history/workload evidence. It must not be used to pull ClickHouse business sources, infer Greenplum business logic, or replace Greenplum metadata/repo evidence.
-
-This restriction does not block normal repo-backed cross-engine lineage/source-flow analysis. If repo evidence proves that a Greenplum object is loaded from ClickHouse, analyze that source flow with `clickhouse-sql` and keep it separate from telemetry evidence.
-
-Known historical source:
-
-- `monitoring.greenplum__queries_history` is a historical persisted copy in ClickHouse and may lag behind fresh runs.
-
-Confirmed fresh/live Greenplum signals in `profi`:
-
-- `pg_catalog.pg_stat_activity` for current sessions; other users' query text may be hidden as `<insufficient privilege>`.
-- `gp_toolkit.gp_workfile_usage_per_query`, `gp_toolkit.gp_workfile_entries`, `gp_toolkit.gp_workfile_usage_per_segment`, and `gp_toolkit.gp_workfile_mgr_used_diskspace` for current spill/workfile evidence.
-
-Known blockers in `profi` until grants/sources change:
-
-- `session_state.session_level_memory_consumption` may require an explicit grant.
-- Do not hunt through ad hoc `public.queries_history`, `queries_tail`, `gpmetrics`, or external-table variants unless the user or environment documentation confirms them for this contour.
-
-Fresh direct Greenplum query history requires a confirmed Greenplum source and grants. If it is required and unavailable, record the blocker instead of cycling through unconfirmed schemas or using ClickHouse external tables as a shortcut.
-
-Rules:
-
-- Use the selected access owner for live query-log checks.
-- If querying the ClickHouse mirror requires non-trivial SQL, use `clickhouse-sql` for that query shape and interpretation.
-- Verify current privileges before relying on the source.
-- If SELECT is blocked, record the exact table/grant blocker.
-- Never invent workload metrics from old proof notes, registry entries, or intuition; use a real bounded query-history window from the task request or the owning workflow/evidence layer.
 
 ## CTE and materialization awareness
 

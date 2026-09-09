@@ -19,8 +19,8 @@ Use this skill for Greenplum SQL/DDL work in repositories that follow our databa
 2. **Reference gate.** Read `references/style.md` for any Greenplum writing, editing, or review. For any non-trivial writing, editing, review, optimization, DDL, or load task, also read `references/sql_readiness.md`. Read the other references only when their trigger applies.
 3. **Metadata gate.** Before final SQL against real tables, inspect columns, types, distribution, partitions, storage, and relevant volume/statistics through the selected access owner when available, or use repo contracts/source definitions when live access is unavailable.
 4. **MPP plan gate.** For non-trivial production `SELECT`s, route lightweight validation through the selected access owner when available. Prefer `EXPLAIN`; use constrained `EXPLAIN ANALYZE` only when safe. Interpret optimizer choice, `Motion`, distribution compatibility, row estimates, partition pruning, repeated scans, `Shared Scan`/`Materialize`, and large scans with approximate row-volume signals.
-5. **Load-readiness gate.** Before handing a Greenplum DDL/load/rebuild artifact back to the workflow layer, run the load-readiness checks from `references/sql_readiness.md`: syntax, storage/distribution/partition shape, staging compatibility, insert/delete/truncate/swap mechanics, stats/`ANALYZE`, repeated heavy scans, and approved event/window semantics. Report pass/fail/blockers; this skill does not decide final proof status or sandbox need.
-6. **Telemetry gate.** For Greenplum workload history in our environment, use only the confirmed telemetry sources in `references/sql_readiness.md`. Fresh Greenplum signals in `profi` are limited to confirmed live views; missing grants/sources are blockers. Use telemetry only as Greenplum workload evidence, not as ClickHouse business data, Greenplum metadata, repo evidence, or a shortcut around missing direct Greenplum logs.
+5. **Load-readiness gate.** Before handing a Greenplum DDL/load/rebuild artifact back to the workflow layer, run the load-readiness checks from `references/load_readiness.md`: syntax, storage/distribution/partition shape, staging compatibility, insert/delete/truncate/swap mechanics, stats/`ANALYZE`, repeated heavy scans, and approved event/window semantics. Report pass/fail/blockers; this skill does not decide final proof status or sandbox need.
+6. **Efficiency and telemetry gate.** In every SQL task, apply the relevant diagnostic/plan sections of `references/optimization.md` to support the SQL-quality efficiency gate. For workload/history evidence, read known sources in `references/telemetry.md`; no personal context document is required. Verify grants, coverage and freshness; a mirror does not prove fresh direct Greenplum history or replace metadata/business lineage.
 7. **Lineage gate.** Repo-backed cross-engine source flow is not telemetry. If repo evidence proves a Greenplum object is loaded from ClickHouse, analyze that source layer through `clickhouse-sql`; keep Greenplum target metadata, DDL, and plan evidence in this skill.
 8. **Evidence-artifact gate.** If the user requested a reasoning/evidence artifact, include exact Greenplum repo-backed paths or a clear `DB-only fallback`, plus concrete plan/validation signals. Do not use another engine's DDL as proof for a live Greenplum object.
 9. **Self-review gate.** Before returning SQL or findings or reporting engine-check passed, run this skill's Final Checklist. If it finds a blocker in this skill's `Owns` area, fix it or stop/downgrade the result.
@@ -34,10 +34,16 @@ Use this skill for Greenplum SQL/DDL work in repositories that follow our databa
 
 ## Reference Triggers
 
+- Read `references/telemetry.md` before selecting or interpreting Greenplum workload/query-history sources, including a configured cross-engine mirror.
+
+- Read `references/load_readiness.md` before DDL/load/rebuild/staging or partition-replacement design, review or handoff.
+
+- Read `references/style_examples.md` only when a concrete formatting example is needed; choose the matching example, not the whole collection.
+
 - Read `references/style.md` for Greenplum-specific/local formatting and layout.
-- Read `references/sql_readiness.md` for metadata, MPP shape, load-readiness, telemetry routing, and lightweight validation.
+- Read `references/sql_readiness.md` for common metadata, MPP/SELECT shape and lightweight validation.
 - Read `references/idioms.md` when choosing Greenplum-compatible functions, runtime settings, load patterns, or SQL idioms.
-- Read `references/optimization.md` for performance work, `EXPLAIN`/`EXPLAIN ANALYZE`, distribution, skew, statistics, partition refresh, and GPORCA concerns.
+- Read the applicable sections of `references/optimization.md` for every SQL task's efficiency evidence; distribution, skew, partition refresh and planner details follow the actual query/load scope.
 - Read `references/anti_patterns.md` when reviewing risky SQL or explaining why a shape is weak.
 - Read `references/examples.md` only when a project-shaped example is useful.
 

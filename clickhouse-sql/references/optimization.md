@@ -1,5 +1,9 @@
 # Optimization
 
+For every SQL task, read the diagnostic/query-shape sections applicable to its
+efficiency evidence. Physical-design details apply only to the requested scope;
+reuse sufficient current proof and do not invent a production history for a new query.
+
 Use this file when the task is about speeding up or diagnosing ClickHouse SQL.
 
 ## Diagnostic workflow
