@@ -2,6 +2,11 @@
 
 Read before proposing, budgeting or materially replanning subagents.
 
+Delegation must add evidence or a useful independent check of a risky result.
+Two agents reaching the same conclusion without checking different evidence do
+not establish quality. Ordinary review stays with its domain owners; skill-test
+and evaluation machinery is not a prerequisite for a domain reviewer.
+
 ## Navigation
 
 - [Host and roles](#host-and-roles)
@@ -40,6 +45,11 @@ host envelope and required skill/input reads; a short user request is not a shor
 subject context. Include a separately launched reviewer in the approved batch.
 Use comparable model/settings, host, role/task and input/cache observations;
 give a justified range and assumptions, with uncertainty where data is missing.
+Make one short planning pass over the available compact summary and a few close
+successes and failures. If evidence is sparse, mark uncertainty and size the
+work accordingly; do not turn estimation into an archive investigation. Account
+for startup, useful work and saving, then stop estimating. Additional history
+research is justified only by a material unresolved decision.
 Retain failed subagent-attempt cost in actual totals; estimate remaining work separately.
 Keep token metrics distinct from subscription/pricing units across models/hosts.
 Do not infer another model's price or subscription savings from token counts.
@@ -128,6 +138,13 @@ Ordinary domain review uses only its domain owners, without skill-development
 test or evaluation dependencies. When testing skills themselves, the validation
 owner adds profile, exact input/plan hashes and isolation to this same approval;
 it does not introduce a second generic approval procedure.
+
+Keep the original forecast, reserve, metric and approved ceiling immutable.
+Record later revisions as dated events, with their reason and any required new
+approval; compare actuals against the original plan as well as the effective cap.
+When shared agent logs are enabled, keep this record in the attempt log using
+`run_logging.md`; otherwise retain the necessary approval/result evidence in the
+existing task or test surface without creating an audit log or index.
 
 ## Compare Cost Without Reducing Proof
 

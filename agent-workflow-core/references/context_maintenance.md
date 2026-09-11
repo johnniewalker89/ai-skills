@@ -177,13 +177,18 @@ If multiple archives exist, keep the same timestamp naming; it sorts naturally a
 
 ## Agent Logs
 
+Apply `references/agent_logging.md` for the shared opt-in, main/subagent scope,
+attempt-history layout and navigation. One enabled initiative covers its main
+and subagent logs; do not request separate permission for each kind. The rules
+below describe the main log, not an exception to that shared flag.
+
 Use `agent_logs/<TASK_ID>.agent_log.md` only when agent logging is explicitly enabled by the user or when the user asks for a separate agent behavior/reasoning audit trail. Do not create agent logs by default. Do not satisfy an agent-log request by printing an "Agent Log" section only in chat; create or append the file after the local context workspace is established. If no local context workspace is established yet, stop and establish it first.
 
 When agent logging is enabled and a task id becomes known, create or append `agent_logs/<TASK_ID>.agent_log.md` immediately with the current mode, active skills, facts, hypotheses, decisions, rejected alternatives, and validation status. Do not backfill the first agent log only at the end of the task.
 
 If skill routing changes during the task, update the log instead of leaving only the initial skill list. Either update `Active skills` or add `Skill routing updates` with the skill name, reason, and role, for example `greenplum-sql: cross-engine lineage interpretation`.
 
-Meta-tasks do not require separate agent logs by default. Keep meta-task reasoning in the meta-task file itself, such as `meta/<topic>.md` or `airflow_logs/airflow_logs.md`. Create an agent log for a meta-task only when the user explicitly asks for a separate reasoning, regression-analysis, or behavior-review trail.
+Meta-tasks do not enable logs by default. Without the shared flag, keep concise decisions in the meta-task snapshot. When the initiative's agent logs are enabled, maintain its main and subagent logs under its stable parent key without another opt-in.
 
 Do not archive agent logs. Keep `agent_logs/<TASK_ID>.agent_log.md` as an append-only audit trail; use search and the current task snapshot to avoid rereading old detail.
 

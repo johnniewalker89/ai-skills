@@ -10,6 +10,12 @@ long artifact tasks, plan incremental saves inside the approved write set; the
 first useful draft must not depend on writing every report or final summary.
 File existence, size, tool activity and elapsed time are not semantic progress.
 
+The first artifact is a growing domain report: what was checked, supported
+findings, evidence links, gaps and the next useful step. A standalone checker or
+output file is supporting evidence, not a substitute for an assessable report.
+Expand that same report as work proceeds; the child need not duplicate the
+parent's coordination log. For short tasks the saved result can be compact.
+
 Check that the subject has a simple permitted way to save that artifact. Resolve
 required shell/runtime/serialization boundaries before launch; verify an uncertain
 write path with inert disposable content, without running a new agent or revealing
@@ -56,6 +62,25 @@ At the saved-result checkpoint, read the artifact and decide whether the remaini
 work still fits. If it is absent or unusable, prioritize a bounded partial save or
 stop; do not wait for the final reserve to discover that nothing was preserved.
 During reserve, save existing conclusions and gaps before expanding presentation.
+Use explicit execution states:
+
+1. **Working:** investigate within scope and update the useful report.
+2. **Finishing:** send one clear instruction before the reserved save window:
+   stop new research, save existing findings/evidence/gaps and a continuation
+   point, then report delivery. An upper-forecast crossing prompts a feasibility
+   check; it is not a hard stop. Leave enough token/time allowance for control
+   latency, writes and bounded repair inside every approved ceiling.
+3. **Saved:** read the report, verify the allowed path and assess what is useful.
+   Preserve partial results and distinguish them from full acceptance.
+4. **Delivered or stopped:** confirm the result/terminal state. Interrupt at an
+   actual agreed hard boundary, explicit stop, access violation, or an
+   unresponsive worker under the agreed fallback. Finishing is not permission
+   to exceed a ceiling; do not send new work after an immediate stop.
+
+Do not repeatedly issue the finishing instruction or keep sampling unchanged
+status when the host can wait for relevant progress. An adapter may report both
+budget action and attention: inspect the failure without forgetting the save
+window. Control observations are not a guarantee against telemetry latency.
 After interruption,
 assess saved artifacts first. Before proposing another attempt, identify the cause,
 what can be reused and a credible remaining-cost path to the required result.
