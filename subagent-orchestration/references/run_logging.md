@@ -1,10 +1,11 @@
 # Attempt Logging
 
-Read only when workflow's shared agent logs are enabled. Workflow owns the flag,
-scope, storage and history navigation in `agent_logging.md`; do not introduce an
-independent mandatory log or a second opt-in. With logging off, this template and
-the audit index are not created. Required results/proof remain in their own
-surfaces.
+Read only when the caller's shared agent logs are enabled. The caller supplies
+the flag, scope, parent identity, storage and history navigation through
+`caller_context.md`; no particular workflow document or directory layout is
+required. Do not introduce an independent mandatory log or a second opt-in. With
+logging off, this template and the audit index are not created. Required
+results/proof remain in their own surfaces.
 
 ## Lifecycle And Responsibility
 
@@ -26,7 +27,7 @@ time, reason, scope and approval evidence. Preserve failures and unknown telemet
 Record actuals, original forecast delta and compliance with each effective cap;
 successful delivery in headroom does not make the base forecast accurate.
 
-Update the compact facts index outside the review tree after the attempt, including
+Update the compact facts index at the caller's supplied location, outside any review tree, after the attempt, including
 its outcome and evidence limits. Do not assign review/remediation status. A
 configured evaluator discovers the log and covers its exact cutoff separately.
 For historical backfill label reconstruction date, source evidence and unknowns;
