@@ -19,6 +19,12 @@ Before choosing source tables:
 
 When source choice is non-obvious, keep a compact candidate matrix in notes: candidate, repo path, live presence, grain, join keys, freshness, and selected/rejected reason.
 
+For a source replacement, compare eligible business keys and relevant attributes
+on the same input state. Matching column names/types does not prove matching
+population: downstream eligibility, filtering and deduplication may be missing
+from the lower source. Preserve those rules or make the intentional change explicit
+before comparing derived metrics; a matching aggregate can hide different keys.
+
 When explaining a table, mart, chain, lineage, source flow, or business logic:
 
 - identify the target object, checked-in DDL/contract, build SQL/model, schedule/orchestration config, and downstream export/consumer configs when they exist;
@@ -58,6 +64,12 @@ For lookup/enrichment joins:
 - verify right-side uniqueness at the intended key when attributes are projected;
 - if the right side can duplicate rows, define whether duplicates are business facts, lookup noise, or candidates for deterministic row choice;
 - avoid accidental row multiplication by pre-aggregating, reducing, or choosing a join primitive that matches the engine and business intent.
+
+For fallback or snapshot selection, distinguish three cases: no usable slice,
+a usable slice with a missing entity, and a present entity with a NULL value.
+Resolve whether the source is chosen per entity or for the whole slice/run.
+Row-level `coalesce(new, legacy)` does not implement a whole-slice switch;
+slice date, eligibility and missing-row defaults belong to the accepted contract.
 
 For independent fact aggregates combined into one output, such as demand and supply, orders and inventory, or events and capacity:
 

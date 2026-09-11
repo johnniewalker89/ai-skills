@@ -1,6 +1,6 @@
 ---
 name: agent-workflow-core
-description: Run non-trivial Engineering tasks with task modes, saved context, exact local runtimes, retained approvals, proportionate proof and final delivery. Use before domain work; select normal or enhanced review without changing task mode.
+description: Run non-trivial Engineering tasks with task modes, saved context, exact local runtimes, retained approvals, proportionate proof and final delivery. Use before domain work; route subagent planning and control to subagent-orchestration when needed.
 ---
 
 # Agent Workflow Core
@@ -8,8 +8,8 @@ description: Run non-trivial Engineering tasks with task modes, saved context, e
 ## Role
 
 - Purpose: deliver Engineering work with enough evidence and the least necessary overhead.
-- Owns: mode, context/environment/runtime, task snapshots, optional logs, planning, approval acquisition/retention, review depth, subagent model selection and approved coordination, subagent cost estimation/control by the main agent, quality-assessment handoff, proof framing and final delivery.
-- Delegates to: the selected research owner for material external gaps; domain owners for correctness; operational owners for action/identity/session policy, execution and readback.
+- Owns: mode, context/environment/runtime, task snapshots, optional logs, task planning, general approval acquisition/retention, review depth, delegation need, quality-assessment handoff, proof framing and final delivery.
+- Delegates to: `subagent-orchestration` for subagent planning, model/budget choice, exact batch approval and execution control; the selected research owner for material external gaps; domain owners for correctness; operational owners for action/identity/session policy, execution and readback.
 
 ## Hard Gates
 
@@ -22,7 +22,7 @@ description: Run non-trivial Engineering tasks with task modes, saved context, e
 7. **Project and artifact gate.** For project, production-like data artifacts, risky/destructive work, cleanup or unclear business rules, read `references/safety_and_stop_points.md` before the dependent step. Safe bounded reconnaissance may precede a concrete proposal. Retain existing implementation approval; separate repo artifacts from sandbox/database writes. Put code in the target repo, context in the configured memory workspace.
 8. **Proof gate.** Read `references/validation_and_review.md` before selecting proof or delivering non-quick work. Domain owners determine sufficient evidence; budget never permits skipping it or overstating readiness. P1/P2 owner blockers prevent the dependent pass.
 9. **Economy gate.** Reuse sufficient current evidence and already loaded instructions. Repeat a read/check only for changed inputs/state, incomplete evidence, freshness or a new risk; retain identity, permission and mandatory post-change readback. Select bounded tool results and inspect all required pages without silently dropping evidence.
-10. **Review depth and subagents gate.** Depth is `normal` or `enhanced`, independent of task mode. Read `references/economy_and_review_depth.md` for enhanced review, any subagent proposal/launch or cost comparison; resolve host capabilities and unavailable-review limits there. Every subagent batch requires prior explicit user approval of tasks, count, models/effort and token/time budgets; general implementation approval never covers it. No automatic nested, replacement or expanded launches.
+10. **Review depth and subagents gate.** Depth is `normal` or `enhanced`, independent of task mode. Read `references/economy_and_review_depth.md` for enhanced review or work-cost comparison. Before any subagent planning, budget, proposal, launch or control, load `subagent-orchestration`; this is mandatory even without a navigator or when delegation arises mid-task. If already active, use its current contract without restarting routing. If unavailable, preserve direct work and stop the dependent delegation step; do not improvise its approval/control procedure.
 11. **Self-review gate.** Before final delivery or handoff, run the Final Checklist; fix owner blockers or state their effect on completion.
 
 ## Workflow
@@ -42,7 +42,7 @@ description: Run non-trivial Engineering tasks with task modes, saved context, e
 - `references/safety_and_stop_points.md`: before project checkpoints, new data artifacts, destructive cleanup, sandbox work or unresolved business decisions.
 - `references/validation_and_review.md`: before proof selection, non-quick final delivery or readiness claims.
 - `references/data_artifact_proof.md`: before SQL/dbt/data-pipeline or production-like proof selection/checkpoints.
-- `references/economy_and_review_depth.md`: before enhanced review, proposing/launching subagents or comparing work cost.
+- `references/economy_and_review_depth.md`: before enhanced review or comparing work cost; subagent planning/control requires `subagent-orchestration` instead.
 
 ## Final Checklist
 
@@ -50,6 +50,6 @@ description: Run non-trivial Engineering tasks with task modes, saved context, e
 - Context/log updates inside the enabled workspace; zero writes under the configured skill-review/evaluation tree during ordinary delivery?
 - Existing approval retained, concrete missing approval obtained, and operational scopes/bindings honored?
 - Code destination, business assumptions and cleanup/use evidence resolved?
-- All subagent launches inside the explicitly approved batch and budgets?
+- When subagent work arose, was `subagent-orchestration` loaded before its planning/control and its approved-scope result checked?
 - Sufficient evidence reused, required checks/readback retained, owner blockers fixed or disclosed?
 - Final claim matches actual proof; unresolved work and material self-review result visible?

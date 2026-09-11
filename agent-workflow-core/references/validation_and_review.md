@@ -11,7 +11,7 @@ Use this reference for proof selection and final delivery for `focused`, `projec
 
 ## Review Depth
 
-Task mode, review depth and access mode are separate. Normal review retains all required owner proof; enhanced review adds a distinct check of a named risk. Use the workflow's conditional economy/depth procedure for enhanced review or any subagent, and never infer independence from a second agent's name. Reuse sufficient current evidence; changed inputs/state, freshness or a new risk justify repeat checks.
+Task mode, review depth and access mode are separate. Normal review retains all required owner proof; enhanced review adds a distinct check of a named risk. Use workflow's conditional economy/depth procedure for enhanced review and `subagent-orchestration` for any subagent planning/control; never infer independence from a second agent's name. Reuse sufficient current evidence; changed inputs/state, freshness or a new risk justify repeat checks.
 
 ## Validation Modes
 
@@ -32,7 +32,12 @@ Fix/disclose blockers; never use a budget limit to upgrade an incomplete result.
 
 ## Self-Review Before Delivery
 
-Before final response, run a self-review pass. After implementation, report the material result of that pass compactly: scope, changed files/artifacts, validation evidence, residual risks or blocked checks, and whether the newest user instructions were honored.
+Before final response, compare the final artifact and observed state with the
+current contract. Reading a checklist, intending a rollback, or passing a check
+on an earlier draft is not evidence that the final result satisfies it. Reuse
+valid checks, rerun only those invalidated by the final delta, and report the
+material result compactly: scope, evidence, residual risks or blocked checks,
+and whether the newest user instructions were honored.
 
 Check:
 

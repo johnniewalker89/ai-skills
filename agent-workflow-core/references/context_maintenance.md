@@ -113,6 +113,12 @@ When creating this artifact, use the matching example in `references/context_tem
 
 Keep `tasks/<TASK_ID>.md` short enough to start a new chat quickly. It is a snapshot, not a full transcript.
 
+Keep the current contract above history: accepted outcome/exclusions, latest
+decisions, authorized next action, and evidence/limits. Replace stale active text
+when a decision changes. If historical plans contradict the current contract,
+move them to a linked archive even below the line-count guardrail; a disclaimer
+above a long obsolete plan is not a reliable continuation snapshot.
+
 Use line count as a guardrail for task snapshots only:
 
 - at 250+ lines, pause and decide whether to compress or archive before adding more detail;
@@ -128,6 +134,11 @@ Update `context.md` as navigation. Keep separate `Активные задачи`
   sections;
 - keep Airflow analyses or other long-lived work without a task id in a separate meta-task section, not in the task list;
 - keep only short status text there.
+
+Before reporting a local task closed, read back the updated snapshot and its
+single closed navigation entry; append the outcome to the enabled log. A log
+entry alone does not complete this request. Local context closure does not imply
+a tracker transition or a review-register update.
 
 Link enabled agent logs from the corresponding task snapshot or meta-task file.
 Keep `context.md` focused on task/direction navigation; do not maintain a separate

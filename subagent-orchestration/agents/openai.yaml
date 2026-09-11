@@ -1,0 +1,4 @@
+interface:
+  display_name: "Subagent Orchestration"
+  short_description: "Plan budgets and preserve useful agent results"
+  default_prompt: "Use $subagent-orchestration to prepare a bounded subagent plan with an explicit budget and saved-result checkpoints."

@@ -10,6 +10,9 @@ The engine owner interprets the physical checks; this skill requires their cover
 - Bind evidence to final SQL, settings, source shape, data window and relevant scale.
   Use plans, current metadata/statistics, measured query history or bounded execution
   as needed to assess scans/pruning, joins, sort/aggregate cost and repeated work.
+- Compare like-for-like work: the same input population/window and measured stages.
+  An INSERT-only duration and a whole task including setup, cleanup or maintenance
+  are different measurements, not a demonstrated speedup.
 - Interpret the evidence and assess plausible cheaper alternatives. Explain the
   accepted shape or tradeoff; a valid query, small LIMIT or successful run alone
   does not prove efficiency. Avoid claiming a global optimum from a bounded check.
@@ -34,6 +37,14 @@ When the task lets you choose a smoke period:
 - if a broad window is intentional, state why and verify the plan remains acceptable.
 
 ## Validation Mindset
+
+For each material changed contract, retain a compact link to the final artifact,
+the check that exercises it, its comparison surface, and remaining limits. Reuse
+existing evidence when applicable; this is not a mandatory extra test suite.
+Component comparisons, invariant checks, and old/new final-output comparisons
+prove different claims. A compositional equivalence argument must also cover
+joining, multiplicity, defaults, precision and final assembly; name it as such,
+not as an executed end-to-end diff.
 
 Before returning or approving non-trivial SQL:
 

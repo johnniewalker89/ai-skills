@@ -13,6 +13,11 @@ Use this file for common SQL code style and readability. Engine-specific skills 
 
 ## General Rules
 
+Review the final changed SELECT/JOIN blocks after mechanical formatting, not
+only the replacement count or an intermediate preview. Check expressions and
+output aliases for accidental edits as well as layout; a semantic change must
+return to the SQL-quality owner instead of passing as formatting-only work.
+
 - SQL keywords and logical operators should be upper-case.
 - SQL functions should be lower-case when the local project style allows it.
 - Data types should be upper-case.

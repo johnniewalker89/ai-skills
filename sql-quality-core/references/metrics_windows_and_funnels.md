@@ -2,6 +2,14 @@
 
 Use this reference for multi-row facts, categories, date/window semantics, sequential funnels, child-entity metrics, mutable sources, and optimization-risk classification.
 
+## Navigation
+
+- [Facts and categories](#multi-row-facts-and-categories)
+- [Date windows and filters](#date-windows-and-filters)
+- [Funnels and entity metrics](#sequential-funnels-and-entity-metrics)
+- [Mutable sources](#mutable-sources-and-reprocessing)
+- [Optimization risk](#optimization-risk-classification)
+
 ## Multi-Row Facts And Categories
 
 Treat multi-row facts as facts, not one-row lookups.
@@ -18,6 +26,14 @@ Treat multi-row facts as facts, not one-row lookups.
 ## Date Windows And Filters
 
 Date predicates are metric semantics, not only performance filters.
+
+For parameterized loads/backfills, inspect the actual supplier of each bound:
+value, type/time zone, inclusive or exclusive meaning, and calendar/batch rule.
+Do not infer exclusivity from a name such as `data_interval_end`. Align selection
+and replacement predicates with that contract. An inclusive last-day DATE needs
+`<=` for DATE values or an explicitly derived next-day exclusive bound for
+timestamps; blindly applying `< end` drops the last day. Check first/last values,
+the next batch boundary, and replay of the affected period before load handoff.
 
 - Decide whether a right-side fact window means same-day activity, first-N-day lifecycle, all activity for selected keys, current/latest state, or another business concept.
 - For first-N-day or lifecycle metrics, apply both bounds in every affected metric: `fact_ts >= event_ts` and `fact_ts < event_ts + interval`.
@@ -68,6 +84,11 @@ When a requested metric is a funnel, lifecycle, or "reached step" chain, model e
 For build-from-scratch marts, this is a release-quality gate. If a final artifact has a sequential funnel or child-entity metric and this check has not passed, do not report SQL-quality-check passed and do not move to sandbox validation.
 
 ## Mutable Sources And Reprocessing
+
+Historical totals are an equality oracle only when the input state and calculation
+contract are comparable. Without source versions/snapshots or a keyed baseline,
+report observed differences and the reproducibility limit; do not attribute an
+unexplained row delta to source mutation merely because mutation is possible.
 
 When proposing incrementalization, window rebuilds, snapshots, materialized intermediates, pre-aggregates, or shortcuts that avoid full history:
 

@@ -74,6 +74,13 @@ When durable context is required or already established for the current task, in
 
 Do not ask the user to repeat context that can be recovered safely from local files, git state, or metadata.
 
+Before resuming a dependent action, recover the current contract: accepted outcome,
+explicit exclusions, decisions that replaced earlier proposals, authorized next
+action, and applicable evidence. Use the current snapshot and later user decisions;
+dated plans/log entries are history, not competing instructions. Read back only the
+repo/runtime facts whose freshness matters to this action. If a claimed current
+decision conflicts with the artifact, resolve that conflict before acting on it.
+
 If a failure looks like `ModuleNotFoundError`, dependency mismatch, wrong command behavior, or another runtime/import problem, verify the already selected runtime before changing code or installing packages. Do not retry through a different environment until the project/runtime mapping and dependency surface are understood.
 
 ## External Research Handoff
@@ -102,10 +109,20 @@ When stakes or ambiguity matter, separate:
 
 Do not turn a hypothesis into implementation logic without either checking it or marking it as an assumption.
 
+When the user corrects a material decision, update its active snapshot entry before
+the next dependent step; an appended failure log alone is not an updated contract.
+Keep the superseded option in history with its disposition. For a repeated failure,
+retain the verified correction or working artifact so the next attempt starts from
+it rather than recreating the rejected assumption.
+
 ## Scope Control
 
 - Do not expand scope silently.
 - If a supporting task appears, say whether it is required for the current goal or a follow-up.
 - Prefer minimal changes inside the requested ownership boundary.
+- A reliability guard, fallback, new failure mode, or cleanup is a separate behavior
+  change when it is not necessary for the requested delta. Keep it as a follow-up
+  unless the user accepts that behavior; approval for mechanics does not settle an
+  unresolved business choice. Preserve an already accepted choice without asking again.
 - Avoid shared framework changes when a local project-level fix solves the task.
 - Preserve meaningful existing comments that explain business logic, history, constraints, or non-obvious behavior.

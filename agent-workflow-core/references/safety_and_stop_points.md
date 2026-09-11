@@ -93,6 +93,15 @@ Do not start any of the following before approval:
 
 Creating files that embody the proposed solution counts as implementation, even if they are temporary or validation artifacts.
 
+For a runnable artifact, distinguish preparing its configuration from invoking it.
+Before the first invocation, inspect the actual entry point, effective mode,
+selected targets and possible side effects against the authorized action. Do not
+assume that `--help`, import, a preview label, or a render command is inert: the
+script may ignore arguments, execute on import, or initialize a live connector.
+For prepare-only work, keep execution disabled and inspect/render only through a
+path verified not to perform the deferred action. Reuse approval once it covers
+the actual invocation; this check is not a new approval gate.
+
 ## Artifact Destination
 
 The local context workspace is for task notes, agent logs, decisions, and evidence. Do not use it as the default destination for code just because it exists.
@@ -188,4 +197,4 @@ Apply instruction priority and retain the user's already authorized scope. The s
 
 Ask only for missing authorization. An unchanged next implementation step is not a new approval boundary. Client/full-access settings and agent-supplied flags cannot supply user consent. If scope, risk or binding changes, return to the operational owner before the dependent action.
 
-All subagent launches have a separate explicit batch approval under the workflow's economy/depth procedure. Project or implementation approval does not authorize agents or a larger test budget.
+All subagent launches have separate explicit batch approval under `subagent-orchestration`. Project or implementation approval does not authorize agents or a larger test budget.

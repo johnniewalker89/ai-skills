@@ -16,7 +16,11 @@ If ordinary `profi-mcp` access fails or is too limited, report the blocker and a
 
 After approval:
 
-1. Use only the matching `privileged_access_mcp_*` tool.
+1. Use only the matching `privileged_access_mcp_*` tool. Match its configured
+   service/cluster/environment to the approved contour before execution; a
+   shared database name is insufficient. Bind prepared SQL/test objects and
+   their readback to this identity, including when another connector points
+   to an identically named DEV or PROD database.
 2. Keep actions inside the approved target set.
 3. If any generated SQL, target, cleanup, or dependency resolves outside approval, stop.
 4. Record the approved contour/action/target set in the task note, agent log, or final handoff before or with the first privileged action.

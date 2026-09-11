@@ -22,6 +22,13 @@ Current sessions/spills do not prove completed-query history. Fresh direct GP
 history requires a confirmed Greenplum source and access. Use a real bounded
 history window and actual metrics, not values inferred from old proof notes.
 
+Before constructing a history query, inspect the confirmed source's actual
+column names/types and available time/job/query identifiers. Filter by the
+narrowest useful interval and known identity before expensive text matching or
+aggregation; LIMIT after a broad scan does not bound the work. If the query
+fails or the metrics are unavailable, keep that measurement unknown rather
+than retrying guessed columns or broadening to all history.
+
 The ClickHouse bridge is narrow Greenplum workload telemetry; it does not replace
 GP metadata, repo evidence or business lineage. Non-trivial SQL against the mirror
 uses `clickhouse-sql` for its query shape. Repo-proven ClickHouse business/source
