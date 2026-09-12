@@ -26,6 +26,10 @@ Keep the original approved plan unchanged. Append forecast/plan revisions with
 time, reason, scope and approval evidence. Preserve failures and unknown telemetry.
 Record actuals, original forecast delta and compliance with each effective cap;
 successful delivery in headroom does not make the base forecast accurate.
+Use `token_accounting.md` for required numerical counters and the planning lesson.
+Unavailable final counts leave accounting unresolved; a completed child or a
+time-only fallback cannot close it. Recover and date backfilled facts without
+rewriting the original plan or claiming live monitoring retroactively.
 
 Update the compact facts index at the caller's supplied location, outside any review tree, after the attempt, including
 its outcome and evidence limits. Do not assign review/remediation status. A
@@ -43,6 +47,7 @@ never invent approvals, original forecasts or a contemporaneous event sequence.
 - Run id / child id: <id / pending until launch, or unavailable with reason>
 - Role / scope / fixture: <question, allowed outputs/access, optional input case>
 - Source / model / effort / host: <exact revision/configuration or unknown>
+- Model choice: <task/proof needs, sufficient model/effort and relevant available alternatives>
 - Logging: <shared flag and enabled scope; evidence of user request>
 
 ## Original Plan And Approval — immutable
@@ -67,5 +72,6 @@ never invent approvals, original forecasts or a contemporaneous event sequence.
 | <primary token metric> | <range> | <cap> | <actual/unknown> | <signed delta/unknown> | <met/exceeded/unknown> |
 | Elapsed time | <range> | <cap> | <actual/unknown> | <signed delta/unknown> | <met/exceeded/unknown> |
 - Diagnostic telemetry: <separate from spending budget; availability/cutoff>
+- Planning lesson: <cause of material deviation, phase to adjust, remaining uncertainty; no automatic headroom reduction>
 - Continuation: <saved point, remaining work, cause of failure; no automatic retry>
 ```

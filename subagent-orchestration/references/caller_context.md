@@ -13,7 +13,7 @@ that needs it; an unknown launch detail need not block unrelated direct work.
 | --- | --- |
 | Task and proof | The caller supplies the objective, bounded question, project/direction when relevant, acceptance criteria, review depth and domain owners. Orchestration determines whether delegation adds useful proof. |
 | Access and outputs | The caller supplies permitted reads/writes, result destinations and any exact runtime needed to use them. Orchestration verifies the saved-result path before launch; it grants no additional access. |
-| Host controls | Use the available delegation tools, model/effort choices, telemetry and stopping mechanisms. Discover only missing capabilities and disclose unavailable controls. |
+| Host controls | Reuse the current environment's available models/settings, tools, child-specific counters and stopping mechanisms; resolve only missing capabilities. Apply explicit user/project model restrictions. Verify measurement through `token_accounting.md`; missing counters in a tool response alone do not establish unavailable telemetry. |
 | Authorization | Reuse the actual user decisions and existing batch bindings. Orchestration obtains any missing exact batch approval; a caller's approved flag or general implementation permission is insufficient. Operational/test owners retain their additional bindings. |
 | Logging | Consume one task-scoped main/subagent flag and, when enabled, its parent identity, log destination and facts-index location. Orchestration owns attempt records and events; the caller owns storage and navigation. |
 | Local policy | Apply explicitly supplied planning/calibration policy within its scope. Private history and configuration are optional inputs, never installation prerequisites. |

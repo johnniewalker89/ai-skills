@@ -2,6 +2,11 @@
 
 Read before launch, control, interruption or result reconciliation.
 
+## Navigation
+
+- [Saved result and reserve](#plan-the-saved-result)
+- [Execution, measurement and reconciliation](#run-and-reconcile)
+
 ## Plan The Saved Result
 
 Before launch, name the smallest independently useful artifact, its allowed path,
@@ -39,10 +44,15 @@ Preserve the active direction's context, access limits and authorized write boun
 Pass the agreed saved-result checkpoint and completion reserve to the subject;
 these are execution instructions, never expected answers or scoring hints.
 
-Prepare and verify the subagent monitor/baseline before launching the subject.
+Before launch, verify monitor capability using existing evidence as described in
+`token_accounting.md`. After the approved spawn, bind the actual child and check
+its baseline/first sample by the agreed deadline. Missing future child records
+before spawn is expected; an unverified reader capability is the launch blocker.
 Use proportionate control: cheap counters or batched local sampling where available,
 without a new main-agent inference per sample when the tool can handle it. Missing
-telemetry is unknown, not zero; agree a bounded fallback or stop before launch.
+telemetry during a run is an unresolved accounting failure, not zero. Recover
+within the agreed allowance or finish/save/stop; time-only fallback does not
+waive required numerical final accounting or authorize an unmetered launch.
 Avoid using a recoverable sampling delay as a stop trigger by default.
 Monitor visible execution failures and the named artifact as well as counters.
 If the adapter only meters usage, arrange the missing progress/error checks
@@ -90,7 +100,10 @@ Apply the agreed criteria to actual artifacts and relevant execution evidence,
 not only an agent's final claim or confidence. Check findings against source/repro
 artifacts; reject unsupported suggestions and reconcile disagreements by evidence.
 The main agent owns the final decision. Record accepted/rejected findings, proof
-gained, gaps and actual/unknown subagent cost separately. Include resolved executor/reviewer
+gained, gaps and measured subagent cost separately. Complete the final counter
+read and original forecast/cap comparison in `token_accounting.md`; missing
+actuals keep accounting open even when useful task output is delivered.
+Include resolved executor/reviewer
 models/settings, host and input revision where known; mark unknowns explicitly.
 Limit conclusions to that configuration and evidence; one successful run does not
 prove reliability on every model, host or task. Low cost never upgrades weak proof.

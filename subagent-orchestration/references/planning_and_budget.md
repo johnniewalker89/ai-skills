@@ -19,6 +19,8 @@ and evaluation machinery is not a prerequisite for a domain reviewer.
 
 Use the current host's available delegation tools, models/settings, isolation,
 usage reporting and stop controls. Reuse known capabilities; discover only gaps.
+Before launch readiness, follow `token_accounting.md` to verify measurement;
+an estimate or agreed time-only fallback cannot replace numerical actuals.
 Keep host-specific commands and chosen model IDs in local configuration or the
 approved plan. Mark unsupported controls as unavailable, not as configured limits.
 If delegation is unavailable, perform the available domain checks directly and
@@ -26,12 +28,16 @@ report any missing independent proof. Self-review is not an independent reviewer
 leave acceptance open when that reviewer is required. Enhanced review may still
 use a different independent method if it provides the required evidence.
 
-Select a model and supported reasoning setting for each role from task difficulty,
-error cost, evidence/context needs and available capabilities. Parent, executor
-and reviewer may use different models. Prefer the least expected subagent cost
-that can meet the same quality criteria, including likely subagent rework and review;
-do not impose a fixed model across roles or hosts.
-Explain the choice from available evidence; mark an uncalibrated choice uncertain.
+Use the model/setting options already exposed by the current environment;
+discover only a missing capability needed for the decision. For each role choose
+a model and supported reasoning setting proportionate to task complexity, error
+cost and required evidence. The child may be weaker or stronger than the parent.
+Prefer the least expected cost that can meet the quality criteria, including
+likely rework and review; neither the parent/maximum nor the cheapest model is
+an automatic choice. Briefly explain why the selected configuration is sufficient
+compared with relevant available alternatives. Keep uncertainty explicit when
+comparable quality/cost evidence is missing. No generation classification or
+predecessor lookup is required. Respect explicit user/project model restrictions.
 
 ## Forecast And Headroom
 
@@ -51,6 +57,9 @@ work accordingly; do not turn estimation into an archive investigation. Account
 for startup, useful work and saving, then stop estimating. Additional history
 research is justified only by a material unresolved decision.
 Retain failed subagent-attempt cost in actual totals; estimate remaining work separately.
+Close each attempt's accounting with measured actuals, original forecast/cap
+deviations and a supported lesson for the next forecast. Missing final counts
+remain an unresolved accounting failure, including after useful delivery.
 Keep token metrics distinct from subscription/pricing units across models/hosts.
 Do not infer another model's price or subscription savings from token counts.
 
