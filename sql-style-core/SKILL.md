@@ -1,6 +1,6 @@
 ---
 name: sql-style-core
-description: Apply shared SQL formatting and readability for SQL writing, editing, review or optimization. Use with agent-workflow-core, sql-quality-core and available engine/dbt owners; this skill changes no business semantics.
+description: Apply shared SQL formatting and readability with sql-quality-core and the resolved engine owner. Formatting changes preserve business semantics; no workflow or access dependency.
 ---
 
 # SQL Style Core
@@ -9,19 +9,18 @@ Use this skill for SQL code style and readability in every SQL writing, editing,
 
 This skill owns engine-agnostic SQL style. `sql-quality-core` owns SQL business semantics. Engine-specific skills own engine syntax, runtime behavior, and engine-specific style overlays.
 
-Direct database/OpenMetadata MCP access must go through `db-access`; a separately installed typed runtime-read route instead follows its dedicated access owner and exact approval contract.
 
 ## Role
 
 - Purpose: provide engine-agnostic SQL style and readability checks.
 - Owns: SQL formatting/layout, source qualification, aliases, common `AS` alignment, compact vs expanded expression choice, named CTE/expression readability, and formatting-only self-review.
-- Delegates to: `agent-workflow-core` for delivery workflow, `sql-quality-core` for SQL semantics, `db-access` for direct database/OpenMetadata MCP access, a separately installed typed runtime-read access owner when selected, and engine/dbt skills for target-specific rules.
+- Delegates to: `sql-quality-core` for semantics/evidence/result status and engine owners for target-specific style overlays. This style pass owns no transport or access policy.
 
 ## Hard Gates
 
-1. **Skill-chain gate.** Use `agent-workflow-core` first and `sql-quality-core` before or alongside this style pass.
+1. **Skill-chain gate.** Apply alongside `sql-quality-core` and the resolved engine owner. No generic workflow or database-access skill is required for formatting.
 2. **Reference gate.** Read `references/style.md` for SQL writing, editing, or review tasks.
-3. **Target-owner gate.** Identify the target engine before SQL writing, editing, review, or optimization and include its available engine owner; add the matching dbt owner when the SQL is inside a dbt model/project. For MySQL or PostgreSQL, where no engine-specific skill exists, use the SQL core pair and document that boundary. Do not treat a style pass as a complete SQL review without the applicable owners.
+3. **Target-owner gate.** Identify the target engine before SQL writing, editing, review, or optimization and include its available engine owner; add an available matching dbt owner for dbt-specific semantics. For MySQL or PostgreSQL, where no engine-specific skill exists, use the SQL core pair and document that boundary. Do not treat a style pass as a complete SQL review without the applicable owners.
 4. **Style-only gate.** Do not change business semantics from this skill. Route semantic concerns to `sql-quality-core` and engine/dbt concerns to their target owners.
 5. **Self-review gate.** Before returning SQL, run this skill's Final Checklist as a formatting-only self-review after semantic and engine-specific checks are complete.
 

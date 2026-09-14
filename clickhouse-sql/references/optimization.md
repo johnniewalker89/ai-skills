@@ -8,7 +8,7 @@ Use this file when the task is about speeding up or diagnosing ClickHouse SQL.
 
 ## Diagnostic workflow
 
-- Apply `agent-workflow-core` first for task mode, local context, and delivery rules.
+- Apply sql-quality-core for semantics, evidence/access boundaries and SQL result status.
 - For non-trivial production `SELECT`s, do not wait for an explicit optimization request: inspect metadata and run lightweight validation through the selected access owner when live access is needed and available; see `sql_readiness.md`.
 - Do not rewrite a query blindly. Start from actual metrics in `system.query_log` when the selected access owner makes those metrics available.
 - For mart/build optimization, search `system.query_log` with more than one marker before saying no production run exists:

@@ -4,9 +4,9 @@ Use this file before returning non-trivial ClickHouse SQL code.
 
 `sql-quality-core` owns engine-agnostic SQL quality checks: source choice, repo-backed proof, driving grain, central join sanity, multi-row fact semantics, category-safe metrics, date-window semantics, proxy timestamp coverage, smoke scale, and general validation mindset.
 
-This file owns ClickHouse-specific SQL metadata and shape checks: table metadata shape, MergeTree semantics, native primitives, physical pruning evidence, and ClickHouse plan interpretation. Final task status, artifact readiness, approval gates, and proof-level wording belong to `agent-workflow-core`.
+This file owns ClickHouse-specific SQL metadata and shape checks: table metadata shape, MergeTree semantics, native primitives, physical pruning evidence, and ClickHouse plan interpretation. sql-quality-core combines final SQL readiness/proof; operational owners define exact live-action authorization.
 
-Precondition: apply `agent-workflow-core` first. For live checks, use the selected access owner: direct database MCP through `db-access`, or a separately installed typed runtime-read owner under its exact approval contract.
+Precondition: apply the shared SQL quality/style chain. For live checks, use the selected access owner: direct database MCP through the selected configured access tool, or a separately installed typed runtime-read owner under its exact approval contract.
 
 ## Navigation
 
@@ -21,7 +21,7 @@ Precondition: apply `agent-workflow-core` first. For live checks, use the select
 
 - `sql-quality-core` owns business SQL quality.
 - `clickhouse-sql` owns ClickHouse syntax, native query shape, engine correctness, physical pruning evidence, and ClickHouse-specific plan interpretation.
-- Use `db-access` for direct database MCP metadata, `EXPLAIN`, query-log, and validation access; use a separately installed typed runtime-read owner only for its explicitly approved route.
+- Use the configured available tool under the SQL evidence/access contract for direct database metadata, `EXPLAIN`, query-log, and validation access; use a separately installed typed runtime-read owner only for its explicitly approved route.
 
 Use all applicable skills together for real ClickHouse work.
 

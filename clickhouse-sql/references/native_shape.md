@@ -13,7 +13,7 @@ Review applicable ClickHouse alternatives against the required result and eviden
 
 ## Mandatory pass
 
-Before finalizing SQL, classify every non-trivial query shape by business intent. This is a local review pass; live checks use direct MCP through `db-access` or a separately installed typed runtime-read owner under its exact approval contract.
+Before finalizing SQL, classify every non-trivial query shape by business intent. This is a local review pass; live checks use direct MCP through the selected configured access tool or a separately installed typed runtime-read owner under its exact approval contract.
 
 - joins and lookup enrichment after `sql-quality-core` defines the intended business grain and unmatched-row behavior;
 - `ASOF JOIN` and "latest state at event time" enrichment;
@@ -57,13 +57,21 @@ These common exceptions apply to every preference in the table, review triggers 
 | Same heavy fact used for smoke coverage and pointer checks | two branches: bounded coverage/categories, plus explicitly named all-history pointer check | one all-history branch used for both coverage and pointer checks | the task explicitly asks for all-history coverage and the output names it that way |
 | Heavy fact joined to a unique driving CTE while using driving columns | `ANY INNER JOIN` or `LEFT SEMI JOIN` after proving the driving side is unique at the join key | plain `JOIN` | right-side multiplicity is intentional and part of the output grain |
 | Category-specific metrics on enum-like fields | metrics for every material category plus optional `other_*` / `null_*` | metrics for only the categories guessed from memory | omitted categories are immaterial by actual data check or task scope |
-| Many-to-many relationship | ordinary `JOIN` | forced `ANY` join | right-side multiplicity is part of the result |
+| Many-to-many relationship | ordinary `JOIN` / `LEFT JOIN` preserving meaningful matches | forced `ANY` join | right-side multiplicity is part of the result |
 | Deduplication | aggregation by the real grain, `argMax` / `argMin`, or engine-aware reader logic | `SELECT DISTINCT` | the whole selected tuple is truly the business grain |
 | Read latest MergeTree state | table-specific reader pattern, carefully justified `FINAL` | casual `FINAL`, unsafe manual collapse | correctness requires merged state and no cheaper validated local reader pattern exists |
 | Percentiles on large groups | approximate quantile family used by the project, for example `quantileTDigest` | `quantileExact` | exact percentile is explicitly required and memory cost is acceptable |
 | Selective filtering on wide tables | filters aligned with `PARTITION BY` / `ORDER BY`, `PREWHERE` when appropriate | late filtering after heavy reads | filter cannot be pushed or tested plan shows no benefit |
 
 ## Correctness Blockers And Review Triggers
+
+Keep the project's ordinary `JOIN` / `LEFT JOIN` spelling; explicit `ALL` is not
+mandatory. A join without explicit strictness inherits `join_default_strictness`.
+When correctness depends on retaining every matching right-side row, check that
+setting using available target evidence; if unknown, state the assumed `ALL`
+semantics and the validation limit. Missing `ALL` alone is not a correctness
+defect. Do not replace meaningful matches with `ANY`. Keep SQL, checks and claims
+consistent with the known or assumed setting.
 
 Block acceptance when the final artifact has an unresolved semantic/engine risk:
 
@@ -151,7 +159,7 @@ If the same referenced/history table also supplies smoke coverage or category me
 
 ### Driving CTE joins that need driving columns
 
-When a heavy fact joins to a constrained driving CTE and needs columns from that CTE, do not keep plain `JOIN` by habit. If the driving CTE is one row per business key, prefer `ANY INNER JOIN` or `LEFT SEMI JOIN` after proving uniqueness at that key. Keep plain `JOIN` when multiplicity is required or another common exception from `native_shape.md` applies.
+When a heavy fact joins to a constrained driving CTE and needs columns from that CTE, do not keep plain `JOIN` by habit. If the driving CTE is one row per business key, prefer `ANY INNER JOIN` or `LEFT SEMI JOIN` after proving uniqueness at that key. Keep ordinary `JOIN` when multiplicity is required, with the relevant strictness setting checked or stated as an assumption; otherwise apply the relevant exception from `native_shape.md`.
 
 ### Existence filtering
 

@@ -10,7 +10,7 @@ reuse sufficient current proof rather than repeating unchanged diagnostics.
 - For non-trivial production `SELECT`s, inspect metadata and run lightweight validation through the selected access owner when live access is needed and available; see `sql_readiness.md`.
 - For Greenplum, prefer `EXPLAIN`; use `EXPLAIN ANALYZE` only when the selected access owner and task safety allow it.
 - Check the final optimizer line in every material `EXPLAIN`: prefer `Optimizer: Pivotal Optimizer (GPORCA)`. If it says `Optimizer: Postgres query optimizer`, treat this as a performance finding and identify the feature that likely forced legacy planning.
-- If the selected access owner blocks `EXPLAIN` or metadata for a referenced schema, stop at that access boundary, record the exact blocked schema/object and contour, and mark the validation as partial. Do not switch from the typed runtime-read contour to `db-access` unless direct database MCP access is separately in scope, and do not call an optimization proven when the material plan is unavailable.
+- If the selected access owner blocks `EXPLAIN` or metadata for a referenced schema, stop at that access boundary, record the exact blocked schema/object and contour, and mark the validation as partial. Do not switch from the typed runtime-read contour to another direct database access contour unless direct database MCP access is separately in scope, and do not call an optimization proven when the material plan is unavailable.
 - When reading `EXPLAIN ANALYZE`, check at least:
   - whether there is `Motion`
   - where the most expensive steps are

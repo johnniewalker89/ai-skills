@@ -1,6 +1,6 @@
 # Load Readiness
 
-Read before designing, reviewing or handing off DDL, load, rebuild, staging or partition-replacement artifacts. Apply the common metadata/SELECT checks in `sql_readiness.md` and the selected workflow/access approvals. These procedures do not authorize writes.
+Read before designing, reviewing or handing off DDL, load, rebuild, staging or partition-replacement artifacts. Apply the common metadata/SELECT checks in `sql_readiness.md` and the selected operational authorization. These procedures do not authorize writes.
 
 ## DDL/load syntax self-review
 

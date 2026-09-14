@@ -1,6 +1,6 @@
 ---
 name: clickhouse-sql
-description: Write, review and optimize ClickHouse SQL and DDL with native shapes, physical pruning and load-readiness proof. Use with agent-workflow-core, sql-quality-core and sql-style-core; access follows its selected owner.
+description: Write, review and optimize ClickHouse SQL/DDL with semantic, style and engine checks. Standalone entry using sql-quality-core and sql-style-core; live access is optional and policy-bound.
 ---
 
 # ClickHouse SQL
@@ -11,16 +11,16 @@ Use this skill for ClickHouse SQL work in repositories that follow our database 
 
 - Purpose: handle ClickHouse SQL writing, review, and optimization.
 - Owns: ClickHouse syntax/functions, alias/name resolution, native query shape, engine correctness, MergeTree/partition/order choices, physical pruning evidence for chosen filters, metadata/plan interpretation, repeated heavy-source reads, `EXPLAIN indexes`, temporary/staging table shape, and engine-local style overlays.
-- Delegates to: `agent-workflow-core` for delivery/proof wording, `sql-quality-core` for SQL semantics, `sql-style-core` for shared style, `db-access` for direct database MCP access, and a separately installed typed runtime-read access owner when selected.
+- Delegates to: `sql-quality-core` for semantics, evidence/access boundaries and SQL status; `sql-style-core` for shared formatting; caller-selected operational owners or configured tools for live operations.
 
 ## Hard Gates
 
-1. **Skill-chain gate.** Always use `agent-workflow-core`, `sql-quality-core`, and `sql-style-core` before ClickHouse rules. Use `db-access` for direct MCP metadata, DDL, query-log, `EXPLAIN`, smoke, or live access. If an installed dedicated access skill owns a typed runtime-read route, follow its exact approval/tool contract instead; do not add `db-access` only for that separate route.
+1. **Skill-chain gate.** Use `sql-quality-core` and `sql-style-core` with this engine owner. This is a standalone SQL entry; no workflow, private context or particular MCP is required. For live operations apply the evidence/access contract from `sql-quality-core`; supplied SQL/DDL/metadata remains usable when live access is unavailable.
 2. **Reference gate.** Read `references/style.md` for any ClickHouse writing, editing, or review. For any non-trivial writing, editing, review, or optimization, also read `references/sql_readiness.md` and `references/native_shape.md`. Read the other references only when their trigger applies.
 3. **Metadata gate.** Before final SQL against real tables, inspect columns, types, engine, `ORDER BY`, `PARTITION BY`, and relevant volume through the selected access owner when available, or use repo contracts/source definitions when live access is unavailable.
 4. **Source-shape gate.** For ClickHouse mart, DDL/load, or production-like SELECT design, run the physical source-shape check from `references/sql_readiness.md`: compare the chosen filters to each heavy source's `PARTITION BY`, primary/sorting key, and prunable predicate shape. If a proxy timestamp guard is used, report ClickHouse pruning evidence and route business-window coverage to `sql-quality-core`; do not call full coverage proven from pruning alone.
 5. **Native-shape gate.** For every non-trivial query, run the ClickHouse-native shape pass from `references/native_shape.md`. Challenge generic joins, subqueries, windows, deduplication, lookup enrichment, `DISTINCT`, `FINAL`, repeated CTE reads, and heavy filters against native alternatives without changing business semantics.
-6. **Load-readiness gate.** Before handing a ClickHouse DDL/load/rebuild artifact back to the workflow layer, run the load-readiness checks from `references/load_readiness.md`: syntax, target engine/partition, staging shape, refresh mechanics, repeated heavy-source reads, lookup scans, approved event/window semantics, and physical source-shape fit. Report pass/fail/blockers; this skill does not decide final proof status or sandbox need.
+6. **Load-readiness gate.** Before handing a ClickHouse DDL/load/rebuild artifact to the SQL result, run the load-readiness checks from `references/load_readiness.md`: syntax, target engine/partition, staging shape, refresh mechanics, repeated heavy-source reads, lookup scans, approved event/window semantics, and physical source-shape fit. Report pass/fail/blockers; sql-quality-core combines final SQL proof; operational owners retain exact sandbox authorization.
 7. **Validation gate.** For non-trivial production `SELECT`s, route lightweight validation through the selected access owner when available. Prefer `EXPLAIN indexes = 1` or `EXPLAIN PLAN`; execute bounded smoke only when safe. Interpret the plan, not only its success.
 8. **Efficiency and telemetry gate.** In every SQL task, apply the relevant diagnostic/query-shape sections of `references/optimization.md` to support the SQL-quality efficiency gate. For query-history evidence, read known sources in `references/telemetry.md`; no personal context document is required. Verify availability, privileges and freshness; telemetry does not replace business, DDL/source or plan evidence.
 9. **Lineage gate.** For lineage/business-logic explanations, ClickHouse mirror evidence is only evidence after the `sql-quality-core` lineage pass. If repo evidence reaches another engine, use that engine skill for that layer.

@@ -1,6 +1,6 @@
 # Data Artifact Proof
 
-Read before SQL/dbt/data-pipeline or production-like artifact proof selection/checkpoints. Keep the workflow's ordinary delivery contract; apply these data-specific proof limits.
+Read before SQL/dbt/data-pipeline or production-like artifact proof selection/checkpoints. Use the standalone SQL result/access contract and these data-specific proof limits.
 
 ## Navigation
 
@@ -26,7 +26,7 @@ Do not choose validation mode by convenience. Choose it by proof power:
 
 - `Read-Only Validation` is sufficient only when it can actually prove the requested result without writes, for example by executing a lightweight equivalent query, checking bounded output, comparing aggregates/diffs, or saving reproducible evidence for the success criteria.
 - Metadata, DDL review, `EXPLAIN`, and smoke counts can support a design, but they do not by themselves prove that a new production-like mart/model returns the correct result.
-- If read-only checks cannot prove the result, explicitly say the artifact is draft/not proven and propose an `Extended Sandbox Validation` plan instead of ending with "done". In user-facing chat, localize that proposal to the user's language and make it an approval question for sandbox work.
+- If read-only checks cannot prove the result, explicitly say the artifact is draft/not proven and propose an `Extended Sandbox Validation` plan instead of ending with "done". In user-facing chat, localize that proposal to the user's language and request approval only when its exact operational scope is not already authorized.
 - If the user asked for a production-like result and no proof-capable validation mode was completed, the final answer must not claim production/MR readiness.
 - Final wording must match the strongest proof actually completed:
   - `designed/draft`: artifacts or design exist, but result correctness or runtime is not proven;
@@ -35,8 +35,8 @@ Do not choose validation mode by convenience. Choose it by proof power:
   - `ready`: only when the requested readiness criteria are proven and residual risks are explicitly acceptable.
 - For new production-like data artifacts, safe read-only validation discovery is allowed before the checkpoint when it is needed to choose sources, grain, and proof strategy. Keep it bounded and reversible. If a lightweight equivalent query, bounded output check, aggregate comparison, invariant check, or small smoke query can safely reduce uncertainty before the checkpoint, run it and bring evidence.
 - After that discovery, the checkpoint must explain whether read-only evidence can prove the result or whether Extended Sandbox Validation is required.
-- If the task requires generated SQL/DDL/build artifacts, do not create them before the checkpoint unless the user explicitly asked for an unapproved draft. The checkpoint should be concrete enough that the user is approving a proposed solution, not approving the agent to start thinking.
-- Keep approvals staged: ask for repo artifact creation first; after artifacts exist and pass self-review plus available read-only validation, ask separately for extended sandbox validation if it is still required. Do not combine those approvals into one "create artifacts and run sandbox" request.
+- Before committing to material unresolved business choices, make sources, grain, refresh and proof assumptions concrete. Already authorized SQL/source creation can proceed; label an assumption-bound draft honestly. A task label does not introduce a new approval.
+- Keep source-edit and live-validation authorization scopes explicit. Retain approvals already covering them; request only the missing exact scope required by the operational owner. Do not infer live DB permission from a request to write SQL.
 
 The proof strategy/evidence boundary should include:
 
@@ -58,15 +58,15 @@ Proof claim precision is mandatory. Any statement such as `exact diff`, `equival
 
 Do not write `diff 0/0` or `equivalence proven` without that scope. If only a guard/predicate was validated, say that the added guard did not change the checked row set for the named window; do not imply a full output-value diff unless that was actually executed.
 
-For new production-like data artifacts, use the mandatory checkpoint shape from `references/safety_and_stop_points.md`; do not leave the proof boundary only as scattered prose, and do not ask for approval until every required section is present. If a section is unknown or not applicable, include it anyway and write that explicitly.
+For new production-like data artifacts, use the mandatory checkpoint shape from `references/data_artifact_checkpoint.md`; do not leave the proof boundary only as scattered prose, and do not ask for approval until every required section is present. If a section is unknown or not applicable, include it anyway and write that explicitly.
 
 Chat-output contract for proposal checkpoints and final proof summaries:
 
 - At most 8 bullets or short lines in chat unless the user asks for detail.
 - No raw counts, query text, full rejected-alternative lists, or long evidence-boundary sections in chat.
 - Chat must include only: status/proof level, proposed decision, top 1-3 risks/open business questions with recommended defaults when possible, strongest completed proof, what remains unproven, and one next approval/proof step.
-- The full mandatory checkpoint shape must still be saved in the task note or agent log; chat may reference that it was saved there instead of printing every section.
-- For `read-only validated` production-like artifacts, the final chat line is mandatory when materialization/refresh/runtime/equivalence is still unproven, but it must be written in the user's language and phrased as an approval question for sandbox work.
+- Keep the complete applicable checkpoint in the requested deliverable or existing task note; use an agent log only when enabled. Standalone SQL requires no context repository or audit log. Chat may link the saved proposal.
+- For `read-only validated` production-like artifacts, the final chat line is mandatory when materialization/refresh/runtime/equivalence is still unproven, written in the user's language. Ask for sandbox approval only if the required exact scope is missing; otherwise perform the already authorized checks.
 - Do not leak English boilerplate such as `Next proof step` or `Extended Sandbox Validation` into user-facing Russian chat. English labels may remain in task notes/logs when they are stable internal section names, but the chat-facing approval request must be localized.
 
 When the work involves an optimization, rewrite, attribution/window change, aggregation change, deduplication, join semantic change, or any shortcut that might alter business meaning, make business semantics visible as its own attention line, not only inside generic risks. This is a high-signal user-facing warning, so it must be visually prominent. Use the user's language and emphasize only the stable label with inline code formatting, for example:
@@ -87,14 +87,14 @@ Allowed checks:
 - targeted diff/readback for low-risk text, config, or documentation;
 - local tests, lint, compile, type checks, dry-runs, or command help/version checks;
 - repository contracts, model definitions, DDL text, and existing implementation review;
-- database validation through the relevant SQL skills plus either direct MCP access in `db-access` or an exactly approved typed runtime database read through its separately installed dedicated access owner;
+- database validation through the relevant SQL skills plus either direct MCP access in the selected configured access tool or an exactly approved typed runtime database read through its separately installed dedicated access owner;
 - small sanity comparisons that do not change database state.
 
 Expectations:
 
 - state the read-only validation plan before using database access when the task is non-trivial;
 - for new production-like artifacts, it is acceptable to state a short reconnaissance intent, perform safe bounded discovery/probes, and then present the full proof strategy after concrete sources and grain are known;
-- keep direct database/catalog MCP work inside `db-access`; use any separately installed typed runtime-read route only through its dedicated access owner, exact current approval contract, and SQL chain;
+- keep direct database/catalog MCP work inside the selected configured access tool; use any separately installed typed runtime-read route only through its dedicated access owner, exact current approval contract, and SQL chain;
 - do not run `dbt run`, `dbt build`, rebuilds, creates, drops, inserts, deletes, or cleanup actions in this mode;
 - for code changes, run the narrowest relevant check or explain the blocker;
 - for SQL, data, or modeling logic, try to prove correctness with read-only evidence first;
@@ -118,14 +118,14 @@ Triggers that can raise validation from read-only to extended sandbox:
 - read-only checks cannot prove a risky aggregation, attribution window, deduplication, `LEFT ANY JOIN`, `FINAL`, `argMin`, or similar data-shape behavior;
 - the user asks to run in a test contour, build a sandbox, or validate on a recreated artifact.
 
-Extended sandbox validation is `project`-gated. Before any action, propose:
+Extended sandbox validation follows the selected operational contract. Prepare the exact scope before an authorization checkpoint:
 
 - sandbox contour/environment;
 - exact commands, actions, target objects, and target set;
 - short validation window or interval;
 - comparison baseline;
 - cleanup/rollback plan;
-- `db-access` escalation path when normal read-only validation is not enough.
+- the selected configured access tool escalation path when normal read-only validation is not enough.
 
 Then obtain missing explicit approval; do not ask again when the exact work is already covered.
 
@@ -133,7 +133,22 @@ If validation will use a separately configured privileged database contour, the 
 
 After approved sandbox actions run, compare the result with the success criteria. A successful run, build, create, or rebuild is not validation by itself.
 
-Do not create database validation artifacts by default. First use read-only validation; if it is insufficient, propose the sandbox validation plan in the user's language and stop. For Russian chat, end with a compact question like: `Следующий шаг проверки: расширенная валидация в песочнице — <sandbox target>, <bounded load>, <comparison checks>, <cleanup>. Запускать?`
+Do not create database validation artifacts by default. First use proof-capable read-only validation; if it is insufficient, prepare the sandbox plan in the user's language. Stop only for missing operational authorization. For Russian chat, a missing-approval question can be: `Следующий шаг проверки: расширенная валидация в песочнице — <sandbox target>, <bounded load>, <comparison checks>, <cleanup>. Запускать?`
 
 Validation should prove the changed behavior, not only that a command completed.
 If the sandbox exists to prove a business-semantics-preserving rewrite, report the equivalence result explicitly in the standalone business-semantics line.
+
+
+## Cleanup And Dependency Evidence
+
+Before data/report deletion or a live drop recommendation, establish exact candidate
+and keep sets from repo/generated callers, catalog/runtime evidence, BI/export/API
+consumers and manual triggers. Naming, stale UI metadata or a single zero-use signal
+cannot prove non-use. State retention/telemetry limits and owner exceptions.
+
+Keep source cleanup separate from live database/report/account mutations. A source
+diff or merge approval is not live cleanup permission. Bind exact targets, contour,
+dependency impact, evidence limits and recovery to the operational authorization;
+avoid CASCADE unless its full dependency impact is inspected and authorized.
+Cleanup after proof needs its own authorization unless target set and timing were
+already included. Preserve objects the user asked to retain for review.

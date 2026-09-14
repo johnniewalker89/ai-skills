@@ -98,7 +98,7 @@ When proposing incrementalization, window rebuilds, snapshots, materialized inte
 - decide whether historical rows should be recalculated with current attributes or frozen as-of the event time before declaring a window rewrite safe;
 - if a source filter uses an update-aware expression such as `greatest(updated_at, event_ts)`, do not replace it with event timestamp alone unless freshness/update contract and duplicate-handling are proven;
 - check or ask for the freshness/update contract: which timestamp or process makes changed rows visible, how late changes can arrive, and which target partitions or keys must be rebuilt;
-- if no contract is known, surface a standalone `Бизнес-семантика:` risk through `agent-workflow-core`;
+- if no contract is known, surface a standalone `Бизнес-семантика:` risk through `sql-quality-core`;
 - for money or attribution metrics, treat "late changes are possible" as a blocker for declaring an incremental/window rewrite safe.
 
 Risk patterns:
@@ -114,4 +114,4 @@ When reviewing or proposing SQL optimizations, separate candidates by risk:
 - business-semantic rewrites, where source choice, grain, windows, tie-breaks, mutable facts, or attribution rules may change;
 - physical/runtime changes such as projections, materialized intermediates, staging tables, data-placement choices, partitions, or engine-specific maintenance/statistics operations.
 
-For every business-semantic rewrite, use `agent-workflow-core` to surface a standalone `Бизнес-семантика:` line before calling the candidate safe. For physical/runtime changes, state the SQL-quality risk and missing evidence; let `agent-workflow-core` decide approval, final proof status, and extended sandbox validation.
+For every business-semantic rewrite, surface a standalone `Бизнес-семантика:` line before calling the candidate safe. For physical/runtime changes, state the SQL-quality risk and missing evidence; state the SQL proof status and follow the selected operational contract for sandbox authorization.

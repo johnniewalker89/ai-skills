@@ -1,4 +1,0 @@
-interface:
-  display_name: "DB Access"
-  short_description: "Use direct database MCP access safely"
-  default_prompt: "Use $db-access for direct database or OpenMetadata MCP access; leave any separately owned typed remote-runtime database read to its installed access owner."

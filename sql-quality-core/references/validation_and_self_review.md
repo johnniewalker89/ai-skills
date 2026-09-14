@@ -72,11 +72,11 @@ Before calling the repair sufficient:
 
 Before returning any non-trivial SQL to the user, run a final SQL-quality self-review. For small one-off snippets this can be a lightweight mental pass; for production-like queries, marts, loads, DDL, or validation suites it is a real gate.
 
-Ask whether there is an obvious safer, simpler, or more efficient semantics-preserving shape. If yes, apply it or explain why it is not appropriate. If an improvement would change business semantics, require explicit business-semantic attention through `agent-workflow-core`. If it needs engine-specific proof or sandbox work, delegate that part to the engine skill and `agent-workflow-core`.
+Ask whether there is an obvious safer, simpler, or more efficient semantics-preserving shape. If yes, apply it or explain why it is not appropriate. If an improvement would change business semantics, surface the changed business rule and missing equivalence evidence. If it needs engine-specific proof or sandbox work, use the engine owner for physical proof and the selected operational contract for sandbox actions.
 
 ## Final SQL Self-Review Gate
 
-Before returning production-like SQL/DDL/load/validation artifacts as SQL-quality-check passed, review the final artifacts themselves, not an earlier prototype. Report pass/fail and blockers to `agent-workflow-core`; do not decide final proof status or sandbox escalation from this skill.
+Before returning production-like SQL/DDL/load/validation artifacts as SQL-quality-check passed, review the final artifacts themselves, not an earlier prototype. Report pass/fail and blockers to `sql-quality-core`; combine final SQL proof from these checks and the engine/style results; sandbox execution remains subject to its operational authorization.
 
 Ask:
 
@@ -92,4 +92,4 @@ Ask:
 - Are validation queries executable for the stated proof level, with read-only source checks separated from post-load/extended-sandbox target-table checks?
 - Is there an obvious simpler, safer, or more efficient shape that preserves semantics?
 
-If this self-review finds a P1/P2 correctness, refresh, or executability issue, do not treat the SQL-quality check as passed. State that the next SQL step is to revise the artifacts, then run the relevant read-only SQL validation again; let `agent-workflow-core` choose the user-facing proof status and next approval step.
+If this self-review finds a P1/P2 correctness, refresh, or executability issue, do not treat the SQL-quality check as passed. State that the next SQL step is to revise the artifacts, then run the relevant read-only SQL validation again; let `sql-quality-core` choose the user-facing proof status and next approval step.

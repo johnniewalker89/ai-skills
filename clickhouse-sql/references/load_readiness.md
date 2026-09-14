@@ -1,6 +1,6 @@
 # Load Readiness
 
-Read before designing, reviewing or handing off DDL, load, rebuild, staging or partition-replacement artifacts. Apply the common metadata/SELECT checks in `sql_readiness.md` and the selected workflow/access approvals. These procedures do not authorize writes.
+Read before designing, reviewing or handing off DDL, load, rebuild, staging or partition-replacement artifacts. Apply the common metadata/SELECT checks in `sql_readiness.md` and the selected operational authorization. These procedures do not authorize writes.
 
 ## Partition replacement safety
 
@@ -21,5 +21,5 @@ Before returning ClickHouse DDL or load files:
 
 - verify all DDL syntax is ClickHouse-native for the expected version, including table comments, column comments, codecs, TTL, settings, temporary table syntax, and `CREATE TABLE ... AS ...` behavior;
 - do not use nonstandard quoting forms such as dollar-quoted comments unless the target ClickHouse version is proven to accept them;
-- if `db-access` can safely run a parse-only or bounded DDL/load check in an approved sandbox, use it when the workflow layer has approved that validation; otherwise mark syntax/runtime proof as unproven and report the engine-check blocker;
+- if the selected configured access tool can safely run a parse-only or bounded DDL/load check in an approved sandbox, use it when the user has authorized that exact validation scope; otherwise mark syntax/runtime proof as unproven and report the engine-check blocker;
 - if a self-review finds invalid DDL/load syntax, fix the artifact before reporting engine-check passed. Sandbox validation is not a place to discover mistakes the agent can catch by reading the final code.

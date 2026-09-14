@@ -4,7 +4,7 @@ Use this file before returning non-trivial Greenplum SQL code.
 
 `sql-quality-core` owns engine-agnostic SQL quality checks: source choice, repo-backed proof, driving grain, central join sanity, multi-row fact semantics, category-safe metrics, date-window semantics, smoke scale, and general validation mindset.
 
-This file owns Greenplum-specific SQL metadata and shape checks: MPP metadata shape, distribution, partition pruning, CTE/materialization behavior, and Greenplum plan interpretation. Final task status, artifact readiness, approval gates, and proof-level wording belong to `agent-workflow-core`.
+This file owns Greenplum-specific SQL metadata and shape checks: MPP metadata shape, distribution, partition pruning, CTE/materialization behavior, and Greenplum plan interpretation. sql-quality-core combines final SQL readiness/proof; operational owners define exact live-action authorization.
 
 ## Navigation
 
@@ -19,7 +19,7 @@ This file owns Greenplum-specific SQL metadata and shape checks: MPP metadata sh
 
 - `sql-quality-core` owns business SQL quality.
 - `greenplum-sql` owns Greenplum syntax, MPP query shape, DDL choices, and Greenplum-specific plan interpretation.
-- Use `db-access` for direct database MCP access; use a separately installed typed runtime-read owner only under its exact approval contract.
+- Use the configured available tool under the SQL evidence/access contract for direct database access; use a separately installed typed runtime-read owner only under its exact approval contract.
 
 Use all applicable skills together for real Greenplum work.
 
