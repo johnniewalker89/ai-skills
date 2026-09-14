@@ -45,17 +45,8 @@ The main agent estimates subagent cost itself; do not delegate tariff/budget
 estimation. This procedure covers only launched subagents: do not estimate,
 meter, budget or report the main agent's own usage, including coordination or
 assessment, and never use it as a subagent stop condition.
-For each subagent estimate startup/context, task execution, and saving/checking
-an assessable result separately, including likely recovery. Count the actual
-host envelope and required skill/input reads; a short user request is not a short
-subject context. Include a separately launched reviewer in the approved batch.
-Use comparable model/settings, host, role/task and input/cache observations;
-give a justified range and assumptions, with uncertainty where data is missing.
-Make one short planning pass over the available compact summary and a few close
-successes and failures. If evidence is sparse, mark uncertainty and size the
-work accordingly; do not turn estimation into an archive investigation. Account
-for startup, useful work and saving, then stop estimating. Additional history
-research is justified only by a material unresolved decision.
+Use the fixed procedure below; do not invent a new estimation workflow per task.
+Include a separately launched reviewer as its own work unit in the same batch.
 Retain failed subagent-attempt cost in actual totals; estimate remaining work separately.
 Close each attempt's accounting with measured actuals, original forecast/cap
 deviations and a supported lesson for the next forecast. Missing final counts
@@ -63,39 +54,111 @@ remain an unresolved accounting failure, including after useful delivery.
 Keep token metrics distinct from subscription/pricing units across models/hosts.
 Do not infer another model's price or subscription savings from token counts.
 
-Separate the subagent forecast from the user-approved expenditure/time ceiling and from
-a diagnostic checkpoint. State whether each control is enforced or estimated;
-never relabel an agreed stop as a warning during a run. Include a completion
-reserve inside each applicable subagent ceiling for its output and required checks.
-Start every new subagent budget with **25% uncertainty headroom above the upper
-forecast**, for both tokens and elapsed time; add it before launch, not only after
-a failure: ceiling = upper forecast × (1 + headroom), rounded upward when needed.
-Crossing the base upper forecast is a diagnostic event, not an interrupt trigger.
-Use the enlarged gap to finish and preserve the result; plan the finish signal,
-save window and stop against the padded ceiling, with enough allowance for writes
-and observed control latency. Propose more upfront when calibration, scope, host or write path is
-uncertain, and state the reason. A higher margin is a specific proposal requiring
-the user's agreement, not a new default or an exception inherited by later batches.
-Show the base forecast, percentage, added amount
-and final ceiling separately; headroom is not expected consumption. Respect an
-explicit user cap by fitting the work unit inside it, never silently increasing it.
+Separate the working forecast, completion allowance, approved ceiling and
+diagnostic checkpoint. The base forecast covers startup and useful work, including
+incremental saves. Final save/readback/delivery and control latency use the added
+**25% headroom above the working upper bound**, independently for tokens and time:
+ceiling = working upper ×1.25. Keep both numbers visible; respect an explicit user
+cap by fitting the work unit inside it, never silently increasing it.
 
-Study comparable completed work before proposing less headroom. Separate
-delivery success from forecast accuracy: a useful result completed in headroom
-is valuable, but does not validate the original upper forecast. Consider failures,
-missing observations, saved-result checkpoints and near-stop completions too.
-Keep the current allowance until an evidence-backed reduction is explicitly
-accepted by the user; one success or a new task/model/host cohort is insufficient.
-Apply any supplied local calibration policy within its scope.
+Set budget-driven FINISH at the working upper bound. Reaching it ends new research
+and starts completion; it never interrupts saving. Earlier checkpoints assess
+progress and remaining work. Do not move FINISH towards the lower bound to reserve
+completion a second time. A missing draft alone does not exhaust the work window.
+Natural completion or a concrete blocker/failed path can justify earlier finishing;
+record that reason rather than presenting it as ordinary budget exhaustion.
 
-Keep completion work in the phase forecast and its protected reserve inside the
-ceiling; do not count it twice. Headroom never delays the first useful-artifact
-checkpoint or authorizes spending through an unresolved failure. A larger ceiling
-still needs exact user approval; the active run's limits do not grow automatically.
+Check that the added allowance covers final writes/readback and the largest plausible
+unobserved request/counter jump. If not, reduce the output scope or explicitly
+propose a larger margin before approval. Do not fund a too-small allowance by
+silently subtracting it from the working range. Protected completion may still
+overrun: retain the original ceiling, preserve the result and report actuals.
+
+Place the first useful checkpoint after plausible startup plus one small proof
+cycle and before FINISH. If those cannot fit, narrow the work unit before approval.
+During execution a missed checkpoint asks for diagnosis and an incremental save;
+continue useful work while it fits below the working upper bound. Headroom does
+not authorize new research during finishing or continuation through an access stop.
+
+Study comparable completed work before proposing less headroom. Assess working
+phase accuracy, completion cost and total compliance separately; completion in
+headroom is expected, not automatically a working-forecast miss. Retain failures,
+missed checkpoints and near-ceiling deliveries. Apply supplied local calibration
+policy; no reduction without evidence and an explicit user decision. A larger
+margin also needs specific agreement and is not inherited from earlier exceptions.
+
 Before proposing delegation, compare sufficient existing/direct checks with the
 subagent's expected extra proof and budget. If a useful result is unlikely to fit,
 reduce the work unit or change the approach before requesting a launch; a smaller
 unit proves only its declared scope and cannot waive required independent proof.
+
+## One-Pass Estimation Procedure
+
+1. **Result first.** State the extra proof needed, acceptance criteria and smallest
+   independently useful output. Compare with sufficient direct checks. Name the
+   task class (classification, document review, evidence review, implementation),
+   allowed files/tools and a finite stopping point. Split unrelated questions.
+2. **Inventory the actual input.** List the inherited host envelope, mandatory
+   skills, raw task evidence and delivery method (inline, paths, snapshot/fork).
+   Inspect sizes/metadata already available; avoid reading an archive to price it.
+   Bound tool-result volume and likely read/check/write cycles. A short prompt
+   with a large inherited context is not a cheap startup.
+3. **Choose a sufficient available model/effort.** Use complexity, error cost and
+   evidence requirements, including likely rework. The next steps estimate this
+   configuration; another model's token count is not its price or proven cost.
+4. **Use evidence when comparable.** Read one compact facts index, selecting at
+   most three close attempts plus a relevant failure if useful. Match task class,
+   output completeness, model/effort/host and input delivery before comparing cost.
+   Adjust for the actual differences; document review is not a classification
+   baseline. Partial/stopped runs are lower-bound or failure evidence, never a
+   completed-task price. Read a selected log only if a missing fact changes the
+   decision. No suitable cohort, or one unresolved lookup: use the fallback below.
+5. **Estimate work and completion.** Sum startup and useful-work token/time
+   ranges for the working forecast. Estimate final save/readback/delivery separately
+   to check that it fits the added25% with control latency; do not sum it into the
+   working forecast or subtract it again from FINISH. Set finish_u/finish_seconds
+   to the corresponding working upper bounds, stop_u/stop_seconds to the padded
+   ceilings. Place a diagnostic checkpoint after startup plus one small useful
+   cycle and before FINISH. Use the actual read envelope, not prompt length alone.
+   If useful work cannot fit, narrow the input/question; if completion cannot fit
+   the added allowance, reduce output or propose a larger margin before approval.
+6. **Stop estimating.** Present the single batch card below. Unknowns change the
+   range or work unit, not the length of a planning investigation. A material gap
+   that prevents a useful bounded result is a reason to avoid that delegation.
+
+### When No Comparable Runs Exist
+
+Use a bottom-up, explicitly **uncalibrated** estimate; historical runs are optional.
+Reuse a known tokenizer/measurement method if already available. Otherwise label
+text-volume estimates approximate; bytes, words and elapsed time are not measured
+tokens. Do not install tooling or launch an agent solely to price this attempt.
+
+| Phase | Derive the range from |
+| --- | --- |
+| Startup | Required host/skill/task input delivered to the child, first bounded reads and their outputs. State cache assumptions; include a cold-input scenario when cache is unknown. |
+| Useful work | A finite number of inspect/compare/check cycles, expected context/input per cycle and bounded output. State the cycle-count assumption and one plausible repair; do not silently assume unlimited research or perfect first-pass execution. |
+| Save/readback/delivery | Size and count of required artifacts, serialization/write calls, necessary readback and final message, plus a plausible write repair and control latency. |
+
+Estimate elapsed time independently from expected tool/write waits and comparable
+host latency where known; do not convert tokens to seconds with an invented rate.
+Without latency evidence give a coarse uncertain range and a small useful work
+unit. An early saved checkpoint tests the assumptions; it does not retroactively
+make the original estimate measured. Explain the numerical assumptions briefly,
+without presenting universal per-task or per-model constants as calibrated facts.
+
+Example: working30–50k plus25% gives FINISH at50k and a62.5k ceiling. A30k
+checkpoint reviews progress; absent a concrete blocker it leaves work running.
+The12.5k gap funds final saving/readback/delivery and control latency. Apply the
+same calculation independently to time; early natural completion remains valid.
+
+### Compact Batch Card
+
+For each role retain: question/output and scope; model/effort and reason; input
+inventory/delivery; selected attempt IDs or `uncalibrated`; startup/work/save
+ranges and assumptions; summed base forecast; primary metric; headroom and cap;
+first useful checkpoint; finish threshold/control latency; protected completion
+and numerical overrun accounting. Keep the user-facing explanation compact and
+put supporting details in the existing plan, not a separate estimation report.
 
 ## Explain The Budget
 

@@ -59,8 +59,10 @@ unrelated session content.
 ## Loss, Final Read And Planning Lesson
 
 During telemetry loss, preserve the last valid measurement, diagnose within the
-agreed allowance, and finish/save/stop before the protected boundary if recovery
-does not fit. `Unknown` is an honest temporary failure state; it is never a
+agreed allowance, and request finishing if recovery does not fit. Once completion
+starts, telemetry loss must not cancel save/readback/delivery; retain the last
+valid measurement and leave accounting unresolved pending recovery. `Unknown`
+is an honest temporary failure state; it is never a
 successful substitute for actuals. Do not fund an automatic continuation or
 replacement with the same unresolved measurement gap.
 

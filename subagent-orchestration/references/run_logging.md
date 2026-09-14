@@ -24,8 +24,11 @@ poll. Logs contain concise decisions and evidence, never hidden reasoning.
 
 Keep the original approved plan unchanged. Append forecast/plan revisions with
 time, reason, scope and approval evidence. Preserve failures and unknown telemetry.
-Record actuals, original forecast delta and compliance with each effective cap;
-successful delivery in headroom does not make the base forecast accurate.
+Record the working forecast, observed phase/usage at FINISH, final total and
+ceiling compliance. Final-total-minus-working-upper is diagnostic, not automatically
+a forecast failure: final completion is meant to use headroom. Final-minus-last-
+pre-FINISH usage is not pure save cost when it includes in-flight work or delayed
+observation. Preserve the original definitions of historical approved plans.
 Use `token_accounting.md` for required numerical counters and the planning lesson.
 Unavailable final counts leave accounting unresolved; a completed child or a
 time-only fallback cannot close it. Recover and date backfilled facts without
@@ -37,7 +40,23 @@ configured evaluator discovers the log and covers its exact cutoff separately.
 For historical backfill label reconstruction date, source evidence and unknowns;
 never invent approvals, original forecasts or a contemporaneous event sequence.
 
-## Template
+## Compact Facts Index
+
+Keep one short row per actual attempt in the caller's direction-specific index:
+run/log and result links; task class/output scope; model/effort/host; required input
+and delivery method; original forecast and cap in the named token metric and time;
+actual tokens/time; delivered/partial/stopped/failed outcome and evidence limits.
+Keep lifecycle delivery separate from task acceptance and accounting completeness.
+Unknown historical fields stay `unknown`; do not infer startup cost from total cost.
+Index rows contain facts, not coordination narratives or current remediation status.
+Put append-only detail in the attempt log. Preserve older index versions when
+compacting them, with reconstruction date/source cutoff. An empty index is valid:
+use the no-history procedure rather than making historical backfill a launch gate.
+
+The planning procedure reads this index once and only a few selected logs. Keep
+source evidence linked so a future reader need not rediscover or reread all runs.
+
+## Attempt Template
 
 ```markdown
 # <run-id> — <bounded task>
@@ -46,16 +65,20 @@ never invent approvals, original forecasts or a contemporaneous event sequence.
 - Parent: <stable task/initiative key and snapshot link>
 - Run id / child id: <id / pending until launch, or unavailable with reason>
 - Role / scope / fixture: <question, allowed outputs/access, optional input case>
+- Task class / input delivery: <bounded output; mandatory envelope/reads; inline/path/fork; known input size or unknown>
 - Source / model / effort / host: <exact revision/configuration or unknown>
 - Model choice: <task/proof needs, sufficient model/effort and relevant available alternatives>
 - Logging: <shared flag and enabled scope; evidence of user request>
 
 ## Original Plan And Approval — immutable
 - Forecast: <token range; elapsed-time range>
+- Basis: <selected comparable attempt IDs and differences, or uncalibrated bottom-up assumptions>
+- Phases: <startup + useful work + save/readback/delivery ranges; save counted once>
 - Metric: <definition and cached-input treatment; main excluded>
 - Headroom: <percentage and added tokens/time>
 - Approved ceiling: <tokens/time per run; applicable additional explicit cap>
 - Completion reserve: <tokens/time within ceiling; finish signal and latency>
+- Completion protection: <phase observation/latch and final dispatch guard; any save overrun reported against original cap>
 - Checkpoint: <first useful report path, when inspected, acceptance criteria>
 - Approval: <exact batch/count/model/input/limits and user reply evidence>
 

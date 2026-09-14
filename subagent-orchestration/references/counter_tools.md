@@ -5,6 +5,14 @@ All ship inside this skill, use Python 3.12 standard library, and require no
 private repository, context package or network service. Resolve the host's exact
 Python executable and permitted input/output paths before running them.
 
+Bundled runtime inventory: `scripts/monitor.py` produces control observations;
+`scripts/accounting.py` validates counters and computes plan/actual comparisons;
+`scripts/adapters/codex_jsonl.py` projects the supported host format. The adapter
+uses accounting validation; monitor uses both. These deterministic operations are
+part of ordinary orchestration, and their contracts are below. This inventory
+does not authorize adding unrelated utilities. Development tests, fixtures and
+run-specific controllers are maintained outside the installable skill.
+
 ## Navigation
 
 - [Input contract](#normalized-snapshot)
@@ -67,6 +75,11 @@ No flags launch, message or stop agents; the parent handles reported decisions.
 
 Required limits are positive `finish_u`, `stop_u`, `finish_seconds`, `stop_seconds`,
 `missing_seconds`; finish precedes stop, with missing allowance inside stop time.
+For new plans, finish_u/finish_seconds equal the working upper forecasts;
+stop_u/stop_seconds equal those upper bounds plus the agreed25% headroom.
+Example: working30–50k gives finish_u50000 and stop_u62500. An earlier checkpoint
+requests review, not finish. The monitor consumes supplied limits; it does not
+choose the budget or reinterpret historical plans.
 U is uncached input plus output. Optional paired `finish_t`/`stop_t` add explicit
 cache-inclusive controls; absent/null pairs leave T diagnostic. Do not silently
 add a second stop. Paired `checkpoint_u`/`checkpoint_seconds` precede finish;
@@ -76,8 +89,31 @@ Presence/hash/size ask for semantic readback; they never prove useful progress.
 `--watch-seconds 40 --interval 5` performs bounded local sampling (maximum 45s,
 interval at most 20s). JSON output and its JSONL companion retain observations.
 `continue`/`waiting` need another watch; `finish` requests saving within the reserve;
-`stop` needs the parent's stop tool. After one finish message, `--finishing` keeps
-sampling. `review` yields on a saved-result checkpoint or visible execution error.
+`stop` is a candidate for the parent's stop tool, subject to a fresh phase check.
+After one finish message or observed final saving, `--finishing` (alias
+`--completion-started`) latches protected completion for this watch. Pass it on
+every later CLI invocation for that child. Python callers use `begin_completion()`;
+its read-only `completion_started` property cannot regress during the instance.
+The parent persists the child/parent-bound phase across process restarts. Do not
+infer it from an old file or set it for ordinary ongoing research.
+
+During protected completion token/time thresholds remain in diagnostic
+`budget_action`; `action` no longer requests budget stop or another finish message.
+Telemetry/identity/artifact errors yield `review`, with no usable new accounting
+implied. Correct the binding/readback; neither review nor an I/O failure authorizes
+interrupting an active save. `completion_protected` records the policy state.
+`done` remains terminal, not acceptance. Actuals and original caps remain unchanged.
+
+Callers with their own useful-output deadlines must apply
+`completion_guard(report, completion_started=latched_phase)` after composing those
+policies and immediately before dispatch. It clears a pending `control_call` and
+retains `blocked_action`/`blocked_reason`; when applicable it supplies a positive
+next wait. Dispatch only final `action`/`control_call`, never `budget_action` or a
+previous report. Explicit user-stop/access enforcement bypasses this budget guard.
+The CLI and helper do not observe phase messages or invoke host tools themselves;
+the parent supplies and retains the live phase observation.
+
+`review` yields on a saved-result checkpoint or visible execution error.
 After inspecting only the named error/checkpoint, use `--reviewed-call-id ID` or
 `--checkpoint-reviewed`. These acknowledgements grant no retry or new spending.
 The Codex adapter recognizes visible `functions.exec` wrapper failures only;
@@ -87,7 +123,9 @@ other tool/domain errors and useful progress require parent checks.
 final counter coverage. Neither proves task acceptance. `usage` may remain the
 last observation in an unresolved attempt. Control thresholds are observations,
 not a hard spending cap; delayed samples/in-flight work require reserved margin.
-Malformed/identity-mismatched inputs fail closed; reports cannot overwrite inputs.
+Malformed/identity-mismatched inputs yield no trusted measurement; they stop the
+working control path or request review during protected completion. Reports cannot
+overwrite inputs.
 
 ## Reconciliation
 
@@ -115,7 +153,3 @@ explicitly partial. Exit 0 means complete accounting, not good forecast or accep
 work. Include every failed attempt in batch totals; if any final actual is missing,
 the batch total and batch cap compliance remain unresolved. Add the evidence-backed
 planning lesson to the result/log; the calculator cannot infer why a task cost more.
-
-Run regressions with the resolved Python: `-B -m unittest discover -s
-<skill>/scripts/tests -p test_*.py`. They cover identity, cumulative/baseline math,
-final coverage, partial output, controls, CLI safety and standalone package use.

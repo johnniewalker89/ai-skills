@@ -48,6 +48,34 @@ class Limits:
                 raise ValueError("checkpoint time must precede the finish reserve")
 
 
+def completion_guard(report: dict, *, completion_started: bool) -> dict:
+    """Last guard for budget/progress decisions, not explicit user/access stops.
+
+    The caller supplies a latched, child-bound completion observation. Apply again
+    after caller deadlines and immediately before dispatch; never dispatch the
+    diagnostic budget_action or a previously prepared interrupt instead.
+    """
+    if type(completion_started) is not bool:
+        raise ValueError('completion state must be boolean')
+    result = {**report, 'completion_protected': completion_started}
+    if not completion_started or report['action'] == 'done':
+        return result
+    action = report['action']
+    if action in ('stop', 'finish', 'request_partial'):
+        uncertain = report.get('reason') in (
+            'counter_reset', 'telemetry_unavailable', 'invalid_session_or_telemetry',
+            'invalid_control_input', 'artifact_unavailable')
+        result.update(action='review' if uncertain else 'continue',
+                      reason=report.get('reason') if uncertain else 'protected_completion',
+                      blocked_action=action, blocked_reason=report.get('reason'))
+    # A diagnostic error/checkpoint never authorizes cancelling an active save.
+    if 'control_call' in result:
+        result['control_call'] = None
+    if 'next_wait_seconds' in result:
+        result['next_wait_seconds'] = 5.0 if result['action'] in ('continue', 'waiting') else 0
+    return result
+
+
 class Monitor:
     def __init__(self, child_id: str, parent_id: str, limits: Limits, *,
                  reviewed_call_ids: tuple[str, ...] = (),
@@ -64,6 +92,15 @@ class Monitor:
         self.missing_since: float | None = None
         self.reviewed_call_ids = set(reviewed_call_ids)
         self.checkpoint_reviewed = checkpoint_reviewed
+        self._completion_started = False
+
+    @property
+    def completion_started(self) -> bool:
+        return self._completion_started
+
+    def begin_completion(self) -> None:
+        """Latch after a finish instruction or observed final save, until delivery."""
+        self._completion_started = True
 
     def sample(self, session: Path, result: Path, now: datetime, *,
                progress_artifact: Path | None = None) -> dict:
@@ -86,11 +123,21 @@ class Monitor:
                 self.missing_since = elapsed if self.previous else 0.0
         measured = usage(totals) if totals is not None else None
         u, t = (measured['U'], measured['T']) if measured else (None, None)
-        evidence = self._artifact(result)
-        progress = evidence if progress_artifact is None else self._artifact(progress_artifact)
+        artifact_error = None
+        try:
+            evidence = self._artifact(result)
+            progress = evidence if progress_artifact is None else self._artifact(progress_artifact)
+        except OSError as error:
+            if not self.completion_started:
+                raise
+            evidence = progress = None
+            artifact_error = type(error).__name__
         failures = state.pop('exec_wrapper_failures', [])
         attention = [failure for failure in failures
                      if failure['call_id'] not in self.reviewed_call_ids]
+        if artifact_error:
+            attention.insert(0, {'kind': 'artifact_unavailable', 'error_type': artifact_error,
+                                 'requires': 'readback after the active write; do not interrupt'})
         checkpoint_due = (self.limits.checkpoint_u is not None and (
             elapsed >= self.limits.checkpoint_seconds
             or u is not None and u >= self.limits.checkpoint_u))
@@ -121,7 +168,7 @@ class Monitor:
         budget_action = action
         if action in ('continue', 'waiting') and attention:
             action, reason = 'review', attention[0]['kind']
-        return {**state, 'sampled_at': now.isoformat(), 'elapsed_seconds': elapsed,
+        report = {**state, 'sampled_at': now.isoformat(), 'elapsed_seconds': elapsed,
                 'usage': measured,
                 'action': action, 'reason': reason, 'budget_action': budget_action,
                 'total_token_limit_enabled': self.limits.stop_t is not None,
@@ -130,6 +177,10 @@ class Monitor:
                 'error_coverage': ('visible functions.exec wrapper failures only; not all tool/domain errors'
                                    if self.source_format == 'codex-jsonl' else
                                    'host adapter observations only; parent checks tool/domain errors')}
+        report = completion_guard(report, completion_started=self.completion_started)
+        if report['action'] in ('continue', 'waiting') and attention:
+            report.update(action='review', reason=attention[0]['kind'])
+        return report
 
     @staticmethod
     def _artifact(path: Path) -> dict | None:
@@ -160,7 +211,8 @@ def main() -> int:
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--watch-seconds', type=float, default=0)
     parser.add_argument('--interval', type=float, default=5)
-    parser.add_argument('--finishing', action='store_true', help='reserve message already sent; keep sampling')
+    parser.add_argument('--finishing', '--completion-started', action='store_true',
+                        help='finish instructed or final save observed; protect save/readback/delivery')
     args = parser.parse_args()
     if (not math.isfinite(args.watch_seconds) or not math.isfinite(args.interval)
             or not 0 <= args.watch_seconds <= 45 or not 0 < args.interval <= 20):
@@ -179,6 +231,8 @@ def main() -> int:
                       reviewed_call_ids=tuple(args.reviewed_call_id),
                       checkpoint_reviewed=args.checkpoint_reviewed,
                       source_format='codex-jsonl' if args.session else 'normalized')
+    if args.finishing:
+        monitor.begin_completion()
     deadline = time.monotonic() + args.watch_seconds
     args.output.parent.mkdir(parents=True, exist_ok=True)
     while True:
@@ -188,6 +242,7 @@ def main() -> int:
         except (OSError, ValueError, KeyError, TypeError) as error:
             report = {'child_id': args.child_id, 'action': 'stop',
                       'reason': 'invalid_session_or_telemetry', 'error': str(error)}
+            report = completion_guard(report, completion_started=monitor.completion_started)
         args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
         with args.output.with_suffix('.jsonl').open('a', encoding='utf-8') as stream:
             stream.write(json.dumps(report, ensure_ascii=False) + '\n')

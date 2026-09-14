@@ -63,29 +63,59 @@ known-broken serialization path is not progress because tokens are increasing.
 At a diagnostic checkpoint, check progress, remaining cost and all applicable
 ceilings. A late but valid sample alone does not require discarding a useful run;
 continue only when the agreed controls and remaining budget support completion.
-Honor explicit stops and access boundaries. If remaining work no longer fits,
-stop starting new work and use the reserved allowance to save available evidence
-and its gaps before the ceiling. Reserve is not extra authorization: no follow-up
-after an agreed immediate stop, no unapproved launch and no spending past a cap.
+Honor explicit stops and access boundaries. At the working upper bound, send
+FINISH and use the added25% for completion. Before it, narrow remaining research
+to a useful partial result within the work budget. A missed draft or the lower
+forecast being reached alone does not shorten that window. Finish earlier for
+natural completion or a concrete blocker/failed path; record the reason. Budget overrun during protected
+completion is recorded, not a reason to cancel that save. No new research, follow-up
+after an explicit user stop or unapproved launch is authorized.
 
 At the saved-result checkpoint, read the artifact and decide whether the remaining
-work still fits. If it is absent or unusable, prioritize a bounded partial save or
-stop; do not wait for the final reserve to discover that nothing was preserved.
+work still fits. If it is absent or unusable, diagnose the cause and prioritize
+a useful incremental save; do not automatically FINISH while useful work fits
+below the working upper bound. Do not wait for headroom to discover missing proof.
+An artifact repeating only scope and intended checks is not a successful useful
+result checkpoint. Acknowledging its readback does not establish useful progress.
+Keep budget observation active while assessing a checkpoint when the host permits;
+otherwise allow for the whole observation-to-decision gap in the reserve and narrow
+remaining work before it is consumed. A stopped watch followed by a lengthy parent
+review leaves counters unobserved; its previous sample is not a current balance.
 During reserve, save existing conclusions and gaps before expanding presentation.
 Use explicit execution states:
 
 1. **Working:** investigate within scope and update the useful report.
-2. **Finishing:** send one clear instruction before the reserved save window:
+2. **Finishing:** at the working upper bound, enter the added headroom and send
+   one clear instruction:
    stop new research, save existing findings/evidence/gaps and a continuation
-   point, then report delivery. An upper-forecast crossing prompts a feasibility
-   check; it is not a hard stop. Leave enough token/time allowance for control
-   latency, writes and bounded repair inside every approved ceiling.
+   point, then report delivery. This transitions out of research; it is not an
+   interrupt. The added allowance covers control latency, writes and bounded repair.
+   Do not reserve it again by moving FINISH earlier. Latch protected completion
+   when this instruction is sent or final saving is observed, whichever comes first.
+   Keep that state across polling invocations and caller-specific deadlines.
 3. **Saved:** read the report, verify the allowed path and assess what is useful.
    Preserve partial results and distinguish them from full acceptance.
-4. **Delivered or stopped:** confirm the result/terminal state. Interrupt at an
-   actual agreed hard boundary, explicit stop, access violation, or an
-   unresponsive worker under the agreed fallback. Finishing is not permission
-   to exceed a ceiling; do not send new work after an immediate stop.
+4. **Delivered or stopped:** confirm the result/terminal state. During protected
+   completion never interrupt for tokens, time, a missed useful-result deadline
+   or unchanged counters. Saving, required readback and delivery may finish past
+   the original cap; retain that cap and the actual overrun in reconciliation.
+   Explicit user stops and access violations remain separate controls.
+
+Protection covers saving existing findings/evidence/gaps and a continuation point,
+not starting new research or expanding presentation. A partial draft's mere presence
+does not establish final saving; use the finish instruction or visible current-phase
+evidence for the bound child. Do not require a new ceremonial child message when
+its final write is already observable. Before any budget interrupt, recheck the
+phase; if unclear or a save call is in flight, request completion once and preserve
+it. A stalled write/telemetry error requires diagnosis and retained evidence, not
+an automatic budget kill. Do not impose a second timeout on protected saving.
+
+Apply the completion guard after all caller policies, immediately before dispatch.
+Never execute an old prepared interrupt after a new saving observation. Recheck
+identity and phase at the dispatch boundary; invalidate queued budget stops when
+completion starts. If the host enforces an unavoidable external hard cap, explain
+that capability limit before launch and reserve earlier; instructions cannot
+guarantee survival of a platform termination.
 
 Do not repeatedly issue the finishing instruction or keep sampling unchanged
 status when the host can wait for relevant progress. An adapter may report both
