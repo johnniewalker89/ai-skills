@@ -26,7 +26,7 @@ This skill owns engine-agnostic SQL style. `sql-quality-core` owns SQL business 
 
 ## Workflow
 
-1. Apply the shared style reference to the final semantic shape, then the target owner's overlay.
+1. Resolve the agreed user/project style, then apply the shared reference and target owner's overlay to the final semantic shape; shared defaults do not relax stricter local alias conventions.
 2. For formatting-only changes, verify the changed SQL surface once and reuse semantic proof only when unaffected.
 3. Run the formatting-only Final Checklist before returning SQL.
 
@@ -39,7 +39,7 @@ This skill owns engine-agnostic SQL style. `sql-quality-core` owns SQL business 
 ## Final Checklist
 
 - Required SQL companions and every available target engine/dbt owner present?
-- Qualified multi-table columns, readable AS alignment and comma-leading layout?
+- Agreed alias consistency applied per SELECT without changing output names; qualified multi-table columns, readable AS alignment and comma-leading layout?
 - Expression expansion and named CTEs improve readability; no unnecessary CTE re-aliasing?
 - First ON shares its JOIN line, later conditions use AND lines?
 - Formatting-only pass preserved meaning after semantic/engine checks?

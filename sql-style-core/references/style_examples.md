@@ -4,6 +4,9 @@ Read only the example needed to resolve a concrete formatting question. The requ
 
 ## Example 1
 
+Under a project convention requiring uniform aliases in a mixed `SELECT`, the
+plain columns keep identity aliases alongside the aggregate aliases below.
+
 ```sql
 SELECT
       source.dt               AS dt

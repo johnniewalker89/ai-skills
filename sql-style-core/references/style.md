@@ -24,8 +24,8 @@ return to the SQL-quality owner instead of passing as formatting-only work.
 - In multi-table queries, selected columns must have explicit sources.
 - Columns inside expressions should keep explicit sources when omitting them makes lineage ambiguous.
 - Column aliases must use `AS`.
-- Plain columns do not need redundant aliases in simple local queries.
-- In production or multi-table `SELECT`s, explicit plain-column aliases are acceptable when they define the output schema, preserve the common `AS` column, or make lineage clearer.
+- Apply the agreed user/project alias convention before these shared defaults. Where it requires uniform aliases, one aliased expression makes explicit aliases mandatory for every individually selected column in that same `SELECT`, including identity aliases such as `orders.order_id AS order_id`. Preserve output names and identifier quoting; follow the engine owner's name-resolution constraints.
+- Without that convention, plain columns may omit redundant aliases in simple local queries. Explicit aliases remain useful when they define the output schema or clarify lineage. An alias in a different `SELECT` block does not activate the uniform-alias rule here.
 - Prefer ordering selected expressions from business-facing attributes to technical helper fields.
 
 ## Alignment And Compactness
