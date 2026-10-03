@@ -62,8 +62,8 @@ For cleanup, deduplication, repair, backfill, or negative-row recovery plans, va
 
 Before calling the repair sufficient:
 
-- prove the bad-row/drop predicate is gone from the repaired source and target surfaces;
-- prove same-grain duplicate keys are absent after repair, even when cross-entity overlap is already fixed;
+- when removing invalid rows, prove the bad-row/drop predicate is gone from the repaired source and target surfaces;
+- validate occurrence counts at the declared repair grain; require duplicate-key absence only when uniqueness is part of the accepted contract, and preserve legitimate repeats in multiset backfill;
 - reconcile the accepted source/repair surface to the affected target or aggregate totals for the declared windows/partitions;
 - separate raw/source repair checks from finalized/aggregate target checks when the target is built from the raw surface;
 - if the repair intentionally removes rows outside pairwise overlap, name that business decision and validate the resulting totals.

@@ -2,6 +2,11 @@
 
 Use this reference for source choice, lineage explanation, driving grain, joins, match coverage, and row multiplication.
 
+## Navigation
+
+- [Source choice](#source-choice-and-lineage), [driving grain](#driving-grain)
+- [Reconciliation and backfill](#reconciliation-and-backfill), [joins](#joins-and-match-sanity)
+
 ## Source Choice And Lineage
 
 Before choosing source tables:
@@ -48,6 +53,46 @@ Before the final `FROM`, name the business grain: orders, sessions, payments, ev
 - Use a raw/link layer only when the task asks for raw relationships, the mart is unavailable, or the mart loses required fields; preserve or rebuild normalized business semantics explicitly.
 - If the canonical fact for a response, payment, assignment, or other lifecycle entity is unavailable, do not substitute invitation/click/event streams as that entity unless the artifact names the surrogate/cohort semantics and validates the changed meaning.
 - Do not use `HAVING matched_count > 0` to hide wrong driving grain; unmatched rows can remain inside groups that also have matches.
+
+## Reconciliation And Backfill
+
+Before choosing a diff or missing-row insert, define equality separately for each
+target: logical identity/comparison fields, fields excluded or checked separately,
+set versus multiset semantics, and the compared population/window. Matching schemas
+do not establish matching row meaning. Use full-row equality when all compared
+values belong to the accepted equality contract; independently generated ingestion
+timestamps or transport metadata can otherwise create false missing rows. Do not
+exclude a field merely because it looks technical: justify its role and retain
+separate checks for material payload/derived values outside the identity.
+
+Separate occurrence identity used to count missing rows from payload correctness.
+When the contract identifies an occurrence by its source payload or event key,
+check parsed, enriched or other derived values separately against their accepted
+mapping; do not silently extend identity with those values. An occurrence already
+represented under that identity but carrying different derived values is a payload
+discrepancy, not another missing occurrence to insert. Classify that discrepancy
+and establish the repair scope separately. Composite or full-row identity remains
+valid when the contract makes those fields part of occurrence identity itself.
+
+Use supplied evidence for both missing counts and material separate payload checks
+before claiming reconciliation is correct. If payload checks are only proposed or
+the evidence cannot distinguish mapping drift, state that limit; correct counts
+alone do not validate the mapping.
+
+Preserve the accepted occurrence counts. For multiset backfill, missing occurrences
+are the positive source-minus-target count at that comparison grain; DISTINCT or
+an existence-only anti-join cannot recover a partially present count. Select only
+those missing occurrences under the accepted payload mapping. Content equality
+alone cannot distinguish a legitimate repeat from redelivery without supporting
+identity or delivery evidence; do not silently convert reconciliation into deduplication.
+
+Bind preview, write and readback to an established source slice and account for
+changes on the matching target surface. Re-evaluate the missing set when relevant
+state changes; a preview or a single insert is not a concurrency/retry guarantee.
+Zero source-minus-target means the compared source occurrences are represented;
+target extras require a separate reverse comparison within its applicable scope.
+Even two-way equality proves only the declared slice and equality contract, not
+upstream completeness, global deduplication or exactly-once delivery.
 
 ## Joins And Match Sanity
 
