@@ -16,7 +16,7 @@ Use this skill for ClickHouse SQL work in repositories that follow our database 
 ## Hard Gates
 
 1. **Skill-chain gate.** Use `sql-quality-core` and `sql-style-core` with this engine owner. This is a standalone SQL entry; no workflow, private context or particular MCP is required. For live operations apply the evidence/access contract from `sql-quality-core`; supplied SQL/DDL/metadata remains usable when live access is unavailable.
-2. **Reference gate.** Read `references/style.md` for any ClickHouse writing, editing, or review. For any non-trivial writing, editing, review, or optimization, also read `references/sql_readiness.md` and `references/native_shape.md`. Read the other references only when their trigger applies.
+2. **Reference gate.** For failures or conflicting results, first read and apply **Diagnostic comparison binding** in `references/optimization.md` before writing even a preliminary causal explanation. An early progress report does not defer this prerequisite. Read `references/style.md` for any ClickHouse writing, editing, or review. For any non-trivial writing, editing, review, or optimization, also read `references/sql_readiness.md` and `references/native_shape.md`. Read the other references only when their trigger applies.
 3. **Metadata gate.** Before final SQL against real tables, inspect columns, types, engine, `ORDER BY`, `PARTITION BY`, and relevant volume through the selected access owner when available, or use repo contracts/source definitions when live access is unavailable.
 4. **Source-shape gate.** For ClickHouse mart, DDL/load, or production-like SELECT design, run the physical source-shape check from `references/sql_readiness.md`: identify each heavy source's engine; compare native filters to partition/key pruning, and external-engine/table-function filters to remote pushdown and source access for the actual connector/version before handoff. If a proxy timestamp guard is used, report ClickHouse pruning evidence and route business-window coverage to `sql-quality-core`; do not call full coverage proven from pruning alone.
 5. **Native-shape gate.** For every non-trivial query, run the ClickHouse-native shape pass from `references/native_shape.md`. Challenge generic joins, subqueries, windows, deduplication, lookup enrichment, `DISTINCT`, `FINAL`, repeated CTE reads, and heavy filters against native alternatives without changing business semantics.
@@ -28,7 +28,7 @@ Use this skill for ClickHouse SQL work in repositories that follow our database 
 
 ## Workflow
 
-1. Resolve SQL scope and current metadata/source contracts with the shared SQL owners.
+1. For diagnostic work, complete the Reference gate before the first causal findings. Resolve SQL scope and current metadata/source contracts with the shared SQL owners.
 2. Apply native-shape and relevant load-readiness checks, then inspect the bounded plan/output.
 3. Reuse unchanged DDL and exact plan evidence across checks; refresh after query/settings/source changes or when freshness requires it.
 4. Save requested evidence artifacts with smoke/parts/granules, repeated ReadFromMergeTree, heavy scans and accept/rewrite decisions; run the Final Checklist.

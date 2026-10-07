@@ -6,6 +6,41 @@ reuse sufficient current proof and do not invent a production history for a new 
 
 Use this file when the task is about speeding up or diagnosing ClickHouse SQL.
 
+## Navigation
+
+- [Diagnostic comparison](#diagnostic-comparison-binding) and [workflow](#diagnostic-workflow)
+- [Optimization mindset](#core-optimization-mindset) and [query shape](#query-shape-guidance)
+- [Joins](#join-optimization) and [storage](#storage-level-options)
+- [Final verification](#what-to-verify-after-optimization)
+
+## Diagnostic comparison binding
+
+Before treating a successful check as a reproduction or explaining conflicting
+results/errors, compare the incident and control using saved evidence first:
+
+- Exact submitted SQL and parameters, including generated `SETTINGS`; identify
+  the failing statement/stage (connection initialization, metadata discovery or
+  model/data query) and original server error, not only the connector's wrapper.
+- Server/node or replica, database, effective user/roles, relevant versions and
+  observation time/data state. Matching table names or SQL text alone is not a
+  matching execution context.
+- Relevant effective session/query settings and user/profile constraints, not
+  just configuration-file values or assumed client defaults. Include reader
+  semantics when material, such as `do_not_merge_across_partitions_select_final`
+  for `FINAL` across partitions, and exact values/units for resource ceilings.
+  A project's integration owner supplies adapter/profile/model precedence;
+  this engine check interprets the resulting settings and constraints.
+
+State matched fields, material differences and unknowns in the existing diagnosis;
+no separate report or full settings dump is required. A successful query under
+different or unknown settings/identity proves only that control's scope: it does
+not refute the incident or prove a missing database, changed key or version cause.
+Separate an initialization failure from model execution; do not infer that model
+SQL ran from an attempted model command. Reuse a sufficient saved pair. If a
+material binding is missing, keep the cause unproven and request only that evidence
+or route a bounded check through the selected access owner. Supplied evidence does
+not authorize live actions; that owner's policy governs settings, identity and writes.
+
 ## Diagnostic workflow
 
 - Apply sql-quality-core for semantics, evidence/access boundaries and SQL result status.
