@@ -15,6 +15,38 @@ do not call execution, result correctness or performance measured. Ask for only
 material missing metadata. A provided EXPLAIN is bounded evidence of its stated
 query/settings/environment, not permission to query that database.
 
+## Causal claims for discrepancies
+
+Before explaining a before/after or source/target discrepancy, use sufficient
+saved evidence first and distinguish the measured delta, a mechanism that could
+produce it, and the historical cause of that state:
+
+- Bind the comparison to the accepted grain, population/window, metric semantics
+  and observed source/target versions or times. Use the source/grain contract for
+  identity and multiplicity; the engine owner establishes relevant execution
+  context. Separate retention/TTL boundaries or other non-overlapping data from
+  the comparable slice; justify any exclusion and retain its measured difference.
+- Locate the delta in the relevant cohorts, keys or periods and quantify their
+  contributions and unexplained remainder. Matching grand totals alone cannot
+  explain offsetting differences; do not substitute current source/rebuilt equality
+  for evidence of the earlier source or target state.
+- For each proposed cause, state its observable prediction and check which rows
+  or measures in the compared population it would affect. If an adequate check
+  finds zero affected rows for a nonzero delta, reject that explanation for the
+  checked scope. Partial or unavailable coverage leaves the hypothesis unproven;
+  it does not establish zero impact elsewhere. Do not reuse a refuted hypothesis.
+- A changed filter, unchanged aggregate formula, model-creation commit or nearby
+  deployment date may identify a candidate mechanism or temporal correlation;
+  none alone proves that it produced this delta or that a backfill did or did not
+  run. Historical execution claims need applicable retained execution/state
+  evidence or a reconstruction that covers the relevant old inputs and behavior.
+- Report what is measured, which mechanisms were supported or ruled out, and
+  which historical cause remains unknown. Preserve proven cohort/retention facts
+  without turning missing history into an invented cause. Request only the
+  missing evidence that can resolve a material claim; do not fetch logs or rerun
+  checks when sufficient proof is already supplied or unavailable history cannot
+  be recovered through that check. Live operations retain their access policy.
+
 ## Available Live Tools
 
 If live checks are needed, use the user's configured and available database/catalog

@@ -87,6 +87,7 @@ Ask:
 - For sequential funnels, does each step search from the previously accepted step, not from an independent global first event that can hide later valid events?
 - For child-entity metrics inside a parent funnel, do names such as `orders_*` count all qualifying child entities, or are first-child metrics explicitly named?
 - Are event-count, entity-count, and sequential funnel metrics separated or clearly named?
+- For discrepancy explanations, are causal predictions checked on the affected population, with retention boundaries and unproven history explicit?
 - Are dimensions and reconciliation sources semantically aligned? If the load derives a dimension from one source but validation compares another source or legacy mapping, label it as semantic drift rather than proof of equality.
 - Are unknown/other categories handled explicitly instead of being folded into a valid business bucket?
 - Are validation queries executable for the stated proof level, with read-only source checks separated from post-load/extended-sandbox target-table checks?

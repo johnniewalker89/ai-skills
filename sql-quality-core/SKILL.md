@@ -19,7 +19,7 @@ This skill owns engine-agnostic SQL business semantics and quality gates. `sql-s
 
 1. **Skill chain gate.** Use this skill with `sql-style-core` and the resolved available engine owner. CH/GP entry points activate this complete SQL chain without workflow or private access dependencies. Add an available dbt owner for dbt-specific behavior; missing tooling bounds that claim.
 2. **Database access gate.** Use the available configured tool under references/evidence_and_access.md and its policy for live proof. A caller-selected operational owner may supply that route. Without live access use supplied/repo evidence and state the limitation; no private skill is mandatory.
-3. **Source/grain gate.** Do not draft, approve, or return non-trivial SQL until source choice, driving grain, central joins, and metric semantics have been considered. Before the first substantive reconciliation/backfill draft or choice of comparison keys, read `references/source_grain_and_joins.md` and establish occurrence identity, separate payload checks, multiplicity and the compared slice. A provisional draft is subject to this prerequisite.
+3. **Source/grain gate.** Do not draft, approve, or return non-trivial SQL until source choice, driving grain, central joins, and metric semantics have been considered. Before the first substantive reconciliation/backfill draft or choice of comparison keys, read `references/source_grain_and_joins.md` and establish occurrence identity, separate payload checks, multiplicity and the compared slice. A provisional draft is subject to this prerequisite. Before even a preliminary explanation of a reconciliation delta, read and apply **Causal claims for discrepancies** in `references/evidence_and_access.md`.
 4. **Independent facts gate.** When two or more fact aggregates are combined, name each fact grain and validate the final join/output grain. Do not approve a shape that can duplicate one fact's measures across another fact's dimensions.
 5. **Date/window gate.** Do not claim full business-window coverage when filtering or validating through a proxy timestamp unless coverage is proven or the claim is downgraded to the proxy/guarded surface.
 6. **Duration gate.** Duration and time-to-stage metrics must subtract from the actual lifecycle start timestamp, not from a truncated reporting bucket, unless the metric is explicitly bucket-relative.
@@ -32,7 +32,7 @@ This skill owns engine-agnostic SQL business semantics and quality gates. `sql-s
 
 ## Workflow
 
-1. Resolve source lineage and driving grain; load references for the affected semantic decisions.
+1. Resolve source lineage and driving grain; load references for the affected semantic decisions. For discrepancy diagnosis, complete the causal-evidence prerequisite before drafting findings.
 2. Check central match/multiplication behavior, independent fact grains and metric/window/entity contracts against final SQL.
 3. Use the smallest proof-capable window/case set. Reuse one exact output for multiple invariants when sufficient, keeping every claim's scope visible.
 4. Run the Final Checklist and combine semantic, style and engine checks into the SQL result status with explicit proof limits. An optional project workflow may consume this result.
@@ -55,5 +55,6 @@ This skill owns engine-agnostic SQL business semantics and quality gates. `sql-s
 - No fake representative rows; categories include material other/unknown cases?
 - Business windows and proxy coverage honest; duration starts at lifecycle timestamp?
 - Funnel steps follow accepted prior events, names match entity grain, mutable enrichment has refresh/reprocessing semantics?
+- Discrepancy causes tested on the affected population; measured delta, mechanism and unproven history distinguished?
 - Bounded final-SQL checks and owner chain complete; P1/P2 blockers prevent pass?
 - Final SQL efficiency supported by applicable evidence and assessed alternatives; missing proof explicit, no unsupported optimality claim?
