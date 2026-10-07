@@ -43,7 +43,7 @@ Metadata inspection is required because ClickHouse SQL choices depend on table s
 
 ## Physical Source-Shape Fit
 
-Before designing or validating a ClickHouse mart, DDL/load, or production-like SELECT over heavy sources:
+Before designing or validating a ClickHouse mart, DDL/load, or production-like SELECT over heavy sources, identify the actual engine/read path. For external engines and table functions apply the external-source check below; native MergeTree pruning cannot prove remote scan cost. For native sources:
 
 - name the business timestamp/window that defines the requested rows;
 - compare it to each heavy source's `PARTITION BY`, primary key, and `ORDER BY` shape;
@@ -68,6 +68,18 @@ Operational handoff gate for ClickHouse mart-build:
 - coverage counts must compare rows in the business window with rows retained by the proxy guard for the same proposed rebuild window;
 - if the proxy guard intentionally defines the cohort, the target name/columns/notes must use cohort or proxy wording rather than claiming the original business-date window;
 - if neither proof is safe, save the rejected business-timestamp and proxy-coverage proof designs and keep the object below sandbox handoff.
+
+### External-source filtering
+
+Before handing off a changed filter or load through an external engine/table function:
+
+- Bind the actual connector/read path, relevant ClickHouse/backend versions and final effective predicate, including aliases, macros and watermark fallbacks.
+- Separate predicates evaluated remotely from predicates evaluated after transfer to ClickHouse. An expression over timestamps may preserve the right incremental window while preventing pushdown; decide from the actual connector/version evidence, not a blanket rule about one function.
+- Check remote filtering and source access separately: a pushed predicate can still scan the source if its index/partition shape does not support that expression. An index on another timestamp does not prove access for the final watermark; merely adding an index does not prove the plan will use it.
+- Reuse applicable source DDL/indexes, captured remote SQL/plans, connector documentation and saved scan telemetry. State what each proves: supported pushdown is not measured scan cost, and ClickHouse parts/granules do not establish a MySQL access path. Refresh only the changed or unproven binding; no full-source benchmark is required.
+- Do not treat an outer `LIMIT`, a narrow logical time window or a small returned row count as a remote-work bound unless the actual read path proves it. Before a live smoke, establish its source-side bound through the selected operational owner; otherwise use saved evidence or report the missing proof.
+- Preserve the business watermark/window. A cheaper guard on another timestamp needs `sql-quality-core` coverage proof before it can replace the intended filter.
+- Before handoff, report the remote/local filter split, index/partition applicability and measured/estimated scan cost or the concrete unknown. Missing pushdown or suitable source access constrains efficiency/readiness claims; do not label the load efficient or unconditionally ready from semantic correctness alone. An explicitly accepted costly load may proceed under the operational owner's policy with its cost and limitations recorded.
 
 ## What metadata should change
 
@@ -116,7 +128,7 @@ Before returning a non-trivial production `SELECT`:
 - If the query reuses CTEs or derived subqueries, scan the plan for repeated `ReadFromMergeTree` nodes for the same heavy tables, especially `FINAL` readers and central join branches.
 - Do not execute a heavy full query just to prove syntax or confidence.
 - For bounded smoke or validation SQL that the agent creates itself, `EXPLAIN` alone is not enough. After the plan is acceptable, run the final aggregate/query on the constrained window unless it is unsafe, exceeds the contour's practical limits, or the user explicitly asked for text-only SQL. If skipped, state the concrete blocker.
-- If a result check is useful, run a constrained check through the selected access owner, such as a narrow date window, `LIMIT`, aggregated row counts, or metadata-only checks.
+- If a result check is useful, run a constrained check through the selected access owner, such as a narrow date window, `LIMIT`, aggregated row counts, or metadata-only checks; for external sources first establish the remote-work bound as above.
 - For heavy enrichment tables, compare unfiltered date-window row counts with row counts after applying relevant business keys when a cheap count is possible through the selected access owner.
 - For large lookup, dimension, or reference tables, key-filter the right side to the driving keys when the left set is narrow. Keep a full lookup scan only when the table is genuinely small, dictionary-like, or the full scan is measured and accepted.
 - For pointer/reference-id checks, collect the relevant ids from the driving rows, deduplicate them, and check the referenced table through one key-filtered CTE. Do not run several unfiltered full-table lookups against the same referenced table for separate pointer columns.
