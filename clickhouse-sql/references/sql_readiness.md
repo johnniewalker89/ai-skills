@@ -109,6 +109,44 @@ For `order_pricing`-like tables this is mandatory in smoke SQL: `pricing_coverag
 
 Correctness comes before avoiding expensive engine readers.
 
+### Engine, writer and reader contract
+
+Before accepting or rejecting an engine for mutable state, separate a bare engine
+swap from a complete update protocol. Bind the business key, sorting key,
+partition expression, state/version and actual reader; state which part fails or
+is unproven. A reader setting or background merge is not a replacement for missing
+writer logic.
+
+For a proposed positive/negative compensation protocol:
+
+- Reduce fresh output to the intended state per business key. Resolve the old
+  live state for those keys across every partition where it can reside; a current
+  event-time/month filter must not hide a moved old row. This semantic requirement
+  justifies that bounded-key historical lookup, not an unrelated full-history scan.
+- Emit a negative copy of each state being cancelled, retaining its old sorting
+  and partition-driving values and payload needed by the reader, then emit the
+  new positive state. Do not negate every physical historical version blindly.
+- Match the actual engine's cancellation rules: preserve the cancelled version
+  for VersionedCollapsing; ordinary Collapsing requires consistent insertion order.
+  Account for retries and concurrent writers before calling the protocol ready;
+  duplicate or unmatched cancellations are not automatically safe.
+- Source-disappeared keys need a deletion/changelog/reconciliation contract; a
+  fresh incremental key set alone cannot discover all of them.
+- Validate the reader separately, including partition scope and effective FINAL
+  settings or sign-aware aggregation at the required output grain. Separate a
+  viable mechanism from an implemented and verified production protocol.
+
+A protocol can compensate an old-partition state without moving that old row into
+the new partition. Do not reject this capability merely because partitions merge
+separately, or promise it from an engine name alone. If the accepted contract makes
+the partition-driving time immutable and a one-off incident is handled by an
+agreed rebuild, preserve that scope instead of introducing a compensation redesign.
+
+Engine rules: [CollapsingMergeTree](https://clickhouse.com/docs/engines/table-engines/mergetree-family/collapsingmergetree)
+and [VersionedCollapsingMergeTree](https://clickhouse.com/docs/engines/table-engines/mergetree-family/versionedcollapsingmergetree).
+
+### Reader correctness
+
 - Do not remove `FINAL` from `ReplacingMergeTree`, `CollapsingMergeTree`, or `VersionedCollapsingMergeTree` just because `FINAL` is expensive.
 - Prefer the existing local reader pattern from repo models for the same table unless there is a measured reason to change it.
 - For aliased `FINAL` readers, review syntax before execution. Do not use `FROM table FINAL AS alias`. Use a locally proven alias form such as `FROM table alias FINAL`, or wrap `SELECT ... FROM table FINAL` in a subquery/CTE and alias that subquery.
