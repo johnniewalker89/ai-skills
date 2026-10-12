@@ -2,6 +2,12 @@
 
 Use this reference in every SQL task before selecting proof or returning SQL/findings.
 
+## Navigation
+
+- [Efficiency evidence](#efficiency-evidence-for-every-sql-task) and [smoke scale](#smoke-scale)
+- [Whole-statement binding](#whole-statement-binding) and [validation mindset](#validation-mindset)
+- [Repair validation](#cleanup-and-repair-validation), [return gate](#default-sql-return-gate) and [final self-review](#final-sql-self-review-gate)
+
 ## Efficiency Evidence For Every SQL Task
 
 Assess the efficiency of the final SQL while preserving its required semantics.
@@ -35,6 +41,42 @@ When the task lets you choose a smoke period:
 - widen only when relationships are sparse, lifecycle semantics require it, or representativeness is part of the task;
 - do not choose a month-sized or otherwise large smoke window by default;
 - if a broad window is intentional, state why and verify the plan remains acceptable.
+
+## Whole-Statement Binding
+
+Apply before a readiness conclusion or SQL pass after changing sources, JOINs or
+SQL rendering, including SQL embedded in another language. Inspect the complete
+statement the caller will send, with representative parameters where relevant;
+include inherited SELECT, ON, WHERE, grouping and ordering expressions. A review
+of the added fragment does not validate the surrounding query.
+
+Bind relevant tables, aliases and column references to available current schema
+or DDL evidence for that target. Check each query scope using the engine's name
+and output-alias resolution rules. A newly joined source can make an unchanged
+reference ambiguous or change which entity a filter addresses. Resolve collisions
+from the intended business source; an arbitrary prefix or the first matching
+column is not a semantics-preserving fix. Qualification/layout conventions remain
+with `sql-style-core`; available engine owners interpret target-specific binding.
+
+Use the lightest adequate evidence for the claim: schema-backed static binding,
+an applicable saved plan, or an authorized bounded target-engine check. Bind it
+to the final rendered statement, rather than a separately rewritten approximation.
+Host-language parsing/compilation, a mocked query call and assertions for SQL
+substrings prove their own surface; they do not prove SQL name resolution or
+execution. Another engine's synthetic schema can expose a risk, but does not prove
+the actual target schema, runtime statement or target-engine success.
+
+For a regression, choose an observation that distinguishes the invalid original
+statement from the corrected final statement. Include an affected inherited
+clause when a source/JOIN change caused the defect; finding the new JOIN/filter
+text is not that observation. Reuse sufficient saved checks instead of rerunning
+unchanged proof.
+
+With incomplete schema, final-render or target-engine evidence, retain a useful
+bounded review and identify the missing fact. Do not invent source columns,
+declare SQL executable, or claim SQL pass with an unresolved P1/P2 binding issue.
+This procedure grants no live access and does not require a live query for every
+simple expression; the existing evidence/access and efficiency contracts apply.
 
 ## Validation Mindset
 
