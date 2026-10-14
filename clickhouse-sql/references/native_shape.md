@@ -7,7 +7,7 @@ Review applicable ClickHouse alternatives against the required result and eviden
 ## Navigation
 
 - [Mandatory pass](#mandatory-pass)
-- [Decision table](#decision-table)
+- [JOIN selection](#join-selection-binding) and [decision table](#decision-table)
 - [Required pattern checks](#required-pattern-checks)
 - [Blockers and review triggers](#correctness-blockers-and-review-triggers)
 
@@ -34,6 +34,30 @@ For each shape:
 
 These common exceptions apply to every preference in the table, review triggers and recipes. A narrower example never cancels them. They cannot waive a correctness blocker.
 
+## JOIN selection binding
+
+Before a JOIN recommendation or causal explanation, including a progress note,
+finish the applicable mandatory SQL-chain reads and this full reference first.
+Reading only the binding section is not a completed read of the reference.
+Then consume `sql-quality-core`'s driving/output
+grain, required attributes and unmatched-row contract. Bind kind and strictness
+separately: `ANY JOIN` is still inner without `LEFT`; `LEFT SEMI JOIN`
+filters for matches even though its spelling contains `LEFT`. RHS uniqueness
+limits multiplicity, not which left rows the result must retain.
+
+Trace the proposed shape on sufficient saved or supplied matched/unmatched
+rows and meaningful duplicates before choosing it. Show retained row identities
+and required RHS values; apply the match/default contract below rather than
+inferring presence from a default value. Include downstream filters that could
+discard preserved misses. Reuse a sufficient row trace; a new live benchmark
+is not required. Syntax normalization establishes the parsed kind/strictness,
+not returned rows or metric correctness.
+
+Justify the choice by that outcome, not an assumed engine prohibition. If a
+material claim depends on column projection or cardinality settings, bind the
+target version/analyzer/effective contract or state the gap before relying on it.
+The existence-filter checks below govern SEMI RHS projection.
+
 ## Decision table
 
 | Intent | Prefer first | Generic form to challenge | Example reasons to keep generic; common exceptions also apply |
@@ -55,7 +79,7 @@ These common exceptions apply to every preference in the table, review triggers 
 | Heavy history/enrichment table used after a narrow driving set | key-filter with `LEFT SEMI JOIN` before aggregation, `ASOF JOIN`, or lookup enrichment | scanning and grouping the whole date window before joining | key filtering would change semantics, the driving key set is not selective, or measured plan shows no benefit |
 | Heavy date-partitioned fact for smoke/lifecycle metrics | bounded date window plus key filter, with outside-window/missing metrics when useful | key-only all-history fact scan | the metric is intentionally all-history and named/justified as such |
 | Same heavy fact used for smoke coverage and pointer checks | two branches: bounded coverage/categories, plus explicitly named all-history pointer check | one all-history branch used for both coverage and pointer checks | the task explicitly asks for all-history coverage and the output names it that way |
-| Heavy fact joined to a unique driving CTE while using driving columns | `ANY INNER JOIN` or `LEFT SEMI JOIN` after proving the driving side is unique at the join key | plain `JOIN` | right-side multiplicity is intentional and part of the output grain |
+| Heavy fact joined to a unique driving CTE while using driving columns | `ANY INNER JOIN` or `LEFT SEMI JOIN` with the required projection/cardinality contract and a unique driving key | plain `JOIN` | right-side multiplicity is intentional and part of the output grain |
 | Category-specific metrics on enum-like fields | metrics for every material category plus optional `other_*` / `null_*` | metrics for only the categories guessed from memory | omitted categories are immaterial by actual data check or task scope |
 | Many-to-many relationship | ordinary `JOIN` / `LEFT JOIN` preserving meaningful matches | forced `ANY` join | right-side multiplicity is part of the result |
 | Deduplication | aggregation by the real grain, `argMax` / `argMin`, or engine-aware reader logic | `SELECT DISTINCT` | the whole selected tuple is truly the business grain |
@@ -159,7 +183,7 @@ If the same referenced/history table also supplies smoke coverage or category me
 
 ### Driving CTE joins that need driving columns
 
-When a heavy fact joins to a constrained driving CTE and needs columns from that CTE, do not keep plain `JOIN` by habit. If the driving CTE is one row per business key, prefer `ANY INNER JOIN` or `LEFT SEMI JOIN` after proving uniqueness at that key. Keep ordinary `JOIN` when multiplicity is required, with the relevant strictness setting checked or stated as an assumption; otherwise apply the relevant exception from `native_shape.md`.
+When a heavy fact joins to a constrained driving CTE and needs columns from that CTE, do not keep plain `JOIN` by habit. If the driving CTE is one row per business key and the target projection/cardinality contract preserves the required rows, prefer `ANY INNER JOIN` or `LEFT SEMI JOIN` after proving uniqueness at that key. Keep ordinary `JOIN` when multiplicity is required, with the relevant strictness setting checked or stated as an assumption; otherwise apply the relevant exception from `native_shape.md`.
 
 ### Existence filtering
 
@@ -167,7 +191,13 @@ Prefer `LEFT SEMI JOIN` when the right side is used only to keep matching left r
 
 [Example 6](native_shape_recipes.md#example-6).
 
-ClickHouse allows selecting columns from the right side of `LEFT SEMI JOIN`. Do not claim those columns are unavailable. However, when right-side columns are part of the output semantics, do not treat `SEMI` as a generic enrichment join by habit:
+Do not assume SEMI RHS columns are universally available or unavailable. In
+analyzer versions supporting `semi_join_include_columns_from_both_sides`,
+effective `1` exposes both sides; `0` leaves only the preserved side
+after the join (`ON` still sees both). Bind this target contract when RHS
+projection is material; unknown support/settings do not prove either claim.
+Projection support does not make SEMI preserve unmatched rows. When RHS
+attributes are needed and supported, do not use SEMI as enrichment by habit:
 
 - if the right side is unique at the join key and `SEMI` is kept, note that the right attributes are deterministic for the checked data;
 - if the right side can have duplicates, use `LEFT ANY JOIN` after deterministic reduction, `argMax`/pre-aggregation, or another row-choice pattern that matches the business meaning;
