@@ -12,6 +12,7 @@ Precondition: apply the shared SQL quality/style chain. For live checks, use the
 
 - [Responsibility split](#responsibility-split)
 - [Metadata and physical shape](#metadata-pass)
+- [Table-function column and JOIN binding](#table-function-column-and-join-binding)
 - [Engine correctness](#engine-correctness)
 - [DDL/load checks, only for that scope](load_readiness.md)
 - [Lightweight validation](#lightweight-validation)
@@ -40,6 +41,32 @@ Before drafting or finalizing non-trivial SQL against real ClickHouse objects:
 4. If metadata is unavailable and the query depends on uncertain columns, engine, keys, or partitions, state the limitation instead of guessing.
 
 Metadata inspection is required because ClickHouse SQL choices depend on table shape, not only on column names.
+
+## Table-function column and JOIN binding
+
+Before accepting SQL that references a table function or virtual column, bind the
+function arguments, source/output schema, aliases, relevant server version and
+analyzer settings. Verify the specific referenced fields; do not infer virtual
+columns from another function or a schema listing that omits them.
+
+Distinguish syntax rewriting, analyzed name/type resolution, planning and actual
+execution. Bare AST or SYNTAX success does not establish column/JOIN binding;
+some versions/settings enable analyzer passes, so inspect the captured stage and
+resolved output instead of deciding from the command name alone. Reuse adequate
+schema-backed review or an applicable analyzed tree/plan; if a target check is
+needed, route the smallest safe binding-capable check through the selected access
+contract. A successful column projection does not validate the complete JOIN.
+
+After a column repair, apply sql-quality-core's Whole-Statement Binding to the
+final SELECT, including inherited ON expressions. ClickHouse can rewrite a
+virtual reference into an expression unsuitable as a JOIN key; inspect that
+diagnostic before guessing another replacement. Preserve each failed statement
+and server diagnostic with its binding. An opaque connector error leaves its
+cause unknown; a later check does not turn the earlier failure into PASS.
+
+When binding evidence is missing, provide the useful bounded proposal and name
+the gap; keep executability unproven. This procedure grants no live access and
+does not require a full data run. [EXPLAIN stages](https://clickhouse.com/docs/reference/statements/explain).
 
 ## Physical Source-Shape Fit
 
