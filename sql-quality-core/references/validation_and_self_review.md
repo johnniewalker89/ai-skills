@@ -5,7 +5,7 @@ Use this reference in every SQL task before selecting proof or returning SQL/fin
 ## Navigation
 
 - [Efficiency evidence](#efficiency-evidence-for-every-sql-task) and [smoke scale](#smoke-scale)
-- [Whole-statement binding](#whole-statement-binding) and [validation mindset](#validation-mindset)
+- [Whole-statement binding](#whole-statement-binding), [claim binding](#validation-claim-binding) and [validation mindset](#validation-mindset)
 - [Repair validation](#cleanup-and-repair-validation), [return gate](#default-sql-return-gate) and [final self-review](#final-sql-self-review-gate)
 
 ## Efficiency Evidence For Every SQL Task
@@ -78,11 +78,32 @@ declare SQL executable, or claim SQL pass with an unresolved P1/P2 binding issue
 This procedure grants no live access and does not require a live query for every
 simple expression; the existing evidence/access and efficiency contracts apply.
 
+## Validation Claim Binding
+
+Before reporting testing completeness or SQL readiness:
+
+1. Link each material claim to the actual submitted SQL or its content hash,
+   rendered parameters/relevant settings, target connection/runtime, check stage
+   and outcome, and available query ID or captured result. Keep missing fields
+   explicit; a query ID alone does not identify the source statement.
+2. Compare the executed statement with the final artifact. A changed aggregation
+   invalidates the previous execution proof for the new SQL even when row counts
+   coincide. Reuse proof for unchanged semantics only within its demonstrated
+   scope; a related query is evidence about that query.
+3. If the required SELECT failed or was not executed, retain that record and mark
+   runtime proof unproven. Passing unit/parser/import or EXPLAIN checks covers
+   only those stages. A later matching successful SELECT proves its own SQL,
+   parameters and runtime; it does not turn earlier failures into passes or prove
+   another service connection, semantic equivalence or efficiency.
+
+Use sufficient saved evidence; this procedure requires no extra live run or test
+suite. State the remaining proof gap instead of a blanket "everything tested".
+
 ## Validation Mindset
 
-For each material changed contract, retain a compact link to the final artifact,
-the check that exercises it, its comparison surface, and remaining limits. Reuse
-existing evidence when applicable; this is not a mandatory extra test suite.
+For changed contracts, name the comparison surface and remaining limits alongside
+the claim bindings.
+
 Component comparisons, invariant checks, and old/new final-output comparisons
 prove different claims. A compositional equivalence argument must also cover
 joining, multiplicity, defaults, precision and final assembly; name it as such,
