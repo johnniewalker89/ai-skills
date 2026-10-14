@@ -68,6 +68,39 @@ When binding evidence is missing, provide the useful bounded proposal and name
 the gap; keep executability unproven. This procedure grants no live access and
 does not require a full data run. [EXPLAIN stages](https://clickhouse.com/docs/reference/statements/explain).
 
+### Cluster topology and host coverage
+
+Before the first mapping, host-count choice or preliminary topology finding,
+complete this comparison's triggered reads: `references/anti_patterns.md`
+(risky SQL), `references/idioms.md` (JOIN/functions/settings),
+`references/native_shape.md` and `references/style.md`, plus sql-style-core's
+shared style. Apply sql-quality-core's source/grain, causal evidence,
+validation/self-review and optimization-risk procedures; the last is in its
+`references/metrics_windows_and_funnels.md`. Recover a truncated required
+section before that first decision. A successful read command or a later
+final-SQL read does not complete this prerequisite.
+
+For topology or replica-presence checks, do not equate virtual `_shard_num` or
+`shardNum()` with `system.clusters.shard_num` from matching types or numbers.
+`clusterAllReplicas` treats replicas as separate connections. Bind observed rows
+to the selected cluster's physical topology using verified node/endpoint identity;
+check hostname aliases and mapping uniqueness before choosing a lookup. Keep
+virtual labels for diagnostics unless their physical meaning is independently
+established. [Cluster functions](https://clickhouse.com/docs/reference/functions/table-functions/cluster).
+
+Let sql-quality-core define the expected population and counting grain. For
+presence on expected hosts, compare distinct observed members of that host set
+with the same expected set; `replica_name` or a local replica ordinal is not a
+host-presence metric without a proven one-to-one relation. Equal counts alone
+can hide a missing expected host replaced by an unexpected one.
+
+Preserve unmapped or ambiguously mapped observed hosts as diagnostics under the
+shared outer-join match contract; do not drop them or assign a default shard as
+proven topology. Use applicable inventory and saved observations to check the
+mapping and host sets, including multiple replicas of one physical shard whose
+virtual labels differ. Missing identity/coverage proof limits the topology claim;
+it does not require another live run when adequate saved evidence exists.
+
 ## Physical Source-Shape Fit
 
 Before designing or validating a ClickHouse mart, DDL/load, or production-like SELECT over heavy sources, identify the actual engine/read path. For external engines and table functions apply the external-source check below; native MergeTree pruning cannot prove remote scan cost. For native sources:
