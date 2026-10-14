@@ -12,6 +12,7 @@ Precondition: apply the shared SQL quality/style chain. For live checks, use the
 
 - [Responsibility split](#responsibility-split)
 - [Metadata and physical shape](#metadata-pass)
+- [Parameter rendering](#parameter-rendering)
 - [Table-function column and JOIN binding](#table-function-column-and-join-binding)
 - [Engine correctness](#engine-correctness)
 - [DDL/load checks, only for that scope](load_readiness.md)
@@ -41,6 +42,30 @@ Before drafting or finalizing non-trivial SQL against real ClickHouse objects:
 4. If metadata is unavailable and the query depends on uncertain columns, engine, keys, or partitions, state the limitation instead of guessing.
 
 Metadata inspection is required because ClickHouse SQL choices depend on table shape, not only on column names.
+
+## Parameter rendering
+
+Before giving a placeholder value or usage example, establish the actual consumer
+and its rendering mode from supplied output, configuration or the API contract;
+placeholder spelling such as `:name` or a parameter-dialog label proves neither.
+
+1. Identify whether the query position expects a String value, an Identifier or
+   another expression. Keep that meaning when moving between consumers.
+2. For raw text substitution, inspect the complete SQL produced by a representative
+   value. A String position needs an escaped single-quoted SQL literal, such as
+   `'example_cluster'`; an unquoted name is an identifier. Do not replace a data
+   string with identifier quoting or ask the user to supply arbitrary SQL.
+3. For a supported driver parameter API, pass the logical data value separately,
+   without adding SQL quote characters to it; follow that driver's marker and
+   rendering contract. Native ClickHouse `{name:String}` and `{name:Identifier}`
+   are typed query parameters, not arbitrary text replacement. Shell/HTTP encoding
+   and SQL literal quoting are separate layers; do not mix parameter modes.
+
+If the consumer mode is unknown, name the missing rendering/binding fact before
+recommending an input form. Reuse a sufficient saved render or driver contract;
+do not require a new live SELECT just to distinguish these modes. Route final
+statement proof and result status to `sql-quality-core`; a corrected literal does
+not prove unrelated columns, joins or the service runtime.
 
 ## Table-function column and JOIN binding
 
