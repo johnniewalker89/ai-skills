@@ -44,8 +44,9 @@ When the task lets you choose a smoke period:
 
 ## Whole-Statement Binding
 
-Apply before a readiness conclusion or SQL pass after changing sources, JOINs or
-SQL rendering, including SQL embedded in another language. Inspect the complete
+Apply before the first dependent draft, application or readiness conclusion for
+an adopted field or changed source, JOIN, projection, CTE or SQL rendering, including
+SQL embedded in another language. Inspect the complete
 statement the caller will send, with representative parameters where relevant;
 include inherited SELECT, ON, WHERE, grouping and ordering expressions. A review
 of the added fragment does not validate the surrounding query.
@@ -57,6 +58,25 @@ reference ambiguous or change which entity a filter addresses. Resolve collision
 from the intended business source; an arbitrary prefix or the first matching
 column is not a semantics-preserving fix. Qualification/layout conventions remain
 with `sql-style-core`; available engine owners interpret target-specific binding.
+
+A name exposed by an API payload, UI label or serializer is not evidence of a
+physical SQL column; it may be derived or renamed. Bind an adopted field to the
+target relation's SQL schema/DDL or an applicable query-output contract. A derived
+SQL expression or projected alias can create a name in its own scope without
+adding that column to the underlying table. Verify its actual inputs and output
+contract instead of copying an API name or guessing a version-specific field.
+
+When changing or shortening a CTE/subquery projection, establish its exported
+columns under the target engine's explicit-column-list and alias rules, then
+follow the affected consumers. Include SELECT, ON, WHERE, grouping, HAVING,
+ordering and recursive arms, even when a helper column is absent from the final
+display. A column present in a physical input is not automatically exported by
+the CTE. Retain required fields until every consumer is deliberately and correctly
+updated. Check declaration order and nested/outer/recursive visibility at each
+reference under the engine's rules; the same name in another block does not
+establish visibility here. A move, hoist or new JOIN must preserve the intended
+grain and filters. If the needed schema or scope evidence is missing, keep that
+binding blocked and name the missing fact rather than inventing an expression.
 
 Use the lightest adequate evidence for the claim: schema-backed static binding,
 an applicable saved plan, or an authorized bounded target-engine check. Bind it
