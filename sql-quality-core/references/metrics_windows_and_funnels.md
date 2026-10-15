@@ -1,14 +1,25 @@
 # Metrics, Windows, And Funnels
 
-Use this reference for multi-row facts, categories, date/window semantics, sequential funnels, child-entity metrics, mutable sources, and optimization-risk classification.
+Use this reference for business criteria/proxies, multi-row facts, categories, date/window semantics, sequential funnels, child-entity metrics, mutable sources, and optimization-risk classification.
 
 ## Navigation
 
+- [Business criteria and proxies](#business-criteria-and-proxies)
 - [Facts and categories](#multi-row-facts-and-categories)
 - [Date windows and filters](#date-windows-and-filters)
 - [Funnels and entity metrics](#sequential-funnels-and-entity-metrics)
 - [Mutable sources](#mutable-sources-and-reprocessing)
 - [Optimization risk](#optimization-risk-classification)
+
+## Business Criteria And Proxies
+
+Before adopting, retaining or defending an activity, eligibility or protection predicate:
+
+- State the accepted business criterion, entity and time scope; distinguish observed behavior, a structural relationship, and an explicitly agreed protection rule.
+- Bind each material criterion to its actual source and SQL predicate. Placement, membership or configuration proves that relationship, not an occurrence or recency of use by itself. Check a plausible case where the relationship exists without the claimed behavior.
+- When protection depends on actual use, trace the qualifying seed and dependency direction: an unused consumer link alone does not make its source used. Keep an explicitly agreed structural exception separate from activity evidence.
+- Carry the latest accepted refinements into affected filters, seeds, propagation, labels and notes. Adjust obsolete branches rather than defending them because they were in an earlier query. A user-approved structural exception may remain without being renamed as observed activity.
+- If the proxy-to-criterion implication is unproven, expose the specific missing evidence/decision or name the narrower measured meaning before claiming correctness. Do not silently replace the requested business criterion with the available proxy.
 
 ## Multi-Row Facts And Categories
 
