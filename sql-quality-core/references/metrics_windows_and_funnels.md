@@ -38,6 +38,36 @@ Treat multi-row facts as facts, not one-row lookups.
 
 Date predicates are metric semantics, not only performance filters.
 
+Before drafting or changing a temporal branch, assign each affected filter and
+output a role: candidate eligibility, qualifying activity/propagation seed, or
+informational history. Bind its source, entity, time field/expression and bounds
+to the accepted contract. Shared input tables do not make those roles share a
+window. In an inactivity report, no qualifying activity inside the selection
+window does not imply no earlier history. Preserve independent all-available-
+history enrichment when requested; NULL then means no history in the available
+source, not necessarily never used. Keep the selection window unchanged.
+
+A candidate-age or last-modified guard belongs to candidate selection, not
+automatically to the usage seed. Moving it upstream can remove an active new
+consumer and wrongly unprotect an older source. Place each guard in its actual
+scope and check repeated WHERE/CTE occurrences when applying a mechanical edit.
+
+After a rename, replacement or accepted time-rule change, inspect the complete
+final predicates themselves. A parameter name, UI label or changed count does
+not prove the new expression is used. If the agreed rule is
+coalesce(updated_at, created_at), verify that expression and its NULL fallback
+at every affected final filter rather than retaining created_at alone.
+Carry the same eligibility and event/account-exclusion rules into full and
+summary variants; aggregation must not keep a superseded candidate population.
+
+Choose distinguishing rows for these roles: no activity in the window with
+older history; no available history; recent activity; an active new consumer
+protecting an older source; and opposing created/updated dates plus NULL updated.
+Compare expected candidate keys and history values across relevant parameter
+modes and full/summary membership, not only totals or SQL substrings. Reuse
+sufficient saved proof; keep synthetic checks, target execution and efficiency
+claims distinct under the existing evidence contract.
+
 For parameterized loads/backfills, inspect the actual supplier of each bound:
 value, type/time zone, inclusive or exclusive meaning, and calendar/batch rule.
 Do not infer exclusivity from a name such as `data_interval_end`. Align selection
