@@ -5,6 +5,7 @@ Use this reference for source choice, lineage explanation, driving grain, joins,
 ## Navigation
 
 - [Source choice](#source-choice-and-lineage), [driving grain](#driving-grain)
+- [Hierarchical membership](#hierarchical-membership)
 - [Reconciliation and backfill](#reconciliation-and-backfill), [joins](#joins-and-match-sanity)
 
 ## Source Choice And Lineage
@@ -53,6 +54,37 @@ Before the final `FROM`, name the business grain: orders, sessions, payments, ev
 - Use a raw/link layer only when the task asks for raw relationships, the mart is unavailable, or the mart loses required fields; preserve or rebuild normalized business semantics explicitly.
 - If the canonical fact for a response, payment, assignment, or other lifecycle entity is unavailable, do not substitute invitation/click/event streams as that entity unless the artifact names the surrogate/cohort semantics and validates the changed meaning.
 - Do not use `HAVING matched_count > 0` to hide wrong driving grain; unmatched rows can remain inside groups that also have matches.
+
+## Hierarchical Membership
+
+Apply before drafting hierarchy-dependent eligibility predicates or display paths.
+Bind node identity, parent relationships and root markers to the source contract;
+keep the relationship graph separate from the eligible set and its presentation.
+
+Establish which ownership, archive and technical-node rules apply to a node alone
+or to its descendants. A child's NULL ownership attribute does not establish that
+it is outside an owned ancestor's subtree. An include-owned option changes only
+that agreed scope; it must not silently admit independently excluded nodes.
+
+Resolve inherited membership on the relevant relationship graph before filtering
+away roots or intermediate nodes. Use recursive closure, authoritative ancestry
+or another proven equivalent representation. Filtering each row's own attribute,
+or traversing only the already filtered graph, can lose the inheritance boundary.
+Distinguish a genuinely missing parent from one excluded by the current scope;
+retain unresolved ancestry or cycle limitations instead of claiming complete scope.
+
+Derive the eligible node IDs before building their paths. A path traversal seeded
+only from physical roots can drop an eligible orphan or a node whose parent is
+outside the visible catalog. Where those nodes are permitted, start a display
+root there without resetting inherited exclusions. Preserve the accepted full
+or visible-scope path meaning; path reachability is not an eligibility rule.
+
+Check exact membership for an owned root, child with NULL local ownership and a
+deeper descendant; an eligible shared orphan; and relevant archive/technical
+boundaries, including nullable type fields. Verify each supported inclusion mode
+and bind list and summary consumers to the same eligible IDs. Compare IDs and
+completeness, not only non-empty output or matching grand totals. Reuse sufficient
+saved source/result proof; live operations and engine execution retain their owners.
 
 ## Reconciliation And Backfill
 

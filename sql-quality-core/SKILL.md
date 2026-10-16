@@ -12,7 +12,7 @@ This skill owns engine-agnostic SQL business semantics and quality gates. `sql-s
 ## Role
 
 - Purpose: provide engine-agnostic SQL quality checks before any engine-specific SQL layer.
-- Owns: source choice, driving grain, join sanity, independent fact aggregate combination, multi-row fact semantics, category-safe metrics, metric/window semantics, proxy timestamp coverage, duration/time-to-stage semantics, sequential funnel logic, mutable-source risk, smoke scale, validation mindset, required efficiency-evidence coverage, SQL-quality blockers, evidence/access boundaries and the combined SQL result status.
+- Owns: source choice, driving grain, inherited hierarchy membership, join sanity, independent fact aggregate combination, multi-row fact semantics, category-safe metrics, metric/window semantics, proxy timestamp coverage, duration/time-to-stage semantics, sequential funnel logic, mutable-source risk, smoke scale, validation mindset, required efficiency-evidence coverage, SQL-quality blockers, evidence/access boundaries and the combined SQL result status.
 - Delegates to: `sql-style-core` for formatting, engine/dbt owners for their target-specific checks, and the available configured access tool or caller-selected operational owner for live operations.
 
 ## Hard Gates
@@ -20,6 +20,8 @@ This skill owns engine-agnostic SQL business semantics and quality gates. `sql-s
 1. **Skill chain gate.** Use this skill with `sql-style-core` and the resolved available engine owner. CH/GP entry points activate this complete SQL chain without workflow or private access dependencies. Add an available dbt owner for dbt-specific behavior; missing tooling bounds that claim.
 2. **Database access gate.** Use the available configured tool under references/evidence_and_access.md and its policy for live proof. A caller-selected operational owner may supply that route. Without live access use supplied/repo evidence and state the limitation; no private skill is mandatory.
 3. **Source/grain gate.** Do not draft, approve, or return non-trivial SQL until source choice, driving grain, central joins, and metric semantics have been considered. Before the first substantive reconciliation/backfill draft or choice of comparison keys, read `references/source_grain_and_joins.md` and establish occurrence identity, separate payload checks, multiplicity and the compared slice. A provisional draft is subject to this prerequisite. Before even a preliminary explanation of a reconciliation delta, read and apply **Causal claims for discrepancies** in `references/evidence_and_access.md`.
+   Before the first hierarchy-dependent predicate or path draft, read and apply
+   **Hierarchical Membership** in `references/source_grain_and_joins.md`; establish inherited scope before filtering nodes or building display paths.
 4. **Independent facts gate.** When two or more fact aggregates are combined, name each fact grain and validate the final join/output grain. Do not approve a shape that can duplicate one fact's measures across another fact's dimensions.
 5. **Date/window gate.** Before assigning a window to a selection, usage seed, history output or final temporal predicate, read and apply **Date Windows And Filters** in `references/metrics_windows_and_funnels.md`, including before a draft. Preserve the distinct roles and check the final predicates and report variants after edits. Do not claim full business-window coverage through a proxy timestamp unless coverage is proven or the claim is downgraded to that proxy/guarded surface.
 6. **Duration gate.** Duration and time-to-stage metrics must subtract from the actual lifecycle start timestamp, not from a truncated reporting bucket, unless the metric is explicitly bucket-relative.
@@ -43,7 +45,7 @@ This skill owns engine-agnostic SQL business semantics and quality gates. `sql-s
 - Read `references/data_artifact_proof.md` for new marts, DDL/load/rebuild and production-like readiness.
 - Read `references/data_artifact_checkpoint.md` when material source/grain/refresh/validation choices need a concrete proposal.
 
-- Read `references/source_grain_and_joins.md` when source choice, lineage, grain, joins, unmatched rows, row multiplication, reconciliation or backfill matter.
+- Read `references/source_grain_and_joins.md` when source choice, lineage, grain, hierarchical membership/paths, joins, unmatched rows, row multiplication, reconciliation or backfill matter.
 - Read `references/metrics_windows_and_funnels.md` for business criteria/proxies, activity/eligibility, categories, dates/windows, lifecycle/funnel steps, child entities, mutable sources, or optimization candidates.
 - Read `references/validation_and_self_review.md` in every SQL task before choosing proof or returning SQL/findings; efficiency evidence is required alongside semantic checks.
 - Read `references/examples.md` when source choice, driving grain, or category-safe metric decisions need a compact example.
@@ -51,6 +53,7 @@ This skill owns engine-agnostic SQL business semantics and quality gates. `sql-s
 ## Final Checklist
 
 - Source/lineage and driving grain supported by repo/live evidence?
+- Hierarchical scope follows the accepted ancestor policy; eligible orphans survive path construction, and list/summary use the same eligible IDs in each supported mode?
 - Central joins have right-key/flag match coverage; independent fact aggregates cannot multiply measures?
 - No fake representative rows; categories include material other/unknown cases?
 - Business windows and proxy coverage honest; duration starts at lifecycle timestamp?
