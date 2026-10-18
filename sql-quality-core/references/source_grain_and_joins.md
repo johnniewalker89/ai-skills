@@ -5,6 +5,7 @@ Use this reference for source choice, lineage explanation, driving grain, joins,
 ## Navigation
 
 - [Source choice](#source-choice-and-lineage), [driving grain](#driving-grain)
+- [Before/after value flow](#beforeafter-value-flow)
 - [Hierarchical membership](#hierarchical-membership)
 - [Reconciliation and backfill](#reconciliation-and-backfill), [joins](#joins-and-match-sanity)
 
@@ -43,6 +44,27 @@ When explaining a table, mart, chain, lineage, source flow, or business logic:
 - separate repo-backed lineage facts from live DB metadata and validation facts.
 
 Include material lineage findings in the final chain summary; do not leave cross-engine mirrors, transfer jobs, or deeper material layers only in notes/logs.
+
+## Before/After Value Flow
+
+Before explaining a metric or value-flow change, map both versions through the
+producer value, consumer publication and downstream calculation using sufficient
+saved or repository evidence. Bind each mapping to its version or time; keep an
+unavailable mapping explicit rather than reconstructing it from a shared name.
+
+For each layer, record the value's meaning and expression and distinguish changed
+from unchanged behavior. Include grain/population, slice selection, units,
+sign handling and NULL/default/fallback rules where they affect that meaning.
+A consumer field name alone does not establish the same quantity across versions.
+
+Describe the changed layer without assigning its change to another layer. An
+unchanged downstream expression can produce a different result from changed input
+values or meaning; it is not a new formula. Trace where a sign or default first
+arises instead of attributing it to a consumer that only passes the value through.
+
+Separate the contract-supported effect from a measured row/result difference.
+For a claim about the actual discrepancy or its history, apply **Causal claims for
+discrepancies** in `evidence_and_access.md`; the mapping alone is not causal proof.
 
 ## Driving Grain
 
