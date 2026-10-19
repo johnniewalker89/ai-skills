@@ -22,7 +22,7 @@ This skill owns engine-agnostic SQL style. `sql-quality-core` owns SQL business 
 2. **Reference gate.** Read `references/style.md` for SQL writing, editing, or review tasks.
 3. **Target-owner gate.** Identify the target engine before SQL writing, editing, review, or optimization and include its available engine owner; add an available matching dbt owner for dbt-specific semantics. For MySQL or PostgreSQL, where no engine-specific skill exists, use the SQL core pair and document that boundary. Do not treat a style pass as a complete SQL review without the applicable owners.
 4. **Style-only gate.** Do not change business semantics from this skill. Route semantic concerns to `sql-quality-core` and engine/dbt concerns to their target owners.
-5. **Self-review gate.** Before returning SQL, run this skill's Final Checklist as a formatting-only self-review after semantic and engine-specific checks are complete.
+5. **Self-review gate.** After the last SQL edit and before returning it, apply **Final Projection Check** in `references/style.md`, then this skill's Final Checklist. Keep this a formatting-only pass after semantic and engine-specific checks.
 
 ## Workflow
 

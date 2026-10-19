@@ -10,6 +10,7 @@ Use this file for common SQL code style and readability. Engine-specific skills 
 - [WITH and CTE readability](#with-and-cte-readability)
 - [JOIN and clause layout](#join-where-having-group-by)
 - [Multiline expressions](#multiline-expressions)
+- [Final projection check](#final-projection-check)
 
 ## General Rules
 
@@ -98,3 +99,26 @@ Preferred multiline join condition:
 Example:
 
 [Example 5](style_examples.md#example-5).
+
+## Final Projection Check
+
+Apply to the final changed SQL after its last edit; an earlier preview or a
+replacement count does not cover the delivered artifact.
+
+1. Inspect each changed `SELECT` separately. Identify its top-level projection
+   items and their output aliases; resolve the agreed alias convention for that
+   block. Preserve output names and quoting. Do not count `AS` inside casts,
+   nested queries or CTE declarations as that block's projection aliases.
+2. Compare the actual line/column positions of those aliases, including the
+   closing line of a multiline `CASE` or function. Choose one readable `AS`
+   column for the block and align to it with whitespace. If that needs excessive
+   padding, expand the long expression first, then recheck its closing-line
+   alias against its peers. Use a small local line/column readback when visual
+   inspection is ambiguous; no new formatter or parser is required.
+3. Read the resulting block again: comma-leading indentation, qualified sources,
+   engine/project identifier quoting and JOIN spelling must still hold. Keep the
+   first `ON` on its JOIN line. Formatting must preserve JOIN kind/strictness,
+   expressions, output identifiers and row semantics; route any intended semantic
+   change back to the quality/engine owners.
+4. If this pass causes another edit, repeat the affected block's check on the
+   resulting text before handoff.
