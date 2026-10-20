@@ -18,26 +18,43 @@ Prefer the verified repo-backed live candidate that fits the requested grain and
 
 ## Business-grain report
 
-When the task is about a concrete business entity, drive the final aggregation from matched rows of that entity. Do not start from a broader source unless unmatched coverage is an explicit metric.
+This example counts orders per observed channel membership. `orders` must have
+one row per non-NULL `order_id`; repeated events for a session/channel are reduced
+to one membership before joining from orders. The intermediate grain is
+`order_id` / `channel`, and the output is order date / channel.
+
+An order observed in several channels contributes once to each. Channel totals
+overlap and must not be summed as a global unique-order total. For exclusive
+attribution, first establish a business-approved unique order-to-channel mapping;
+do not choose an arbitrary channel or hide the ambiguity with `DISTINCT`.
+
+A NULL channel remains a separate unknown membership. Only orders with a matching
+source session are included; unmatched-order coverage needs a separate metric.
 
 ```sql
 WITH
-   matched_orders AS (
-        SELECT
-              orders.order_id      AS order_id
-            , orders.client_id     AS client_id
-            , orders.created_at    AS created_at
-            , source.channel       AS channel
-        FROM source_events source
-        JOIN orders ON source.session_id = orders.session_id
+   session_channels AS (
+    SELECT
+          source_events.session_id AS session_id
+        , source_events.channel    AS channel
+    FROM source_events
+    GROUP BY source_events.session_id
+           , source_events.channel
+), order_channels AS (
+    SELECT
+          orders.order_id                 AS order_id
+        , CAST(orders.created_at AS DATE) AS report_dt
+        , session_channels.channel        AS channel
+    FROM orders
+    JOIN session_channels ON orders.session_id = session_channels.session_id
 )
 SELECT
-      CAST(matched_orders.created_at AS DATE) AS report_dt
-    , matched_orders.channel                  AS channel
-    , count(*)                                AS n_order
-FROM matched_orders
-GROUP BY CAST(matched_orders.created_at AS DATE)
-       , matched_orders.channel
+      order_channels.report_dt AS report_dt
+    , order_channels.channel   AS channel
+    , count(*)                 AS n_order_per_channel
+FROM order_channels
+GROUP BY order_channels.report_dt
+       , order_channels.channel
 ```
 
 ## Category-safe metrics
