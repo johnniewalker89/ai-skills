@@ -30,7 +30,7 @@ For engine-agnostic SQL quality anti-patterns, use `sql-quality-core` first.
 - Writing `md5(a, b)` or another multi-argument hash call that is not valid Greenplum syntax.
 - Building a technical hash key without `coalesce(...)` when any component may be nullable and would null out the whole hash.
 - Writing ClickHouse-style scalar `WITH` declarations such as `current_setting(...) AS report_dt_from` instead of wrapping runtime settings in a one-row params CTE.
-- Using `count(alias.*)`; use `count(*)` or `count(1)`.
+- Using `count(alias.*)` without considering planner fallback, or replacing it unconditionally with `count(*)` / `count(1)`; preserve match/NULL semantics under the [COUNT rewrite contract](optimization.md#count-rewrite-contract).
 - Using row/tuple expressions such as `SELECT (a, b)` in analytic SQL.
 - Using tuple-shaped hash text such as `md5_hash((a, b, c)::text)` in heavy analytic SQL, especially in projection/join/hash paths. This shape has repeatedly forced the legacy optimizer in local proof cases. Prefer a GPORCA-friendly explicit text shape only after saving before/after `EXPLAIN` anchors and proving the resulting hash contract is identical; surface `Бизнес-семантика:` when null/delimiter/text-format behavior is not proven.
 - Using `SELECT DISTINCT ON (...)` in heavy analytic SQL without checking the actual plan; prefer `row_number() OVER (...)` plus a deterministic filter when semantics and tie-breaks match.

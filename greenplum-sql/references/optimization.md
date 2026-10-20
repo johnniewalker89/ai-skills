@@ -4,6 +4,13 @@ For every SQL task, read the diagnostic/plan sections applicable to its efficien
 evidence. Distribution, statistics and physical-design details follow actual scope;
 reuse sufficient current proof rather than repeating unchanged diagnostics.
 
+## Navigation
+
+- [Diagnostic workflow](#diagnostic-workflow)
+- [Planner patterns](#gporca-vs-legacy-planner) and [COUNT rewrites](#count-rewrite-contract)
+- [MPP choices](#core-optimization-mindset) and [distribution/skew](#distribution-skew-and-repeated-heavy-work)
+- [Statistics](#statistics-and-maintenance) and [rewrite verification](#what-to-verify-after-optimization)
+
 ## Diagnostic workflow
 
 - Do not rewrite a query blindly. Start from the actual plan.
@@ -31,7 +38,7 @@ Hard fallback patterns verified on the local Greenplum 6.25 contour:
 
 - row/tuple expressions, for example `SELECT (1, 2)`;
 - tuple-shaped technical hashes or row expressions inside heavy projection/join/hash paths, such as `md5_hash((uuid, segment_id, key_id)::text)`. Local proof exists on multiple objects: tuple-text hash returned `Optimizer: Postgres query optimizer`, while an explicit `concat(...)` text shape returned GPORCA. Treat any rewrite as semantics-sensitive because delimiters, nulls, numeric/text formatting, and old row-text output must match;
-- `count(alias.*)`; use `count(*)` or `count(1)` instead;
+- `count(alias.*)`; choose a replacement under the [COUNT rewrite contract](#count-rewrite-contract) before comparing planners;
 - ordered-set percentiles such as `percentile_disc(...) WITHIN GROUP (...)` and `percentile_cont(...) WITHIN GROUP (...)`;
 - `LATERAL` joins; prefer a normal join shape with explicit inequality/key conditions when it preserves semantics.
 
@@ -43,6 +50,24 @@ Soft warning patterns:
 - missing or stale statistics can make plans poor even when GPORCA is used. Treat stale stats as a first hypothesis for bad estimates; check `ANALYZE` needs through allowed metadata/system views when available.
 
 For tuple-hash rewrites, do not stop at "concat returns GPORCA". Save compact before/after `EXPLAIN` anchors and require an equality check on representative rows before calling the rewrite safe for production.
+
+### COUNT rewrite contract
+
+`count(*)` and `count(1)` count joined output rows. Use them only when that is the
+original metric and equivalence is established; planner preference cannot change
+what is counted or its multiplicity.
+
+For right-side match counts in an outer join, use `count(rhs.non_null_key)` only
+if the key is non-NULL for every matched row. Otherwise project a non-NULL marker
+inside the right input before the join and count `rhs.match_flag`. A nullable
+business column counts non-NULL values, not match presence; a row NULL predicate
+is not a proven substitute for that marker.
+
+A LEFT JOIN with two left rows and one right match has two output rows but one
+match: `count(*)` gives 2, while counting a guaranteed non-NULL right key gives 1.
+Validate the intended count on unmatched, fully matched and nullable matched-row
+controls before checking the rewritten plan. If an equivalent compatible rewrite
+is not proven, retain and explain the original planner tradeoff.
 
 ## Core optimization mindset
 
