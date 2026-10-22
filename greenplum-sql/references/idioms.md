@@ -30,9 +30,9 @@ Preferred params pattern:
 ```sql
 WITH
    params AS (
-        SELECT
-              current_setting('etl.dt_from')::DATE AS report_dt_from
-            , current_setting('etl.dt_to')::DATE   AS report_dt_to
+    SELECT
+          current_setting('etl.dt_from')::DATE AS report_dt_from
+        , current_setting('etl.dt_to')::DATE   AS report_dt_to
 )
 SELECT
       source.dt               AS dt
@@ -49,9 +49,9 @@ Minimal reusable pattern:
 ```sql
 WITH
    params AS (
-        SELECT
-              current_setting('etl.dt_from')::DATE AS report_dt_from
-            , current_setting('etl.dt_to')::DATE   AS report_dt_to
+    SELECT
+          current_setting('etl.dt_from')::DATE AS report_dt_from
+        , current_setting('etl.dt_to')::DATE   AS report_dt_to
 )
 SELECT
       params.report_dt_from AS report_dt_from
@@ -64,29 +64,29 @@ Preferred mixed pattern:
 ```sql
 WITH
    params AS (
-        SELECT
-              current_setting('etl.dt_from')::DATE AS report_dt_from
-            , current_setting('etl.dt_to')::DATE   AS report_dt_to
+    SELECT
+          current_setting('etl.dt_from')::DATE AS report_dt_from
+        , current_setting('etl.dt_to')::DATE   AS report_dt_to
 ), orders AS (
-        SELECT
-              source.order_id     AS order_id
-            , source.client_id    AS client_id
-            , source.dt           AS dt
-        FROM some_orders source
-        CROSS JOIN params
-        WHERE 1 = 1
-          AND source.dt >= params.report_dt_from
-          AND source.dt <  params.report_dt_to
+    SELECT
+          source.order_id     AS order_id
+        , source.client_id    AS client_id
+        , source.dt           AS dt
+    FROM some_orders source
+    CROSS JOIN params
+    WHERE 1 = 1
+      AND source.dt >= params.report_dt_from
+      AND source.dt <  params.report_dt_to
 ), revenue AS (
-        SELECT
-              source.order_id     AS order_id
-            , sum(source.amount)  AS revenue
-        FROM some_payments source
-        CROSS JOIN params
-        WHERE 1 = 1
-          AND source.dt >= params.report_dt_from
-          AND source.dt <  params.report_dt_to
-        GROUP BY source.order_id
+    SELECT
+          source.order_id     AS order_id
+        , sum(source.amount)  AS revenue
+    FROM some_payments source
+    CROSS JOIN params
+    WHERE 1 = 1
+      AND source.dt >= params.report_dt_from
+      AND source.dt <  params.report_dt_to
+    GROUP BY source.order_id
 )
 SELECT
       orders.client_id            AS client_id

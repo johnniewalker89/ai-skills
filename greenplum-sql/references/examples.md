@@ -31,16 +31,16 @@ GROUP BY source.dt
 ```sql
 WITH
    orders AS (
-        SELECT
-              source.order_id     AS order_id
-            , source.client_id    AS client_id
-        FROM some_orders source
+    SELECT
+          source.order_id     AS order_id
+        , source.client_id    AS client_id
+    FROM some_orders source
 ), revenue AS (
-        SELECT
-              source.order_id     AS order_id
-            , sum(source.amount)  AS revenue
-        FROM some_payments source
-        GROUP BY source.order_id
+    SELECT
+          source.order_id     AS order_id
+        , sum(source.amount)  AS revenue
+    FROM some_payments source
+    GROUP BY source.order_id
 )
 SELECT
       orders.client_id            AS client_id
@@ -55,29 +55,29 @@ GROUP BY orders.client_id
 ```sql
 WITH
    params AS (
-        SELECT
-              current_setting('etl.dt_from')::DATE AS report_dt_from
-            , current_setting('etl.dt_to')::DATE   AS report_dt_to
+    SELECT
+          current_setting('etl.dt_from')::DATE AS report_dt_from
+        , current_setting('etl.dt_to')::DATE   AS report_dt_to
 ), orders AS (
-        SELECT
-              source.order_id     AS order_id
-            , source.client_id    AS client_id
-            , source.dt           AS dt
-        FROM some_orders source
-        CROSS JOIN params
-        WHERE 1 = 1
-          AND source.dt >= params.report_dt_from
-          AND source.dt <  params.report_dt_to
+    SELECT
+          source.order_id     AS order_id
+        , source.client_id    AS client_id
+        , source.dt           AS dt
+    FROM some_orders source
+    CROSS JOIN params
+    WHERE 1 = 1
+      AND source.dt >= params.report_dt_from
+      AND source.dt <  params.report_dt_to
 ), revenue AS (
-        SELECT
-              source.order_id     AS order_id
-            , sum(source.amount)  AS revenue
-        FROM some_payments source
-        CROSS JOIN params
-        WHERE 1 = 1
-          AND source.dt >= params.report_dt_from
-          AND source.dt <  params.report_dt_to
-        GROUP BY source.order_id
+    SELECT
+          source.order_id     AS order_id
+        , sum(source.amount)  AS revenue
+    FROM some_payments source
+    CROSS JOIN params
+    WHERE 1 = 1
+      AND source.dt >= params.report_dt_from
+      AND source.dt <  params.report_dt_to
+    GROUP BY source.order_id
 )
 SELECT
       orders.client_id            AS client_id
@@ -143,29 +143,29 @@ When a narrow driving set exists, restrict heavy enrichment tables by relevant k
 ```sql
 WITH
    relevant_orders AS (
-        SELECT
-              orders.order_id AS order_id
-        FROM orders
-        GROUP BY orders.order_id
+    SELECT
+          orders.order_id AS order_id
+    FROM orders
+    GROUP BY orders.order_id
 ), pricing_ranked AS (
-        SELECT
-              source.order_id           AS order_id
-            , source.pricing_ts         AS pricing_ts
-            , source.price              AS price
-            , row_number() OVER (
-                  PARTITION BY source.order_id
-                  ORDER BY source.pricing_ts DESC
-                         , source.pricing_id DESC
-              )                         AS rn
-        FROM order_pricing source
-        JOIN relevant_orders ON source.order_id = relevant_orders.order_id
+    SELECT
+          source.order_id           AS order_id
+        , source.pricing_ts         AS pricing_ts
+        , source.price              AS price
+        , row_number() OVER (
+              PARTITION BY source.order_id
+              ORDER BY source.pricing_ts DESC
+                     , source.pricing_id DESC
+          )                         AS rn
+    FROM order_pricing source
+    JOIN relevant_orders ON source.order_id = relevant_orders.order_id
 ), pricing AS (
-        SELECT
-              pricing_ranked.order_id   AS order_id
-            , pricing_ranked.pricing_ts AS last_pricing_ts
-            , pricing_ranked.price      AS price
-        FROM pricing_ranked
-        WHERE pricing_ranked.rn = 1
+    SELECT
+          pricing_ranked.order_id   AS order_id
+        , pricing_ranked.pricing_ts AS last_pricing_ts
+        , pricing_ranked.price      AS price
+    FROM pricing_ranked
+    WHERE pricing_ranked.rn = 1
 )
 SELECT
       orders.order_id AS order_id
@@ -268,9 +268,9 @@ FROM some_table source
 ```sql
 WITH
    params AS (
-        SELECT
-              current_setting('etl.dt_from')::DATE AS report_dt_from
-            , current_setting('etl.dt_to')::DATE   AS report_dt_to
+    SELECT
+          current_setting('etl.dt_from')::DATE AS report_dt_from
+        , current_setting('etl.dt_to')::DATE   AS report_dt_to
 )
 SELECT
       params.report_dt_from AS report_dt_from
@@ -283,9 +283,9 @@ FROM params
 ```sql
 WITH
    params AS (
-        SELECT
-              current_setting('etl.dt_from')::DATE AS report_dt_from
-            , current_setting('etl.dt_to')::DATE   AS report_dt_to
+    SELECT
+          current_setting('etl.dt_from')::DATE AS report_dt_from
+        , current_setting('etl.dt_to')::DATE   AS report_dt_to
 )
 SELECT
       source.dt         AS dt
