@@ -31,16 +31,16 @@ GROUP BY source.dt
 ```sql
 WITH
    orders AS (
-        SELECT
-              source.order_id     AS order_id
-            , source.client_id    AS client_id
-        FROM some_orders source
+    SELECT
+          source.order_id     AS order_id
+        , source.client_id    AS client_id
+    FROM some_orders source
 ), revenue AS (
-        SELECT
-              source.order_id     AS order_id
-            , sum(source.amount)  AS revenue
-        FROM some_payments source
-        GROUP BY source.order_id
+    SELECT
+          source.order_id     AS order_id
+        , sum(source.amount)  AS revenue
+    FROM some_payments source
+    GROUP BY source.order_id
 )
 SELECT
       orders.client_id            AS client_id
@@ -57,23 +57,23 @@ WITH
    toDate(getSetting('custom_dt_from')) AS report_dt_from
  , toDate(getSetting('custom_dt_to'))   AS report_dt_to
  , orders AS (
-        SELECT
-              source.order_id     AS order_id
-            , source.client_id    AS client_id
-            , source.dt           AS dt
-        FROM some_orders source
-        WHERE 1 = 1
-          AND source.dt >= report_dt_from
-          AND source.dt <  report_dt_to
+    SELECT
+          source.order_id     AS order_id
+        , source.client_id    AS client_id
+        , source.dt           AS dt
+    FROM some_orders source
+    WHERE 1 = 1
+      AND source.dt >= report_dt_from
+      AND source.dt <  report_dt_to
 ), revenue AS (
-        SELECT
-              source.order_id     AS order_id
-            , sum(source.amount)  AS revenue
-        FROM some_payments source
-        WHERE 1 = 1
-          AND source.dt >= report_dt_from
-          AND source.dt <  report_dt_to
-        GROUP BY source.order_id
+    SELECT
+          source.order_id     AS order_id
+        , sum(source.amount)  AS revenue
+    FROM some_payments source
+    WHERE 1 = 1
+      AND source.dt >= report_dt_from
+      AND source.dt <  report_dt_to
+    GROUP BY source.order_id
 )
 SELECT
       orders.client_id            AS client_id
@@ -160,26 +160,26 @@ Before this shape, check duplicate rows in `pricing_raw` by `(order_id, order_pr
 ```sql
 WITH
    relevant_orders AS (
-        SELECT
-              orders.order_id AS order_id
-        FROM orders
-        GROUP BY orders.order_id
+    SELECT
+          orders.order_id AS order_id
+    FROM orders
+    GROUP BY orders.order_id
 ), pricing AS (
-        SELECT
-              source.order_id                                      AS order_id
-            , source.order_pricer_ts                               AS order_pricer_ts
-            , argMax(source.order_pricing_value,
-                     source.order_pricing_id)                      AS order_pricing_value
-            , argMax(source.wprice, source.order_pricing_id)        AS wprice
-        FROM pricing_raw source
-        LEFT SEMI JOIN relevant_orders USING (order_id)
-        WHERE 1 = 1
-          AND source.order_pricer_ts >= toDateTime('2026-01-01 00:00:00')
-          AND source.order_pricer_ts <  toDateTime('2026-02-01 00:00:00')
-        GROUP BY source.order_id
-               , source.order_pricer_ts
-        ORDER BY source.order_id
-               , source.order_pricer_ts
+    SELECT
+          source.order_id                                      AS order_id
+        , source.order_pricer_ts                               AS order_pricer_ts
+        , argMax(source.order_pricing_value,
+                 source.order_pricing_id)                      AS order_pricing_value
+        , argMax(source.wprice, source.order_pricing_id)       AS wprice
+    FROM pricing_raw source
+    LEFT SEMI JOIN relevant_orders USING (order_id)
+    WHERE 1 = 1
+      AND source.order_pricer_ts >= toDateTime('2026-01-01 00:00:00')
+      AND source.order_pricer_ts <  toDateTime('2026-02-01 00:00:00')
+    GROUP BY source.order_id
+           , source.order_pricer_ts
+    ORDER BY source.order_id
+           , source.order_pricer_ts
 )
 SELECT
       orders.order_id             AS order_id

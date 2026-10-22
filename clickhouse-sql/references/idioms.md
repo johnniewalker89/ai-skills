@@ -53,23 +53,23 @@ WITH
    toDate(getSetting('custom_dt_from')) AS report_dt_from
  , toDate(getSetting('custom_dt_to'))   AS report_dt_to
  , orders AS (
-        SELECT
-              source.order_id     AS order_id
-            , source.client_id    AS client_id
-            , source.dt           AS dt
-        FROM some_orders source
-        WHERE 1 = 1
-          AND source.dt >= report_dt_from
-          AND source.dt <  report_dt_to
+    SELECT
+          source.order_id     AS order_id
+        , source.client_id    AS client_id
+        , source.dt           AS dt
+    FROM some_orders source
+    WHERE 1 = 1
+      AND source.dt >= report_dt_from
+      AND source.dt <  report_dt_to
 ), revenue AS (
-        SELECT
-              source.order_id     AS order_id
-            , sum(source.amount)  AS revenue
-        FROM some_payments source
-        WHERE 1 = 1
-          AND source.dt >= report_dt_from
-          AND source.dt <  report_dt_to
-        GROUP BY source.order_id
+    SELECT
+          source.order_id     AS order_id
+        , sum(source.amount)  AS revenue
+    FROM some_payments source
+    WHERE 1 = 1
+      AND source.dt >= report_dt_from
+      AND source.dt <  report_dt_to
+    GROUP BY source.order_id
 )
 SELECT
       orders.client_id            AS client_id
