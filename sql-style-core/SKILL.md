@@ -40,6 +40,6 @@ This skill owns engine-agnostic SQL style. `sql-quality-core` owns SQL business 
 
 - Required SQL companions and every available target engine/dbt owner present?
 - Agreed alias consistency applied per SELECT without changing output names; qualified multi-table columns, readable AS alignment and comma-leading layout?
-- Expression expansion and named CTEs improve readability; no unnecessary CTE re-aliasing?
+- Expression expansion and named CTEs improve readability; short Russian comments explain touched extracted blocks and match final SQL; no unnecessary CTE re-aliasing?
 - First ON shares its JOIN line, later conditions use AND lines?
 - Formatting-only pass preserved meaning after semantic/engine checks?

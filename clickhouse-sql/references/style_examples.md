@@ -63,6 +63,7 @@ WITH
    toDate(getSetting('custom_dt_from')) AS report_dt_from
  , toDate(getSetting('custom_dt_to'))   AS report_dt_to
  , orders AS (
+    -- Отбираем заказы отчётного периода для расчёта выручки по клиентам.
     SELECT
           source.order_id   AS order_id
         , source.client_id  AS client_id
@@ -72,6 +73,7 @@ WITH
       AND source.dt >= report_dt_from
       AND source.dt <  report_dt_to
 ), revenue AS (
+    -- Суммируем платежи периода по заказам перед соединением с выбранными заказами.
     SELECT
           source.order_id     AS order_id
         , sum(source.amount)  AS revenue

@@ -61,6 +61,27 @@ Preferred pattern:
 - Table aliases in `FROM` / `JOIN` should be written without `AS`.
 - Prefer short meaningful table aliases from project patterns.
 
+### Comments For Extracted Logic
+
+- Give every new or changed CTE or other extracted logical block (such as a
+  derived table, named calculation or view definition) a short comment in plain
+  Russian. Explain what it selects or calculates and the purpose of that step.
+  Mention grain, units or an unusual filter only when needed to understand it;
+  derive the explanation from the agreed semantics, never invent a business rule.
+- Usually one simple sentence is enough. Describe the meaning, not each SQL
+  operator or the block's name again. Reuse an existing adequate comment; do not
+  add a second description just to satisfy the checklist. A small group of related
+  scalar parameters may share one explanation.
+- Keep the comment next to its block. For a subquery CTE, place a `--` comment
+  inside the opening parenthesis before its query, preserving the `), next_cte AS (`
+  chain. For scalar calculations or an object definition, place it immediately
+  above the relevant declaration without breaking engine-specific syntax.
+- After changing a block, compare its comment with the final SQL and consumers:
+  repair stale descriptions even if its name and output columns did not change.
+  Comments cannot substitute for the SQL-quality checks. Do not create extra CTEs,
+  change logic or add database `COMMENT` operations solely for this rule; preserve
+  untouched blocks during a narrow edit.
+
 Preferred subquery CTE pattern:
 
 [Example 2](style_examples.md#example-2).

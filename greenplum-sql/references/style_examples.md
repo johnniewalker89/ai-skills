@@ -25,6 +25,7 @@ FROM some_table source
 ```sql
 WITH
    params AS (
+    -- Читаем границы отчётного периода из настроек сессии в одну строку.
     SELECT
           current_setting('etl.dt_from')::DATE AS report_dt_from
         , current_setting('etl.dt_to')::DATE   AS report_dt_to

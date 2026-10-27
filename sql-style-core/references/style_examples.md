@@ -26,11 +26,13 @@ GROUP BY source.dt
 ```sql
 WITH
    orders AS (
+    -- Берём заказы и их клиентов для расчёта выручки по клиентам.
     SELECT
           source.order_id   AS order_id
         , source.client_id  AS client_id
     FROM some_orders source
 ), revenue AS (
+    -- Суммируем платежи до одной строки на заказ для соединения с заказами.
     SELECT
           source.order_id     AS order_id
         , sum(source.amount)  AS revenue
