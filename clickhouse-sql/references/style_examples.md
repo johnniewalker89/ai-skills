@@ -122,7 +122,7 @@ SELECT
         , ifNull(source.paid_amount, 0.) >= source.order_amount
         , 'full_payment'
         , 'other'
-      )                                  AS payment_bucket
+      )                                           AS payment_bucket
     , cityHash64(source.order_id, payment_bucket) AS row_id
 FROM some_table source
 ```
