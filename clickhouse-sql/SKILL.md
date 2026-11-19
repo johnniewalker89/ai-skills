@@ -39,7 +39,7 @@ Use this skill for ClickHouse SQL work in repositories that follow our database 
 
 - Read `references/native_shape_recipes.md` only when a concrete code example is useful; all required pattern checks are in the mandatory `references/native_shape.md`.
 
-- Read `references/load_readiness.md` before DDL/load/rebuild/staging or partition-replacement design, review or handoff.
+- Read `references/load_readiness.md` before DDL/load/rebuild/staging or partition-replacement design, review or handoff, including a proposal to resume a partially written INSERT.
 
 - Read `references/style_examples.md` only when a concrete formatting example is needed; choose the matching example, not the whole collection.
 

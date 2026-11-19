@@ -15,6 +15,22 @@ For any build that writes a temp/staging table and swaps data with `REPLACE PART
 - record the decision in the validation notes when designing a new mart or changing a partitioned load.
 
 
+## Resuming a partially written INSERT
+
+Before proposing another non-idempotent INSERT after a failure or uncertain
+outcome, establish that the original writer has stopped. Read the persisted
+target within the original source window and account for any pre-existing rows.
+ClickHouse query-log write counters describe execution progress. A maximum
+timestamp can lie beyond holes or within a partly written group of equal keys.
+
+Reconcile the source and target at a grain that preserves legitimate duplicates.
+Verify completeness of any ranges you skip, including their boundaries. Use key
+exclusion only where identity and multiplicity justify it. Check that the proposed
+remainder and the persisted baseline together reproduce the intended source
+population and content. Recheck a changing baseline before dispatch and verify
+the final target after the authorized write. If the exact remainder is unknown,
+retain the partial result and resolve that gap before proposing a retry.
+
 ## DDL/load syntax self-review
 
 Before returning ClickHouse DDL or load files:
